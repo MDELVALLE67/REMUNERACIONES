@@ -1,0 +1,2373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SistemRem Chile 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ─────────────────────────────────────────────────── */
+:root{
+  --ink:  #0f1623;
+  --ink2: #3d4a6b;
+  --ink3: #7c88a8;
+  --ink4: #b0bacf;
+  --surf: #ffffff;
+  --surf2:#f4f6fb;
+  --surf3:#ebeff7;
+  --brd:  #dde2ef;
+  --brd2: #c8d0e6;
+
+  --blue: #1d4ed8;
+  --blue-lt:#eff4ff;
+  --blue-dk:#1338a8;
+  --teal: #0891b2;
+  --grn:  #059669;
+  --grn-lt:#ecfdf5;
+  --red:  #dc2626;
+  --red-lt:#fff1f1;
+  --amb:  #b45309;
+  --amb-lt:#fffbeb;
+
+  --r:   10px;
+  --r-lg:14px;
+  --sh0: 0 1px 2px rgba(15,22,35,.05);
+  --sh1: 0 2px 8px rgba(15,22,35,.07), 0 1px 2px rgba(15,22,35,.04);
+  --sh2: 0 6px 20px rgba(15,22,35,.09), 0 2px 6px rgba(15,22,35,.05);
+  --sh3: 0 16px 48px rgba(15,22,35,.13), 0 4px 12px rgba(15,22,35,.06);
+  --mono: "JetBrains Mono", monospace;
+}
+
+/* ── RESET ───────────────────────────────────────────────────── */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:"Outfit",sans-serif;
+  background:var(--surf2);
+  color:var(--ink);
+  min-height:100vh;
+  font-size:13px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── SCROLLBAR ───────────────────────────────────────────────── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--surf2)}
+::-webkit-scrollbar-thumb{background:var(--brd2);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink4)}
+
+/* ── LOGIN ───────────────────────────────────────────────────── */
+#LS{
+  position:fixed;inset:0;z-index:1000;
+  display:flex;align-items:center;justify-content:center;
+  background: #f0f4ff;
+  background-image:
+    radial-gradient(ellipse 80% 60% at 15% 35%, #c7d7fc88 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 70%, #a5f3eb55 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 10%, #dbeafe44 0%, transparent 50%);
+}
+.l-wrap{
+  display:flex;flex-direction:column;align-items:center;gap:0;
+  width:400px;max-width:94vw;
+}
+.l-header{
+  text-align:center;margin-bottom:24px;
+}
+.l-logo-ring{
+  width:56px;height:56px;border-radius:15px;
+  background:linear-gradient(135deg,var(--blue) 0%,var(--teal) 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;margin:0 auto 14px;
+  box-shadow:0 8px 24px rgba(29,78,216,.3);
+}
+.l-header h1{
+  font-size:24px;font-weight:800;letter-spacing:-.6px;color:var(--ink);
+}
+.l-header h1 span{color:var(--blue)}
+.l-header p{font-size:11px;color:var(--ink3);margin-top:4px;letter-spacing:.1px}
+
+.lbox{
+  background:#fff;
+  border:1.5px solid var(--brd);
+  border-radius:var(--r-lg);
+  padding:32px 36px;
+  width:100%;
+  box-shadow:var(--sh3);
+}
+.lbox-title{
+  font-size:13px;font-weight:600;color:var(--ink2);
+  margin-bottom:20px;display:flex;align-items:center;gap:8px;
+}
+.lbox-title::before{
+  content:"";width:3px;height:14px;border-radius:2px;
+  background:linear-gradient(to bottom, var(--blue), var(--teal));
+  flex-shrink:0;
+}
+.lerr{
+  color:var(--red);font-size:11px;text-align:center;
+  margin-top:10px;display:none;
+  background:var(--red-lt);padding:8px 12px;border-radius:7px;
+  border:1px solid #fca5a5;font-weight:500;
+}
+
+/* ── FORM FIELDS ─────────────────────────────────────────────── */
+.fg{margin-bottom:13px}
+.fg label{
+  display:block;font-size:10px;font-weight:700;
+  color:var(--ink3);margin-bottom:5px;
+  letter-spacing:.9px;text-transform:uppercase;
+}
+.fg input,.fg select,.fg textarea{
+  width:100%;background:var(--surf2);
+  border:1.5px solid var(--brd);border-radius:8px;
+  padding:9px 13px;color:var(--ink);
+  font-family:"Outfit",sans-serif;font-size:13px;
+  transition:border-color .15s,box-shadow .15s,background .15s;
+}
+.fg input:hover,.fg select:hover{border-color:var(--brd2)}
+.fg input:focus,.fg select:focus,.fg textarea:focus{
+  outline:none;border-color:var(--blue);background:#fff;
+  box-shadow:0 0 0 3px rgba(29,78,216,.1);
+}
+.fg textarea{resize:vertical;min-height:72px}
+
+/* ── BUTTONS ─────────────────────────────────────────────────── */
+.btn{
+  background:var(--blue);color:#fff;border:none;
+  border-radius:8px;padding:9px 16px;
+  font-family:"Outfit",sans-serif;font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .15s;
+  display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+  letter-spacing:.1px;
+}
+.btn:hover{background:var(--blue-dk);transform:translateY(-1px);box-shadow:0 4px 14px rgba(29,78,216,.28)}
+.btn:active{transform:translateY(0);box-shadow:none}
+.btn.full{width:100%;justify-content:center;padding:11px;font-size:13px}
+.btn.sec{
+  background:#fff;border:1.5px solid var(--brd);
+  color:var(--ink2);box-shadow:var(--sh0);
+}
+.btn.sec:hover{border-color:var(--blue);color:var(--blue);background:#fff;box-shadow:var(--sh1);transform:translateY(-1px)}
+.btn.rd{background:var(--red)}
+.btn.rd:hover{background:#b91c1c;box-shadow:0 4px 14px rgba(220,38,38,.25)}
+.btn.gn{background:var(--grn)}
+.btn.gn:hover{background:#047857;box-shadow:0 4px 14px rgba(5,150,105,.25)}
+.btn.amb{background:var(--amb);color:#fff}
+.btn.sm{padding:6px 12px;font-size:11px;border-radius:7px}
+.btn.xs{padding:4px 8px;font-size:10px;border-radius:5px}
+
+/* ── APP SHELL ───────────────────────────────────────────────── */
+#APP{display:none;min-height:100vh}
+
+/* ── TOPBAR ──────────────────────────────────────────────────── */
+.topbar{
+  background:#fff;
+  border-bottom:1.5px solid var(--brd);
+  padding:0 22px;height:54px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:200;gap:14px;
+  box-shadow:var(--sh1);
+}
+.tlogo{
+  font-size:16px;font-weight:800;letter-spacing:-.5px;
+  white-space:nowrap;display:flex;align-items:center;gap:10px;
+}
+.tlogo-icon{
+  width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,var(--blue) 0%,var(--teal) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+  flex-shrink:0;
+}
+.tlogo em{font-style:normal;color:var(--blue)}
+.tlogo-ver{font-size:10px;font-weight:500;color:var(--ink4);margin-left:2px}
+
+.esel select{
+  background:var(--surf2);border:1.5px solid var(--brd);
+  border-radius:8px;padding:5px 11px;
+  color:var(--ink);font-size:12px;font-family:"Outfit",sans-serif;
+  max-width:240px;font-weight:500;
+  transition:border-color .15s;
+}
+.esel select:focus{outline:none;border-color:var(--blue)}
+
+/* ── PERIOD SELECTOR ─────────────────────────────────────────── */
+.persel{
+  display:flex;align-items:center;
+  background:var(--blue-lt);border:1.5px solid #c3d3fa;
+  border-radius:9px;padding:3px 4px;flex-shrink:0;gap:2px;
+}
+.persel button{
+  background:none;border:none;color:var(--blue);cursor:pointer;
+  font-size:16px;font-weight:700;padding:3px 9px;
+  border-radius:6px;line-height:1;transition:all .12s;
+}
+.persel button:hover{background:rgba(29,78,216,.12)}
+.persel .plbl{
+  font-family:var(--mono);font-size:11px;font-weight:600;
+  color:var(--blue-dk);min-width:122px;text-align:center;
+  padding:3px 6px;
+}
+
+/* ── USER BADGE ──────────────────────────────────────────────── */
+.ubadge{
+  background:var(--surf2);border:1.5px solid var(--brd);
+  border-radius:20px;padding:4px 13px;
+  font-size:11px;color:var(--ink2);white-space:nowrap;font-weight:500;
+}
+
+/* ── SIDEBAR ─────────────────────────────────────────────────── */
+.sb{
+  width:212px;background:#fff;
+  border-right:1.5px solid var(--brd);
+  height:calc(100vh - 54px);position:fixed;
+  top:54px;left:0;overflow-y:auto;
+  padding:10px 8px 20px;
+}
+.stit{
+  font-size:9px;color:var(--ink4);text-transform:uppercase;
+  letter-spacing:1.3px;padding:0 10px;margin:14px 0 4px;font-weight:700;
+}
+.nav{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 11px;border-radius:8px;
+  cursor:pointer;font-size:12px;font-weight:500;
+  color:var(--ink3);transition:all .12s;margin-bottom:1px;
+}
+.nav:hover{background:var(--surf3);color:var(--ink)}
+.nav.on{
+  background:var(--blue-lt);color:var(--blue);
+  font-weight:600;
+  box-shadow:inset 3px 0 0 var(--blue);
+}
+.nav .ic{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+
+/* ── MAIN CONTENT ────────────────────────────────────────────── */
+.mc{margin-left:212px;padding:22px 24px;min-height:calc(100vh - 54px)}
+.panel{display:none}
+.panel.on{display:block;animation:fadeSlide .18s ease}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── PAGE HEADER ─────────────────────────────────────────────── */
+.phr{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  flex-wrap:wrap;gap:10px;margin-bottom:22px;
+}
+.phr-left h2{
+  font-size:21px;font-weight:800;letter-spacing:-.6px;color:var(--ink);
+}
+.phr-left p{color:var(--ink3);font-size:12px;margin-top:3px}
+.phr-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:flex-start}
+
+/* ── STAT CARDS ──────────────────────────────────────────────── */
+.sg{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(172px,1fr));
+  gap:14px;margin-bottom:22px;
+}
+.sc{
+  background:#fff;border:1.5px solid var(--brd);
+  border-radius:var(--r-lg);padding:18px 20px;
+  position:relative;overflow:hidden;
+  transition:box-shadow .15s,transform .15s;
+  cursor:default;
+}
+.sc:hover{box-shadow:var(--sh2);transform:translateY(-2px)}
+.sc::after{
+  content:"";position:absolute;
+  top:0;left:0;right:0;height:3px;
+}
+.sc.b::after{background:linear-gradient(90deg,var(--blue),var(--teal))}
+.sc.g::after{background:linear-gradient(90deg,var(--grn),#34d399)}
+.sc.y::after{background:linear-gradient(90deg,var(--amb),#fbbf24)}
+.sc.r::after{background:linear-gradient(90deg,var(--red),#f87171)}
+.sc.c::after{background:linear-gradient(90deg,var(--teal),#22d3ee)}
+.sc .lbl{
+  font-size:9.5px;font-weight:700;color:var(--ink3);
+  text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;
+}
+.sc .val{
+  font-size:24px;font-weight:800;font-family:var(--mono);
+  letter-spacing:-.8px;color:var(--ink);line-height:1.1;
+}
+.sc .sub{font-size:10px;color:var(--ink4);margin-top:4px;font-weight:500}
+
+/* ── TABLE WRAPPER ───────────────────────────────────────────── */
+.tw{
+  background:#fff;border:1.5px solid var(--brd);
+  border-radius:var(--r-lg);overflow:hidden;
+  box-shadow:var(--sh0);
+}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--surf2)}
+th{
+  padding:10px 14px;text-align:left;
+  font-size:10px;font-weight:700;color:var(--ink3);
+  text-transform:uppercase;letter-spacing:.8px;
+  border-bottom:1.5px solid var(--brd);white-space:nowrap;
+}
+td{
+  padding:11px 14px;font-size:12px;font-weight:400;
+  border-bottom:1px solid var(--surf3);vertical-align:middle;
+  color:var(--ink);
+}
+tr:last-child td{border-bottom:none}
+tbody tr{transition:background .1s}
+tbody tr:hover td{background:#f7f9ff}
+
+/* ── BADGES ──────────────────────────────────────────────────── */
+.badge{
+  display:inline-flex;align-items:center;
+  padding:3px 9px;border-radius:20px;
+  font-size:10px;font-weight:700;letter-spacing:.2px;white-space:nowrap;
+}
+.bg{background:#d1fae5;color:#065f46}
+.br{background:#fee2e2;color:#991b1b}
+.by{background:#fef3c7;color:#92400e}
+.bb{background:#dbeafe;color:#1e40af}
+.bc{background:#cffafe;color:#155e75}
+.bgr{background:var(--surf3);color:var(--ink2)}
+.pbadge{
+  background:linear-gradient(135deg,var(--blue),var(--teal));
+  color:#fff;border-radius:6px;padding:3px 10px;
+  font-size:10px;font-family:var(--mono);font-weight:600;
+  box-shadow:0 2px 8px rgba(29,78,216,.22);
+}
+
+/* ╔══════════════════════════════════════════════════════════════╗
+   ║  EXECUTIVE DESIGN SYSTEM — Modals & Forms                   ║
+   ╚══════════════════════════════════════════════════════════════╝ */
+
+/* Modal outer */
+.mo { position:fixed;inset:0;background:rgba(8,12,28,.55);backdrop-filter:blur(6px);
+  z-index:500;display:none;align-items:center;justify-content:center;padding:16px; }
+.mo.on { display:flex; }
+.mbox { background:#fff;border:1px solid var(--brd);border-radius:16px;
+  width:100%;max-width:720px;max-height:93vh;overflow-y:auto;
+  box-shadow:0 32px 80px rgba(0,0,0,.18),0 8px 20px rgba(0,0,0,.08);
+  animation:mIn .2s cubic-bezier(.34,1.3,.64,1); }
+.mbox.w  { max-width:880px; }
+.mbox.xl { max-width:1040px; }
+@keyframes mIn { from{opacity:0;transform:scale(.95) translateY(12px)} to{opacity:1;transform:none} }
+
+/* Modal header */
+.mh { display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:20px 28px 18px;border-bottom:1.5px solid var(--brd);
+  position:sticky;top:0;background:#fff;z-index:10; }
+.mh-left { display:flex;flex-direction:column;gap:3px; }
+.mh-top  { display:flex;align-items:center;gap:10px; }
+.mh h3   { font-size:17px;font-weight:800;color:var(--ink);letter-spacing:-.5px; }
+.mh-badge {
+  font-size:9px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;
+  padding:3px 10px;border-radius:4px; }
+.mh-badge.bl { background:#dbeafe;color:#1e40af; }
+.mh-badge.gn { background:#d1fae5;color:#065f46; }
+.mh-badge.am { background:#fef3c7;color:#92400e; }
+.mh-badge.rd { background:#fee2e2;color:#991b1b; }
+.mh-sub { font-size:11px;color:var(--ink4);font-weight:500; }
+.mh-close { width:32px;height:32px;border-radius:8px;border:1.5px solid var(--brd);
+  background:#fff;color:var(--ink3);cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;transition:all .13s;flex-shrink:0; }
+.mh-close:hover { background:#fee2e2;border-color:#fca5a5;color:var(--red); }
+
+/* Modal body & footer */
+.mb { padding:28px; }
+.mf { padding:16px 28px;border-top:1.5px solid var(--brd);
+  display:flex;gap:8px;align-items:center;background:var(--surf2);
+  border-radius:0 0 16px 16px; }
+.mf-right { margin-left:auto;display:flex;gap:8px; }
+
+/* ── FORM SECTIONS ── */
+.fg { margin-bottom:0; }
+.fg label { display:block;font-size:10px;font-weight:700;color:var(--ink3);
+  margin-bottom:5px;letter-spacing:.8px;text-transform:uppercase; }
+.fg input,.fg select,.fg textarea {
+  width:100%;background:#fafbfd;border:1.5px solid var(--brd);border-radius:8px;
+  padding:10px 13px;color:var(--ink);font-family:'Outfit',sans-serif;font-size:13px;
+  font-weight:500;transition:all .15s; }
+.fg input:hover,.fg select:hover { border-color:var(--brd2); }
+.fg input:focus,.fg select:focus,.fg textarea:focus {
+  outline:none;border-color:var(--blue);background:#fff;
+  box-shadow:0 0 0 3px rgba(29,78,216,.1); }
+.fg textarea { resize:vertical;min-height:76px; }
+
+.fsec { display:flex;flex-direction:column;gap:14px;margin-bottom:26px; }
+.fsec:last-child { margin-bottom:0; }
+.fsec-title {
+  display:flex;align-items:center;gap:10px;font-size:11px;
+  font-weight:700;color:var(--ink);padding-bottom:10px;
+  border-bottom:1.5px solid var(--surf3); }
+.fsec-num {
+  width:24px;height:24px;border-radius:7px;background:var(--ink);
+  color:#fff;font-size:10px;font-weight:800;display:flex;
+  align-items:center;justify-content:center;flex-shrink:0;font-family:var(--mono); }
+.fr  { display:grid;grid-template-columns:1fr 1fr;gap:14px; }
+.fr3 { display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px; }
+
+/* ── REMUNERACIÓN CARD ROW ── */
+.rem-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:12px; }
+.rem-card { background:var(--surf2);border:1.5px solid var(--brd);border-radius:10px;padding:14px 16px; }
+.rem-card-lbl { font-size:9.5px;font-weight:700;color:var(--ink3);text-transform:uppercase;
+  letter-spacing:.7px;margin-bottom:9px; }
+.rem-card-lbl small { font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink4); }
+.rem-inp { display:flex;align-items:center;gap:6px; }
+.rem-inp-sym { font-size:15px;font-weight:700;color:var(--ink3); }
+.rem-inp input { flex:1;background:#fff;border:1.5px solid var(--brd);border-radius:7px;
+  padding:8px 10px;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink); }
+.rem-inp input:focus { outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(29,78,216,.09); }
+
+/* ╔══════════════════════════════════════════════════════════════╗
+   ║  LIQUIDACIÓN — 3-column layout                              ║
+   ╚══════════════════════════════════════════════════════════════╝ */
+.liq-topbar { display:flex;gap:16px;margin-bottom:20px;align-items:flex-end; }
+.liq-topbar .fg:first-child { flex:2; }
+.liq-topbar .fg:last-child  { flex:1; }
+
+.liq3 { display:grid;grid-template-columns:1fr 1fr 290px;gap:14px; }
+
+.liq-col {
+  background:var(--surf2);border:1.5px solid var(--brd);border-radius:12px;overflow:hidden; }
+.liq-col-hdr {
+  padding:10px 16px;font-size:9px;font-weight:800;letter-spacing:1.3px;
+  text-transform:uppercase;display:flex;align-items:center;gap:8px;border-bottom:1.5px solid rgba(0,0,0,.07); }
+.liq-col-hdr.blue  { background:#eff4ff;color:#1e40af; }
+.liq-col-hdr.teal  { background:#ecfeff;color:#155e75; }
+.liq-col-hdr.violet{ background:#f5f3ff;color:#5b21b6; }
+.liq-col-hdr.rd    { background:#fff1f2;color:#9f1239; }
+.liq-col-hdr.grn   { background:#f0fdf4;color:#14532d; }
+
+.lf { display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:8px 16px;border-bottom:1px solid rgba(0,0,0,.04);font-size:11px;
+  color:var(--ink2);font-weight:500; }
+.lf:last-child { border-bottom:none; }
+.lf > span { flex:1; }
+.lf em { font-style:normal;font-size:10px;color:var(--ink4); }
+.lf input,.lf select {
+  width:120px;background:#fff;border:1.5px solid var(--brd);border-radius:6px;
+  padding:5px 9px;font-family:var(--mono);font-size:11px;font-weight:600;
+  color:var(--ink);text-align:right;transition:border-color .14s; }
+.lf select { text-align:left;width:140px;font-family:'Outfit',sans-serif; }
+.lf input:focus,.lf select:focus {
+  outline:none;border-color:var(--blue);box-shadow:0 0 0 2px rgba(29,78,216,.1); }
+.lf-$ { display:flex;align-items:center;gap:4px; }
+.lf-$ span { font-size:12px;font-weight:700;color:var(--ink4); }
+.lf-$ input { width:105px; }
+
+/* Live summary col */
+.liq-sum-col { background:#fff; }
+.lsum { padding:16px; }
+.lsum-row {
+  display:flex;justify-content:space-between;align-items:center;
+  padding:5px 0;border-bottom:1px solid var(--surf3);font-size:11px;color:var(--ink2); }
+.lsum-row:last-of-type { border-bottom:none; }
+.lsum-row b { font-family:var(--mono);font-weight:700;white-space:nowrap; }
+.lsum-row.indent { padding-left:12px; }
+.lsum-row.indent span { font-size:10px;color:var(--ink4); }
+.lsum-row.indent b { color:var(--red); }
+.lsum-row.section { padding-top:10px;margin-top:4px;border-top:2px solid var(--brd); }
+.lsum-row.section span,.lsum-row.section b { font-weight:700;color:var(--ink);font-size:12px; }
+.lsum-liq {
+  margin:14px;background:linear-gradient(135deg,#d1fae5,#a7f3d0);
+  border:2px solid #34d399;border-radius:12px;padding:16px;text-align:center; }
+.lsum-liq-label { font-size:9px;font-weight:800;color:var(--grn);
+  text-transform:uppercase;letter-spacing:1.4px;margin-bottom:6px; }
+.lsum-liq-value { font-size:26px;font-weight:800;font-family:var(--mono);
+  color:var(--grn);letter-spacing:-1.5px; }
+
+/* ╔══════════════════════════════════════════════════════════════╗
+   ║  FINIQUITO — 2-column layout                                ║
+   ╚══════════════════════════════════════════════════════════════╝ */
+.fin-layout { display:grid;grid-template-columns:1fr 310px;gap:18px; }
+.fin-left  { display:flex;flex-direction:column;gap:22px; }
+
+.fin-mrow {
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:9px 0;border-bottom:1px solid var(--surf3);
+  font-size:11px;font-weight:500;color:var(--ink2); }
+.fin-mrow:last-child { border-bottom:none; }
+.fin-mrow label { flex:1;line-height:1.4; }
+.fin-mrow em { font-style:normal;font-size:10px;color:var(--ink4); }
+.fin-mrow input {
+  width:135px;background:#fafbfd;border:1.5px solid var(--brd);border-radius:8px;
+  padding:7px 10px;font-family:var(--mono);font-size:13px;font-weight:700;
+  color:var(--ink);text-align:right;transition:all .14s; }
+.fin-mrow input:focus { outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 2px rgba(29,78,216,.1); }
+.fin-$wrap { display:flex;align-items:center;gap:5px; }
+.fin-$sym  { font-size:14px;font-weight:700;color:var(--ink4); }
+.fin-$wrap input { width:118px; }
+
+/* Finiquito live panel */
+.fin-live {
+  background:var(--surf2);border:1.5px solid var(--brd);border-radius:14px;
+  overflow:hidden;position:sticky;top:0;align-self:start; }
+.fin-live-hdr {
+  padding:12px 18px;background:#fff;border-bottom:1.5px solid var(--brd);
+  font-size:10px;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:1.1px; }
+.fin-live-empty {
+  padding:28px 18px;text-align:center;font-size:11px;color:var(--ink4);line-height:1.7; }
+
+.flv-rows { padding:14px 18px;display:flex;flex-direction:column;gap:0; }
+.flv-r {
+  display:flex;justify-content:space-between;align-items:center;
+  padding:7px 0;border-bottom:1px solid var(--surf3);font-size:11px; }
+.flv-r:last-child { border-bottom:none; }
+.flv-r span { color:var(--ink3);font-weight:500; }
+.flv-r b { font-family:var(--mono);font-weight:700;color:var(--ink); }
+.flv-r.hi b { color:var(--blue); }
+.flv-r.rd b { color:var(--red); }
+.flv-bruto {
+  margin:0 14px 8px;padding:12px 16px;background:var(--surf3);
+  border-radius:10px;display:flex;justify-content:space-between;align-items:center; }
+.flv-bl { font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.7px; }
+.flv-bv { font-family:var(--mono);font-size:15px;font-weight:800;color:var(--ink); }
+.flv-neto {
+  margin:0 14px 16px;padding:16px;
+  background:linear-gradient(135deg,#eff6ff,#dbeafe);
+  border:2px solid #93c5fd;border-radius:12px;
+  display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center; }
+.flv-nl { font-size:9px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:1.3px; }
+.flv-nv { font-family:var(--mono);font-size:24px;font-weight:800;color:var(--blue);letter-spacing:-1px; }
+
+/* ── TABS ── */
+.tabs { display:flex;gap:0;border-bottom:2px solid var(--brd);margin-bottom:22px; }
+.tab  { padding:10px 20px;cursor:pointer;font-size:12px;font-weight:600;
+  color:var(--ink3);border-bottom:2.5px solid transparent;margin-bottom:-2px;
+  transition:all .15s;letter-spacing:.1px; }
+.tab:hover { color:var(--ink2);background:var(--surf2); }
+.tab.on    { color:var(--blue);border-bottom-color:var(--blue); }
+.tp  { display:none; }
+.tp.on { display:block; }
+
+</style>
+<body>
+
+<div id="LS">
+  <div class="l-wrap">
+    <div class="l-header">
+      <div class="l-logo-ring">&#x1F4BC;</div>
+      <h1>Sistem<span>Rem</span></h1>
+      <p>Sistema Integral de Remuneraciones &nbsp;&#8231;&nbsp; Normativa Laboral Chile 2026</p>
+    </div>
+    <div class="lbox">
+      <div class="lbox-title">Acceso al Sistema</div>
+      <div class="fg">
+        <label>Empresa</label>
+        <select id="lEmp"><option value="">&#8212; Seleccione empresa &#8212;</option></select>
+      </div>
+      <div class="fg">
+        <label>Usuario</label>
+        <input type="text" id="lU" placeholder="Ingrese su usuario" autocomplete="username">
+      </div>
+      <div class="fg">
+        <label>Contrase&#241;a</label>
+        <input type="password" id="lP" placeholder="&#8226; &#8226; &#8226; &#8226; &#8226; &#8226; &#8226; &#8226;" onkeydown="if(event.key==='Enter')doLogin()" autocomplete="current-password">
+      </div>
+      <button class="btn full" onclick="doLogin()" style="margin-top:6px">Iniciar Sesi&#243;n &#8594;</button>
+      <div class="lerr" id="lErr">&#9888;&#65039; Credenciales incorrectas o empresa sin acceso</div>
+
+    </div>
+  </div>
+</div>
+
+<div id="APP">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="tlogo">
+        <div class="tlogo-icon">&#x1F4BC;</div>
+        Sistem<em>Rem</em><span class="tlogo-ver">2026</span>
+      </div>
+      <div class="esel"><select id="aEmp" onchange="chEmp()"></select></div>
+    </div>
+    <div class="persel">
+      <button onclick="movPer(-1)" title="Mes anterior">&#8249;</button>
+      <span class="plbl" id="perLbl">&#8212;</span>
+      <button onclick="movPer(1)" title="Mes siguiente">&#8250;</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="ubadge" id="uBadge"></span>
+      <button class="btn sm sec" onclick="abrirCambioClave()" title="Cambiar contraseña">&#x1F512; Clave</button>
+      <button class="btn sm sec" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+
+  <div class="sb">
+    <div class="stit">Principal</div>
+    <div class="nav on" onclick="goNav('dashboard',this)"><span class="ic">&#x1F4CA;</span>Dashboard</div>
+    <div class="nav" onclick="goNav('empresas',this)"><span class="ic">&#x1F3E2;</span>Empresas</div>
+    <div class="nav" onclick="goNav('trabajadores',this)"><span class="ic">&#x1F465;</span>Trabajadores</div>
+    <div class="stit">Remuneraciones</div>
+    <div class="nav" onclick="goNav('contratos',this)"><span class="ic">&#x1F4CB;</span>Contratos</div>
+    <div class="nav" onclick="goNav('liquidaciones',this)"><span class="ic">&#x1F4B5;</span>Liquidaciones</div>
+    <div class="nav" onclick="goNav('finiquitos',this)"><span class="ic">&#x1F4DD;</span>Finiquitos</div>
+    <div class="stit">Configuraci&#243;n</div>
+    <div class="nav" onclick="goNav('parametros',this)"><span class="ic">&#x2699;&#xFE0F;</span>Par&#225;metros</div>
+    <div class="nav" onclick="goNav('prevision',this)"><span class="ic">&#x1F3E6;</span>AFP &amp; Salud</div>
+    <div class="nav" onclick="goNav('informes',this)"><span class="ic">&#x1F4C8;</span>Informes</div>
+  </div>
+
+  <div class="mc">
+
+    <div class="panel on" id="panel-dashboard">
+      <div class="phr">
+        <div class="phr-left">
+          <h2>Dashboard</h2>
+          <p id="dSub">Cargando informaci&#243;n&#8230;</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;color:var(--ink4)">Per&#237;odo activo</span>
+          <span class="pbadge" id="dPerBadge">&#8212;</span>
+        </div>
+      </div>
+      <div class="sg" id="dStats"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="tw" style="padding:20px">
+          <div style="font-size:11px;font-weight:700;color:var(--ink2);margin-bottom:16px;letter-spacing:.3px;text-transform:uppercase">Sueldos N&#243;mina Activa</div>
+          <div class="cbar" id="dChart"></div>
+        </div>
+        <div class="tw" style="padding:20px">
+          <div style="font-size:11px;font-weight:700;color:var(--ink2);margin-bottom:16px;letter-spacing:.3px;text-transform:uppercase">Liquidaciones del Per&#237;odo</div>
+          <div id="dLiqs"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-empresas">
+      <div class="phr">
+        <div class="phr-left"><h2>Empresas</h2><p>Gesti&#243;n de empresas y datos tributarios</p></div>
+        <div class="phr-actions"><button class="btn sm" onclick="abrirEmp()">+ Nueva Empresa</button></div>
+      </div>
+      <div class="tw">
+        <table><thead><tr>
+          <th>RUT</th><th>Raz&#243;n Social</th><th>Giro</th><th>Representante Legal</th><th>Trabajadores</th><th>Mutual</th><th>Acciones</th>
+        </tr></thead><tbody id="tbEmp"></tbody></table>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-trabajadores">
+      <div class="phr">
+        <div class="phr-left"><h2>Trabajadores</h2><p>N&#243;mina completa de personal activo e inactivo</p></div>
+        <div class="phr-actions"><button class="btn sm" onclick="abrirTrab()">+ Nuevo Trabajador</button></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <input class="si" style="flex:1;min-width:200px" type="text" placeholder="Buscar nombre o RUT&#8230;" oninput="filtT(this.value)">
+        <select class="si" onchange="filtTE(this.value)">
+          <option value="">Todos los estados</option>
+          <option value="1">Solo activos</option>
+          <option value="0">Solo inactivos</option>
+        </select>
+      </div>
+      <div class="tw">
+        <table><thead><tr>
+          <th>RUT</th><th>Nombre Completo</th><th>Cargo</th><th>Ingreso</th><th>Antig&#252;edad</th><th>Sueldo Base</th><th>AFP</th><th>Salud</th><th>Estado</th><th>Acciones</th>
+        </tr></thead><tbody id="tbTrab"></tbody></table>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-contratos">
+      <div class="phr">
+        <div class="phr-left"><h2>Contratos</h2><p>Contratos individuales vigentes y con alertas de vencimiento</p></div>
+        <div class="phr-actions"><button class="btn sm" onclick="abrirCont()">+ Nuevo Contrato</button></div>
+      </div>
+      <div class="tw">
+        <table><thead><tr>
+          <th>N&#176; Contrato</th><th>Trabajador</th><th>Tipo</th><th>Inicio</th><th>T&#233;rmino</th><th>Jornada</th><th>Sueldo Base</th><th>Estado</th><th>Acciones</th>
+        </tr></thead><tbody id="tbCont"></tbody></table>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-liquidaciones">
+      <div class="phr">
+        <div class="phr-left">
+          <h2>Liquidaciones de Sueldo</h2>
+          <p>Per&#237;odo&thinsp;: <span class="pbadge" id="liqPerBadge" style="font-size:10px;vertical-align:middle">&#8212;</span>&ensp;&#183;&ensp;Usa <strong>&#8249; &#8250;</strong> en el men&#250; superior para navegar meses</p>
+        </div>
+        <div class="phr-actions">
+          <button class="btn sm sec" onclick="expLibroXLS()">&#x1F4C5; Excel</button>
+          <button class="btn sm sec" onclick="expLibroPDF()">&#x1F5A8;&#xFE0F; PDF</button>
+          <button class="btn sm sec" onclick="expLibroRTF()">&#x1F4C4; Word</button>
+          <button class="btn sm" onclick="abrirLiq()">+ Nueva Liquidaci&#243;n</button>
+        </div>
+      </div>
+      <div class="ib bl">Mostrando liquidaciones del per&#237;odo activo. Datos demo: Nov/Dic 2025 y Ene/Feb 2026.</div>
+      <div class="tw">
+        <table><thead><tr>
+          <th>Per&#237;odo</th><th>Trabajador</th><th>D&#237;as</th><th>Sueldo Base</th><th>Total Haberes</th><th>AFP</th><th>Salud</th><th>IUT</th><th>Otros Desc.</th><th>L&#205;QUIDO</th><th>Estado</th><th>Acciones</th>
+        </tr></thead><tbody id="tbLiq"></tbody></table>
+      </div>
+      <div id="liqRes" style="margin-top:16px"></div>
+    </div>
+
+    <div class="panel" id="panel-finiquitos">
+      <div class="phr">
+        <div class="phr-left"><h2>Finiquitos</h2><p>Arts. 159, 160, 161 C&#243;digo del Trabajo &#8212; Todos los per&#237;odos registrados</p></div>
+        <div class="phr-actions">
+          <button class="btn sm sec" onclick="expFinListaXLS()">&#x1F4C5; Excel</button>
+          <button class="btn sm sec" onclick="expFinListaPDF()">&#x1F5A8;&#xFE0F; PDF</button>
+          <button class="btn sm" onclick="abrirFin()">+ Calcular Finiquito</button>
+        </div>
+      </div>
+      <div class="tw">
+        <table><thead><tr>
+          <th>Fecha</th><th>Trabajador</th><th>RUT</th><th>Causal</th><th>A&#241;os Serv.</th><th>Indem. A&#241;os</th><th>Aviso Prev.</th><th>Feriado</th><th>Total Bruto</th><th>Total Neto</th><th>Estado</th><th>Acciones</th>
+        </tr></thead><tbody id="tbFin"></tbody></table>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-parametros">
+      <div class="phr">
+        <div class="phr-left"><h2>Par&#225;metros Legales</h2><p>Valores vigentes 2026 &#8212; editables por per&#237;odo</p></div>
+      </div>
+      <div class="ib yl">Actualiza estos valores al inicio de cada per&#237;odo seg&#250;n resoluciones SII, Mintrab y SUSESO.</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(295px,1fr));gap:14px">
+        <div class="tw" style="padding:20px">
+          <div class="fst">Remuneraciones y Valores UF/UTM</div>
+          <div id="pRem"></div>
+          <button class="btn gn" style="width:100%;margin-top:15px" onclick="guardarP()">Guardar y Aplicar Cambios</button>
+        </div>
+        <div class="tw" style="padding:20px">
+          <div class="fst">Cotizaciones Previsionales (%)</div>
+          <div id="pPrev"></div>
+        </div>
+        <div class="tw" style="padding:20px">
+          <div class="fst">Tasas AFP por Instituci&#243;n (%)</div>
+          <div id="pAFP"></div>
+        </div>
+        <div class="tw" style="padding:20px">
+          <div class="fst">IUT &#8212; Tramos Impuesto &#218;nico (en UF)</div>
+          <div id="pIUT"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-prevision">
+      <div class="phr">
+        <div class="phr-left"><h2>AFP e Instituciones de Salud</h2><p>Tasas y cotizaciones vigentes 2026</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <p style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:10px">AFP Vigentes 2026</p>
+          <div class="tw"><table><thead><tr><th>AFP</th><th>Tasa Trabajador</th><th>SIS Empleador</th><th>Total</th></tr></thead><tbody id="tbAFP"></tbody></table></div>
+        </div>
+        <div>
+          <p style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:10px">FONASA e Isapres</p>
+          <div class="ib bl" style="font-size:11px">La cotizaci&#243;n legal es 7% de la renta imponible. Las Isapres cobran adicional en UF/mes seg&#250;n plan contratado.</div>
+          <div class="tw"><table><thead><tr><th>Instituci&#243;n</th><th>Legal</th><th>Adicional ref.</th><th>Tipo</th></tr></thead><tbody id="tbIsa"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-informes">
+      <div class="phr">
+        <div class="phr-left"><h2>Informes y Reportes</h2><p>Exportaci&#243;n en Excel, PDF imprimible y Word (RTF)</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px">
+        <div class="rcard">
+          <div class="rice">&#x1F4CA;</div>
+          <div class="rtit">Libro de Remuneraciones</div>
+          <div class="rdesc">Detalle completo de haberes, descuentos y l&#237;quidos por per&#237;odo, con totales legales.</div>
+          <div class="fg" style="margin-bottom:13px"><label>Per&#237;odo</label><input type="month" id="rMes" class="si" style="width:100%"></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn sm gn" onclick="expLibroXLSMes()">Excel</button>
+            <button class="btn sm sec" onclick="expLibroPDFMes()">PDF</button>
+            <button class="btn sm sec" onclick="expLibroRTFMes()">Word</button>
+          </div>
+        </div>
+        <div class="rcard">
+          <div class="rice">&#x1F465;</div>
+          <div class="rtit">N&#243;mina de Personal</div>
+          <div class="rdesc">Listado con datos laborales, previsionales, antig&#252;edad y cuentas bancarias.</div>
+          <div style="height:53px"></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn sm gn" onclick="expNominaXLS()">Excel</button>
+            <button class="btn sm sec" onclick="expNominaPDF()">PDF</button>
+            <button class="btn sm sec" onclick="expNominaRTF()">Word</button>
+          </div>
+        </div>
+        <div class="rcard">
+          <div class="rice">&#x1F4B0;</div>
+          <div class="rtit">Archivo Previred</div>
+          <div class="rdesc">Formato de pago de cotizaciones previsionales AFP, salud y cesant&#237;a por per&#237;odo.</div>
+          <div class="fg" style="margin-bottom:13px"><label>Per&#237;odo</label><input type="month" id="rPrev" class="si" style="width:100%"></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn sm gn" onclick="expPrevXLS()">Excel</button>
+            <button class="btn sm sec" onclick="expPrevPDF()">PDF</button>
+          </div>
+        </div>
+        <div class="rcard">
+          <div class="rice">&#x1F4CB;</div>
+          <div class="rtit">Informe de Contratos</div>
+          <div class="rdesc">Contratos vigentes, vencidos y alertas de t&#233;rminos pr&#243;ximos a 30/60/90 d&#237;as.</div>
+          <div style="height:53px"></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn sm gn" onclick="expContsXLS()">Excel</button>
+            <button class="btn sm sec" onclick="expContsPDF()">PDF</button>
+            <button class="btn sm sec" onclick="expContsRTF()">Word</button>
+          </div>
+        </div>
+        <div class="rcard">
+          <div class="rice">&#x1F4DD;</div>
+          <div class="rtit">Finiquitos Emitidos</div>
+          <div class="rdesc">Todos los finiquitos registrados con causales, montos, antig&#252;edad y estado de firma.</div>
+          <div style="height:53px"></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn sm gn" onclick="expFinListaXLS()">Excel</button>
+            <button class="btn sm sec" onclick="expFinListaPDF()">PDF</button>
+          </div>
+        </div>
+        <div class="rcard">
+          <div class="rice">&#x1F4C6;</div>
+          <div class="rtit">Consolidado Anual</div>
+          <div class="rdesc">Resumen de 12 per&#237;odos con totales de haberes, descuentos y l&#237;quidos por mes.</div>
+          <div class="fg" style="margin-bottom:13px"><label>A&#241;o</label><input type="number" id="rAnio" class="si" style="width:100%" value="2026" min="2020" max="2035"></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn sm gn" onclick="expAnualXLS()">Excel</button>
+            <button class="btn sm sec" onclick="expAnualPDF()">PDF</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+<!-- MODAL EMPRESA -->
+
+
+<!-- EMPRESA -->
+
+<div class="mo" id="moEmp">
+ <div class="mbox">
+  <div class="mh">
+   <div class="mh-left">
+    <div class="mh-top"><span class="mh-badge bl">EMPRESA</span><h3 id="moEmpT">Nueva Empresa</h3></div>
+    <div class="mh-sub">Datos tributarios y de contacto empresarial</div>
+   </div>
+   <button class="mh-close" onclick="cerrar('moEmp')">&#x2715;</button>
+  </div>
+  <div class="mb">
+   <div class="fsec">
+    <div class="fsec-title"><span class="fsec-num">01</span>Identificaci&#243;n Tributaria</div>
+    <div class="fr"><div class="fg"><label>RUT Empresa</label><input type="text" id="eRut" placeholder="12.345.678-9"></div><div class="fg"><label>Raz&#243;n Social</label><input type="text" id="eNom"></div></div>
+    <div class="fr"><div class="fg"><label>Giro Comercial</label><input type="text" id="eGiro"></div><div class="fg"><label>C&#243;d. Actividad SII</label><input type="text" id="eSII" placeholder="4120"></div></div>
+   </div>
+   <div class="fsec">
+    <div class="fsec-title"><span class="fsec-num">02</span>Representante Legal</div>
+    <div class="fr"><div class="fg"><label>Nombre Completo</label><input type="text" id="eRep"></div><div class="fg"><label>RUT Representante</label><input type="text" id="eRepRut"></div></div>
+   </div>
+   <div class="fsec">
+    <div class="fsec-title"><span class="fsec-num">03</span>Contacto y Ubicaci&#243;n</div>
+    <div class="fr"><div class="fg"><label>Direcci&#243;n</label><input type="text" id="eDir"></div><div class="fg"><label>Ciudad</label><input type="text" id="eCiu" placeholder="Santiago"></div></div>
+    <div class="fr"><div class="fg"><label>Tel&#233;fono</label><input type="text" id="eTel"></div><div class="fg"><label>Email Corporativo</label><input type="email" id="eEmail"></div></div>
+    <div class="fg"><label>Mutual de Seguridad</label><select id="eMut"><option>ACHS</option><option>Mutual de Seguridad CChC</option><option>IST</option></select></div>
+   </div>
+  </div>
+  <div class="mf">
+   <button class="btn sm rd" id="btnDE" onclick="elimEmp()" style="display:none">Eliminar</button>
+   <div class="mf-right">
+    <button class="btn sm sec" onclick="cerrar('moEmp')">Cancelar</button>
+    <button class="btn sm sec" onclick="impEmpresaId(eEmpId)">&#x1F5A8; Ficha</button>
+    <button class="btn sm" onclick="guardarEmp()">Guardar Empresa</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- TRABAJADOR -->
+<div class="mo" id="moTrab">
+ <div class="mbox w">
+  <div class="mh">
+   <div class="mh-left">
+    <div class="mh-top"><span class="mh-badge gn">TRABAJADOR</span><h3 id="moTrabT">Nuevo Trabajador</h3></div>
+    <div class="mh-sub">Datos personales, laborales y previsionales</div>
+   </div>
+   <button class="mh-close" onclick="cerrar('moTrab')">&#x2715;</button>
+  </div>
+  <div class="mb">
+   <div class="fsec">
+    <div class="fsec-title"><span class="fsec-num">01</span>Datos Personales</div>
+    <div class="fr3"><div class="fg"><label>RUT</label><input type="text" id="tRut" placeholder="15.234.567-8"></div><div class="fg"><label>Nombres</label><input type="text" id="tNom"></div><div class="fg"><label>Ap. Paterno</label><input type="text" id="tA1"></div></div>
+    <div class="fr3"><div class="fg"><label>Ap. Materno</label><input type="text" id="tA2"></div><div class="fg"><label>Fecha de Nacimiento</label><input type="date" id="tFNac"></div><div class="fg"><label>Sexo</label><select id="tSex"><option value="M">Masculino</option><option value="F">Femenino</option></select></div></div>
+    <div class="fr"><div class="fg"><label>Email</label><input type="email" id="tEmail"></div><div class="fg"><label>Tel&#233;fono</label><input type="text" id="tTel"></div></div>
+    <div class="fr"><div class="fg"><label>Direcci&#243;n</label><input type="text" id="tDir"></div><div class="fg"><label>Nacionalidad</label><select id="tNac"><option>Chilena</option><option>Argentina</option><option>Peruana</option><option>Colombiana</option><option>Venezolana</option><option>Boliviana</option><option>Otra</option></select></div></div>
+   </div>
+   <div class="fsec">
+    <div class="fsec-title"><span class="fsec-num">02</span>Datos Laborales</div>
+    <div class="fr"><div class="fg"><label>Cargo</label><input type="text" id="tCargo"></div><div class="fg"><label>Fecha de Ingreso</label><input type="date" id="tIng"></div></div>
+    <div class="fr"><div class="fg"><label>Sueldo Base ($)</label><input type="number" id="tSuel" min="0"></div><div class="fg"><label>Jornada</label><select id="tJorn"><option value="45">45 horas semanales</option><option value="40">40 horas</option><option value="30">30 horas</option><option value="20">20 horas (media jornada)</option></select></div></div>
+   </div>
+   <div class="fsec">
+    <div class="fsec-title"><span class="fsec-num">03</span>Previsi&#243;n y Cuenta Bancaria</div>
+    <div class="fr"><div class="fg"><label>AFP</label><select id="tAFP"><option>Habitat</option><option>Modelo</option><option>Planvital</option><option>ProVida</option><option>Capital</option><option>Cuprum</option><option>Uno</option></select></div><div class="fg"><label>Instituci&#243;n de Salud</label><select id="tIsa"><option>FONASA</option><option>Banm&#233;dica</option><option>Colmena</option><option>Cruz Blanca</option><option>Consalud</option><option>Vida Tres</option><option>Nueva Masvida</option></select></div></div>
+    <div class="fr"><div class="fg"><label>Cotizaci&#243;n adicional Isapre (UF/mes)</label><input type="number" id="tSUF" value="0" min="0" step="0.01"></div><div class="fg"><label>Banco</label><select id="tBco"><option>Banco de Chile</option><option>Santander</option><option>BCI</option><option>Estado</option><option>BICE</option><option>Scotiabank</option><option>Falabella</option></select></div></div>
+    <div class="fr"><div class="fg"><label>Tipo de Cuenta</label><select id="tTipoCta"><option>Cuenta Corriente</option><option>Cuenta Vista</option><option>Cuenta RUT</option></select></div><div class="fg"><label>N&#176; de Cuenta</label><input type="text" id="tCta"></div></div>
+   </div>
+  </div>
+  <div class="mf">
+   <button class="btn sm rd" id="btnDT" onclick="elimTrab()" style="display:none">Eliminar</button>
+   <div class="mf-right">
+    <button class="btn sm sec" onclick="cerrar('moTrab')">Cancelar</button>
+    <button class="btn sm sec" onclick="impFichaTrabId(eTrabId)">&#x1F5A8; Ficha PDF</button>
+    <button class="btn sm" onclick="guardarTrab()">Guardar</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- CONTRATO -->
+<div class="mo" id="moCont">
+ <div class="mbox w">
+  <div class="mh">
+   <div class="mh-left">
+    <div class="mh-top"><span class="mh-badge am">CONTRATO</span><h3 id="moContT">Contrato Individual de Trabajo</h3></div>
+    <div class="mh-sub">Art&#237;culo 10 — C&#243;digo del Trabajo</div>
+   </div>
+   <button class="mh-close" onclick="cerrar('moCont')">&#x2715;</button>
+  </div>
+  <div class="mb">
+   <div class="fsec">
+    <div class="fsec-title"><span class="fsec-num">01</span>Partes Contratantes</div>
+    <div class="fr"><div class="fg"><label>Trabajador</label><select id="cTrab"></select></div><div class="fg"><label>Tipo de Contrato</label><select id="cTipo" onchange="chTerm()"><option value="indefinido">Indefinido</option><option value="plazo_fijo">Plazo Fijo</option><option value="obra_faena">Por Obra o Faena</option><option value="reemplazo">De Reemplazo</option></select></div></div>
+    <div class="fr"><div class="fg"><label>Fecha de Inicio</label><input type="date" id="cIni"></div><div class="fg" id="cTermG"><label>Fecha de T&#233;rmino</label><input type="date" id="cTerm"></div></div>
+   </div>
+   <div class="fsec">
+    <div class="fsec-title"><span class="fsec-num">02</span>Lugar y Jornada</div>
+    <div class="fr"><div class="fg"><label>Lugar de Trabajo</label><input type="text" id="cLug" placeholder="Ej: Oficina Central — Providencia"></div><div class="fg"><label>Ciudad</label><input type="text" id="cCiu" placeholder="Santiago"></div></div>
+    <div class="fr"><div class="fg"><label>Jornada Semanal</label><select id="cJorn"><option value="45">45 hrs — Jornada Completa</option><option value="40">40 hrs</option><option value="30">30 hrs</option><option value="20">20 hrs — Media Jornada</option></select></div><div class="fg"><label>Distribuci&#243;n de Jornada</label><select id="cDist"><option>Lunes a Viernes</option><option>Lunes a S&#225;bado</option><option>Turnos Rotativos</option></select></div></div>
+   </div>
+   <div class="fsec">
+    <div class="fsec-title"><span class="fsec-num">03</span>Remuneraci&#243;n Pactada</div>
+    <div class="rem-grid">
+     <div class="rem-card"><div class="rem-card-lbl">Sueldo Base</div><div class="rem-inp"><span class="rem-inp-sym">$</span><input type="number" id="cSuel" min="0" placeholder="504.000"></div></div>
+     <div class="rem-card"><div class="rem-card-lbl">Asig. Colaci&#243;n <small>(No Imponible)</small></div><div class="rem-inp"><span class="rem-inp-sym">$</span><input type="number" id="cCol" value="0" min="0"></div></div>
+     <div class="rem-card"><div class="rem-card-lbl">Asig. Movilizaci&#243;n <small>(No Imponible)</small></div><div class="rem-inp"><span class="rem-inp-sym">$</span><input type="number" id="cMov" value="0" min="0"></div></div>
+    </div>
+    <div class="fg"><label>Tipo de Gratificaci&#243;n</label><select id="cGrat"><option value="legal">Legal 25% — tope 4.75 IMF anual (Art. 50 CT)</option><option value="garantizada">Garantizada 1/12 mensual del 25% de 4.75 IMF</option></select></div>
+   </div>
+   <div class="fsec">
+    <div class="fsec-title"><span class="fsec-num">04</span>Funciones y Cl&#225;usulas Legales</div>
+    <div class="fg"><label>Funciones Principales del Cargo</label><textarea id="cFunc" rows="3" placeholder="Describir las principales responsabilidades, tareas y funciones del cargo..."></textarea></div>
+    <div class="fg"><label>Cl&#225;usulas Especiales <span style="font-weight:400;color:var(--ink4);text-transform:none;letter-spacing:0">(opcional)</span></label><textarea id="cClaus" rows="2" placeholder="Confidencialidad, exclusividad, bonos variables, no competencia, etc."></textarea></div>
+   </div>
+  </div>
+  <div class="mf">
+   <button class="btn sm rd" id="btnDC" onclick="elimCont()" style="display:none">Eliminar</button>
+   <div class="mf-right">
+    <button class="btn sm sec" onclick="cerrar('moCont')">Cancelar</button>
+    <button class="btn sm sec" onclick="expContXLSId(eContId)">&#x1F4C5; Excel</button>
+    <button class="btn sm sec" onclick="impContratoId(eContId)">&#x1F5A8; Imprimir</button>
+    <button class="btn sm" onclick="guardarCont()">Guardar Contrato</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- LIQUIDACIÓN -->
+<div class="mo" id="moLiq">
+ <div class="mbox xl">
+  <div class="mh">
+   <div class="mh-left">
+    <div class="mh-top"><span class="mh-badge gn">LIQUIDACI&#211;N</span><h3 id="moLiqT">Liquidaci&#243;n de Sueldo</h3></div>
+    <div class="mh-sub">C&#225;lculo conforme DFL-1 C&#243;digo del Trabajo &#8212; Gratificaci&#243;n, AFP, Salud, IUT, Ces</div>
+   </div>
+   <button class="mh-close" onclick="cerrar('moLiq')">&#x2715;</button>
+  </div>
+  <div class="mb">
+   <div class="tabs">
+    <div class="tab on" id="tl1" onclick="sTab('l',1)">&#9312;&ensp;Datos de Entrada</div>
+    <div class="tab" id="tl2" onclick="sTab('l',2)">&#9313;&ensp;Hoja de C&#225;lculo</div>
+    <div class="tab" id="tl3" onclick="sTab('l',3)">&#9314;&ensp;Documento</div>
+   </div>
+   <div class="tp on" id="tp-l1">
+    <div class="liq-topbar">
+     <div class="fg"><label>Trabajador</label><select id="lTrab" onchange="cargarTrab()"></select></div>
+     <div class="fg"><label>Per&#237;odo</label><input type="month" id="lPer"></div>
+    </div>
+    <div class="liq3">
+     <!-- col 1 -->
+     <div class="liq-col">
+      <div class="liq-col-hdr blue">&#9650;&ensp;Haberes Imponibles</div>
+      <div class="lf"><span>Sueldo Base</span><div class="lf-$"><span>$</span><input type="number" id="lSuel" oninput="calcLiq()"></div></div>
+      <div class="lf"><span>D&#237;as trabajados <em>/ 30</em></span><input type="number" id="lDias" value="30" min="1" max="31" oninput="calcLiq()"></div>
+      <div class="lf"><span>H. extras <em>cantidad</em></span><input type="number" id="lHE" value="0" oninput="calcLiq()"></div>
+      <div class="lf"><span>Recargo H.E.</span><select id="lHET" onchange="calcLiq()"><option value="1.5">50% Diurna</option><option value="2.0">100% Nocturna</option></select></div>
+      <div class="lf"><span>Bonos / Comisiones</span><div class="lf-$"><span>$</span><input type="number" id="lBon" value="0" oninput="calcLiq()"></div></div>
+      <div class="lf"><span>Otros hab. imponibles</span><div class="lf-$"><span>$</span><input type="number" id="lOH" value="0" oninput="calcLiq()"></div></div>
+      <div class="liq-col-hdr teal" style="margin-top:0">&#9651;&ensp;No Imponibles</div>
+      <div class="lf"><span>Colaci&#243;n</span><div class="lf-$"><span>$</span><input type="number" id="lCol" value="0" oninput="calcLiq()"></div></div>
+      <div class="lf"><span>Movilizaci&#243;n</span><div class="lf-$"><span>$</span><input type="number" id="lMov" value="0" oninput="calcLiq()"></div></div>
+     </div>
+     <!-- col 2 -->
+     <div class="liq-col">
+      <div class="liq-col-hdr violet">&#9632;&ensp;Previsi&#243;n Social</div>
+      <div class="lf"><span>AFP</span><select id="lAFP" onchange="calcLiq()"><option value="11.44">Cargando...</option></select></div>
+      <div class="lf"><span>Salud</span><select id="lIsa"><option>FONASA</option><option>Banm&#233;dica</option><option>Colmena</option><option>Cruz Blanca</option><option>Consalud</option><option>Vida Tres</option><option>Nueva Masvida</option></select></div>
+      <div class="lf"><span>Isapre adicional <em>UF/mes</em></span><input type="number" id="lSUF" value="0" step="0.01" oninput="calcLiq()"></div>
+      <div class="liq-col-hdr rd" style="margin-top:0">&#9660;&ensp;Descuentos Adicionales</div>
+      <div class="lf"><span>Anticipos</span><div class="lf-$"><span>$</span><input type="number" id="lAnt" value="0" oninput="calcLiq()"></div></div>
+      <div class="lf"><span>Cuota pr&#233;stamo</span><div class="lf-$"><span>$</span><input type="number" id="lPrest" value="0" oninput="calcLiq()"></div></div>
+      <div class="lf"><span>Otras deducciones</span><div class="lf-$"><span>$</span><input type="number" id="lOD" value="0" oninput="calcLiq()"></div></div>
+     </div>
+     <!-- col 3 live -->
+     <div class="liq-col liq-sum-col">
+      <div class="liq-col-hdr grn">&#10003;&ensp;Resumen en Vivo</div>
+      <div class="lsum">
+       <div class="lsum-row"><span>Base imponible</span><b id="ls-imp">$&#8212;</b></div>
+       <div class="lsum-row indent"><span>AFP cotizado</span><b id="ls-afp">$&#8212;</b></div>
+       <div class="lsum-row indent"><span>Salud 7%</span><b id="ls-sal">$&#8212;</b></div>
+       <div class="lsum-row indent"><span>Isapre adicional</span><b id="ls-isa">&#8212;</b></div>
+       <div class="lsum-row indent"><span>Cesant&#237;a trab.</span><b id="ls-ces">$&#8212;</b></div>
+       <div class="lsum-row indent"><span>Imp. &#218;nico</span><b id="ls-iut">$&#8212;</b></div>
+       <div class="lsum-row section"><span>Total Haberes</span><b id="ls-hab">$&#8212;</b></div>
+       <div class="lsum-row section"><span>Total Descuentos</span><b id="ls-desc" style="color:var(--red)">$&#8212;</b></div>
+      </div>
+      <div class="lsum-liq"><div class="lsum-liq-label">L&#237;quido a Pagar</div><div class="lsum-liq-value" id="ls-liq">$&#8212;</div></div>
+     </div>
+    </div>
+   </div>
+
+   <!-- CONCEPTOS ADICIONALES — full width -->
+   <div style="margin-top:12px;background:var(--surf2);border:1.5px solid var(--brd);border-radius:10px;overflow:hidden">
+     <div style="background:#ecfeff;border-bottom:1.5px solid #a5f3fc;padding:9px 16px;display:flex;align-items:center;justify-content:space-between">
+       <div style="font-size:10px;font-weight:800;color:#0e7490;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px">
+         <span style="font-size:14px">&#43;</span> Haberes y Descuentos Adicionales
+       </div>
+       <button onclick="addConcepto()"
+         style="padding:6px 14px;background:#0891b2;color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px">
+         &#43; Agregar Concepto
+       </button>
+     </div>
+     <div id="cexList" style="padding:10px 14px;display:flex;flex-direction:column;gap:6px;min-height:10px"></div>
+     <div id="cexEmpty" style="padding:14px 16px;font-size:11px;color:var(--ink4);font-style:italic">
+       Sin conceptos adicionales. Haz clic en &ldquo;+ Agregar Concepto&rdquo; para a&#241;adir bonos, descuentos, asignaciones especiales, etc.
+     </div>
+   </div>
+
+   <div class="tp" id="tp-l2"><div id="lCalc"></div></div>
+   <div class="tp" id="tp-l3">
+    <div id="lPrev"></div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+     <button class="btn sm gn" onclick="expLiqXLS()">&#x1F4C5; Excel</button>
+     <button class="btn sm sec" onclick="expLiqPDF()">&#x1F5A8; PDF</button>
+     <button class="btn sm sec" onclick="expLiqRTF()">&#x1F4C4; Word</button>
+    </div>
+   </div>
+  </div>
+  <div class="mf">
+   <button class="btn sm rd" id="btnDL" onclick="elimLiq()" style="display:none">Eliminar</button>
+   <div class="mf-right">
+    <button class="btn sm sec" onclick="cerrar('moLiq')">Cancelar</button>
+    <button class="btn sm sec" onclick="calcLiq();sTab('l',2)">Ver C&#225;lculo &#8594;</button>
+    <button class="btn sm" onclick="guardarLiq()">Guardar Liquidaci&#243;n</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- FINIQUITO -->
+<div class="mo" id="moFin">
+ <div class="mbox xl">
+  <div class="mh">
+   <div class="mh-left">
+    <div class="mh-top"><span class="mh-badge rd">FINIQUITO</span><h3>Finiquito de Trabajo</h3></div>
+    <div class="mh-sub">Art&#237;culo 177 C&#243;digo del Trabajo &#8212; Documento Legal con Ministro de Fe</div>
+   </div>
+   <button class="mh-close" onclick="cerrar('moFin')">&#x2715;</button>
+  </div>
+  <div class="mb">
+   <div class="tabs">
+    <div class="tab on" id="tf1" onclick="sTab('f',1)">&#9312;&ensp;Datos</div>
+    <div class="tab" id="tf2" onclick="sTab('f',2)">&#9313;&ensp;C&#225;lculo Legal</div>
+    <div class="tab" id="tf3" onclick="sTab('f',3)">&#9314;&ensp;Documento</div>
+   </div>
+   <div class="tp on" id="tp-f1">
+    <div class="fin-layout">
+     <div class="fin-left">
+      <div class="fsec">
+       <div class="fsec-title"><span class="fsec-num">01</span>Identificaci&#243;n de las Partes</div>
+       <div class="fr"><div class="fg"><label>Trabajador a Desvincular</label><select id="fTrab" onchange="calcFin()"></select></div><div class="fg"><label>Fecha de T&#233;rmino</label><input type="date" id="fFec" onchange="calcFin()"></div></div>
+      </div>
+      <div class="fsec">
+       <div class="fsec-title"><span class="fsec-num">02</span>Causal y Modalidad</div>
+       <div class="fg"><label>Causal de T&#233;rmino del Contrato</label>
+        <select id="fCaus" onchange="calcFin()">
+         <optgroup label="Art. 159 — T&#233;rmino sin responsabilidad del empleador">
+          <option value="159_1">N&#176;1 — Mutuo Acuerdo de las Partes</option>
+          <option value="159_2">N&#176;2 — Renuncia Voluntaria del Trabajador</option>
+          <option value="159_3">N&#176;3 — Muerte del Trabajador</option>
+          <option value="159_4">N&#176;4 — Vencimiento del Plazo Convenido</option>
+          <option value="159_5">N&#176;5 — Conclusi&#243;n del Trabajo o Servicio</option>
+          <option value="159_6">N&#176;6 — Caso Fortuito o Fuerza Mayor</option>
+         </optgroup>
+         <optgroup label="Art. 161 — Necesidades de la empresa (con indemnizaci&#243;n)">
+          <option value="161">Necesidades de la Empresa o Establecimiento</option>
+          <option value="161b">Inciso 2&#176; — Desahucio del Empleador</option>
+         </optgroup>
+         <optgroup label="Art. 160 — Incumplimiento grave (sin indemnizaci&#243;n)">
+          <option value="160_1">N&#176;1 — Falta de Probidad o Actos Deshonestos</option>
+          <option value="160_2">N&#176;2 — Acoso Sexual</option>
+          <option value="160_3">N&#176;3 — No Concurrencia Injustificada</option>
+          <option value="160_4">N&#176;4 — Abandono del Trabajo</option>
+          <option value="160_5">N&#176;5 — Actos que Afectan el Proceso Productivo</option>
+          <option value="160_6">N&#176;6 — Perjuicio Intencional a Instalaciones</option>
+          <option value="160_7">N&#176;7 — Incumplimiento Grave de las Obligaciones</option>
+         </optgroup>
+        </select>
+       </div>
+       <div class="fr"><div class="fg"><label>Tipo de Contrato</label><select id="fTCont" onchange="calcFin()"><option value="indefinido">Indefinido</option><option value="plazo_fijo">Plazo Fijo</option><option value="obra">Por Obra o Faena</option></select></div><div class="fg"><label>Aviso Previo de 30 D&#237;as</label><select id="fAviso" onchange="calcFin()"><option value="si">S&#237;, fue otorgado oportunamente</option><option value="no">No se otorg&#243; — se pagar&#225; indemnizaci&#243;n</option></select></div></div>
+      </div>
+      <div class="fsec">
+       <div class="fsec-title"><span class="fsec-num">03</span>Montos y Haberes Pendientes</div>
+       <div class="fin-mrow"><label>Promedio &#250;ltimas 3 remuneraciones <em>(tope 90 UF/mes)</em></label><div class="fin-$wrap"><span class="fin-$sym">$</span><input type="number" id="fProm" placeholder="820.000" oninput="calcFin()"></div></div>
+       <div class="fin-mrow"><label>D&#237;as feriado pendientes <em>(d&#237;as h&#225;biles)</em></label><input type="number" id="fVac" value="0" min="0" oninput="calcFin()"></div>
+       <div class="fin-mrow"><label>Remuneraci&#243;n proporcional mes en curso</label><div class="fin-$wrap"><span class="fin-$sym">$</span><input type="number" id="fSP" value="0" oninput="calcFin()"></div></div>
+       <div class="fin-mrow"><label>Gratificaci&#243;n proporcional mes en curso</label><div class="fin-$wrap"><span class="fin-$sym">$</span><input type="number" id="fGP" value="0" oninput="calcFin()"></div></div>
+       <div class="fin-mrow"><label>Otros haberes y beneficios pendientes</label><div class="fin-$wrap"><span class="fin-$sym">$</span><input type="number" id="fOtros" value="0" oninput="calcFin()"></div></div>
+      </div>
+     </div>
+     <!-- live panel -->
+     <div class="fin-live">
+      <div class="fin-live-hdr">&#9646; Resumen Autom&#225;tico</div>
+      <div id="fResumen"><div class="fin-live-empty">Complete los datos y el sistema calcular&#225; autom&#225;ticamente los montos del finiquito.</div></div>
+     </div>
+    </div>
+   </div>
+   <div class="tp" id="tp-f2"><div id="fCalc"></div></div>
+   <div class="tp" id="tp-f3">
+    <div id="fDoc"></div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+     <button class="btn sm gn" onclick="expFinXLS()">&#x1F4C5; Excel</button>
+     <button class="btn sm sec" onclick="expFinPDF()">&#x1F5A8; PDF</button>
+     <button class="btn sm sec" onclick="expFinRTF()">&#x1F4C4; Word</button>
+    </div>
+   </div>
+  </div>
+  <div class="mf">
+   <button class="btn sm sec" onclick="cerrar('moFin')">Cancelar</button>
+   <div class="mf-right">
+    <button class="btn sm sec" onclick="calcFin();sTab('f',2)">Ver C&#225;lculo &#8594;</button>
+    <button class="btn sm sec" onclick="calcFin();genFinDoc();sTab('f',3)">Ver Documento &#8594;</button>
+    <button class="btn sm rd" onclick="guardarFin()">Registrar y Desvincular</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- MODAL CAMBIO DE CLAVE -->
+<div class="mo" id="moClave">
+ <div class="mbox" style="max-width:400px">
+  <div class="mh">
+   <div class="mh-left">
+    <div class="mh-top"><span class="mh-badge bl">SEGURIDAD</span><h3>Cambiar Contrase&#241;a</h3></div>
+    <div class="mh-sub">Actualiza tu clave de acceso al sistema</div>
+   </div>
+   <button class="mh-close" onclick="cerrar('moClave')">&#x2715;</button>
+  </div>
+  <div class="mb">
+   <div class="fsec">
+    <div class="fsec-title"><span class="fsec-num">&#x1F512;</span>Verificaci&#243;n y nueva clave</div>
+    <div class="fg"><label>Clave Actual</label><input type="password" id="claveActual" placeholder="Ingresa tu clave actual"></div>
+    <div class="fg"><label>Nueva Clave</label><input type="password" id="claveNueva" placeholder="M&#237;nimo 6 caracteres"></div>
+    <div class="fg"><label>Confirmar Nueva Clave</label><input type="password" id="claveConfirm" placeholder="Repite la nueva clave" onkeydown="if(event.key==='Enter')guardarClave()"></div>
+    <div id="claveErr" style="display:none;background:var(--red-lt);border:1.5px solid #fca5a5;border-radius:7px;padding:8px 12px;font-size:11px;color:var(--red);font-weight:500"></div>
+    <div id="claveOk" style="display:none;background:var(--grn-lt);border:1.5px solid #6ee7b7;border-radius:7px;padding:8px 12px;font-size:11px;color:var(--grn);font-weight:500">&#x2713; Contrase&#241;a actualizada correctamente</div>
+   </div>
+  </div>
+  <div class="mf">
+   <div class="mf-right">
+    <button class="btn sm sec" onclick="cerrar('moClave')">Cancelar</button>
+    <button class="btn sm" onclick="guardarClave()">Actualizar Clave</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+
+
+<script>
+// ── CONCEPTOS EXTRA ──────────────────────────────────────────────
+function getConceptosExtra(){
+  const rows=[...document.querySelectorAll('.cex-row')];
+  return rows.map(r=>{
+    const nom=r.querySelector('.cex-nom').value.trim();
+    const monto=parseFloat(r.querySelector('.cex-monto').value)||0;
+    const tipo=r.querySelector('.cex-tipo').value;
+    return nom&&monto>0?{nombre:nom,monto,tipo}:null;
+  }).filter(Boolean);
+}
+function addConcepto(){
+  const cont=document.getElementById('cexList');
+  const emp=document.getElementById('cexEmpty');
+  if(emp) emp.style.display='none';
+  const row=document.createElement('div');
+  row.className='cex-row';
+  row.style.cssText='display:grid;grid-template-columns:130px 1fr 140px 32px;gap:8px;align-items:center;background:#fff;border:1.5px solid var(--brd);border-radius:8px;padding:8px 12px';
+  row.innerHTML=`
+    <select class="cex-tipo" onchange="calcLiq()"
+      style="border:1.5px solid var(--brd);border-radius:6px;padding:6px 8px;font-size:11px;font-weight:600;background:#fff;color:var(--ink);width:100%">
+      <option value="haber" style="color:#1d4ed8">▲ Haber</option>
+      <option value="descuento" style="color:#dc2626">▼ Descuento</option>
+    </select>
+    <input class="cex-nom" type="text" placeholder="Ej: Bono productividad, Desc. uniforme..." oninput="calcLiq()"
+      style="border:1.5px solid var(--brd);border-radius:6px;padding:6px 10px;font-size:12px;background:#fff;width:100%">
+    <div style="display:flex;align-items:center;gap:5px;background:var(--surf2);border:1.5px solid var(--brd);border-radius:6px;padding:4px 8px">
+      <span style="font-size:12px;font-weight:700;color:var(--ink4)">$</span>
+      <input class="cex-monto" type="number" value="0" min="0" oninput="calcLiq()"
+        style="border:none;background:none;text-align:right;font-family:var(--mono);font-size:12px;font-weight:700;width:100%;outline:none">
+    </div>
+    <button onclick="this.closest('.cex-row').remove();updCexEmpty();calcLiq()"
+      style="width:32px;height:32px;border-radius:7px;border:none;background:#fee2e2;color:#dc2626;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;font-weight:700">&#x2715;</button>`;
+  cont.appendChild(row);
+}
+function updCexEmpty(){
+  const emp=document.getElementById('cexEmpty');
+  const rows=document.querySelectorAll('.cex-row');
+  if(emp) emp.style.display=rows.length===0?'block':'none';
+}
+
+function clearConceptos(){document.getElementById('cexList').innerHTML='';const emp=document.getElementById('cexEmpty');if(emp)emp.style.display='block';}
+
+function abrirCambioClave(){
+  $i('claveActual').value='';
+  $i('claveNueva').value='';
+  $i('claveConfirm').value='';
+  $i('claveErr').style.display='none';
+  $i('claveOk').style.display='none';
+  abrir('moClave');
+}
+function guardarClave(){
+  const actual=gv('claveActual'),nueva=gv('claveNueva'),confirm=gv('claveConfirm');
+  const err=$i('claveErr'),ok=$i('claveOk');
+  err.style.display='none'; ok.style.display='none';
+  if(!actual){err.textContent='Ingresa tu clave actual';err.style.display='block';return;}
+  if(CU.pass!==actual){err.textContent='La clave actual no es correcta';err.style.display='block';return;}
+  if(nueva.length<6){err.textContent='La nueva clave debe tener al menos 6 caracteres';err.style.display='block';return;}
+  if(nueva!==confirm){err.textContent='Las claves no coinciden';err.style.display='block';return;}
+  const usr=DB.usuarios.find(x=>x.id===CU.id);
+  if(usr){usr.pass=nueva;CU.pass=nueva;}
+  ok.style.display='block';
+  setTimeout(()=>cerrar('moClave'),1800);
+  toast('Clave actualizada correctamente','gn');
+}
+
+
+
+
+
+
+// PARÁMETROS
+let P={IMF:504000,UF:38500,UTM:68306,GRATIF_TOPE:4.75,TOPE_AFP_UF:81.6,SALUD:7.0,SIS:1.49,MUTUAL:0.95,CES_T:0.6,CES_E_IND:2.4,CES_E_PF:3.0,AFP:{Habitat:11.44,Modelo:10.58,Planvital:11.44,ProVida:11.44,Capital:11.44,Cuprum:11.44,Uno:10.65},IUT:[{d:0,h:13.5,t:0,r:0},{d:13.5,h:30,t:.04,r:.54},{d:30,h:50,t:.08,r:1.74},{d:50,h:70,t:.135,r:4.49},{d:70,h:90,t:.23,r:11.14},{d:90,h:120,t:.304,r:17.8},{d:120,h:310,t:.355,r:23.9},{d:310,h:9999,t:.4,r:39.45}]};
+
+// PERÍODO
+let PER=new Date();PER.setDate(1);
+function movPer(d){PER.setMonth(PER.getMonth()+d);updPer();renderAll();}
+function perStr(dt){return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');}
+function perNom(s){if(!s)return'—';const[y,m]=s.split('-');return['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'][parseInt(m)-1]+' '+y;}
+function updPer(){const s=perStr(PER),n=perNom(s);$i('perLbl').textContent=n;const a=$i('dPerBadge');if(a)a.textContent=n;const b=$i('liqPerBadge');if(b)b.textContent=n;}
+
+// DB
+let DB={
+  usuarios:[{id:1,user:'admin',pass:'admin123',rol:'admin',nombre:'Administrador',empIds:[1,2,3]}],
+  empresas:[
+    {id:1,rut:'12.345.678-9',nombre:'Constructora Demo SpA',giro:'Construcción de Edificios',sii:'4120',rep:'Juan Pérez Soto',repRut:'8.765.432-1',mut:'ACHS',dir:'Av. Providencia 1234',ciu:'Santiago',tel:'+56 2 2345 6789',email:'info@constructora.cl'},
+    {id:2,rut:'98.765.432-1',nombre:'Servicios Tech Ltda.',giro:'Tecnologías de la Información',sii:'6201',rep:'María González Ruiz',repRut:'12.987.654-3',mut:'Mutual de Seguridad CChC',dir:'Alameda 890 Of.201',ciu:'Santiago',tel:'+56 2 9876 5432',email:'info@techltda.cl'},
+    {id:3,rut:'76.543.219-0',nombre:'Comercial Sur S.A.',giro:'Comercio al por Menor',sii:'4711',rep:'Carlos López Mora',repRut:'15.432.109-7',mut:'IST',dir:"Av. O'Higgins 456",ciu:'Concepción',tel:'+56 41 234 5678',email:'admin@sur.cl'}
+  ],
+  trabajadores:[
+    {id:1,empId:1,rut:'15.234.567-8',nom:'Pedro',a1:'Vásquez',a2:'Morales',cargo:'Maestro Mayor',ing:'2022-03-15',suel:820000,afp:'Capital',isa:'FONASA',sUF:0,jorn:'45',bco:'Banco de Chile',tipoCta:'Cuenta Corriente',cta:'1234567',email:'pedro@mail.cl',tel:'+56 9 1111 2222',sexo:'M',fnac:'1985-06-10',dir:'Calle 1 N°100, Santiago',nac:'Chilena',activo:true},
+    {id:2,empId:1,rut:'18.765.432-1',nom:'Claudia',a1:'Muñoz',a2:'Reyes',cargo:'Administrativa',ing:'2023-01-10',suel:650000,afp:'Habitat',isa:'Banmédica',sUF:1.5,jorn:'45',bco:'Santander',tipoCta:'Cuenta Corriente',cta:'9876543',email:'claudia@mail.cl',tel:'+56 9 3333 4444',sexo:'F',fnac:'1990-03-22',dir:'Av. Las Rosas 500',nac:'Chilena',activo:true},
+    {id:3,empId:2,rut:'17.456.789-K',nom:'Rodrigo',a1:'Fernández',a2:'Castro',cargo:'Desarrollador Senior',ing:'2021-07-01',suel:1850000,afp:'Modelo',isa:'Colmena',sUF:2.1,jorn:'45',bco:'BCI',tipoCta:'Cuenta Corriente',cta:'4567890',email:'rod@mail.cl',tel:'+56 9 5555 6666',sexo:'M',fnac:'1988-11-05',dir:'Calle B 200',nac:'Chilena',activo:true},
+    {id:4,empId:2,rut:'20.123.456-7',nom:'Valentina',a1:'Silva',a2:'Torres',cargo:'Product Manager',ing:'2022-09-01',suel:2200000,afp:'Cuprum',isa:'Cruz Blanca',sUF:2.8,jorn:'45',bco:'Estado',tipoCta:'Cuenta Vista',cta:'3456789',email:'vale@mail.cl',tel:'+56 9 7777 8888',sexo:'F',fnac:'1992-08-18',dir:'Los Pinos 33',nac:'Chilena',activo:true},
+    {id:5,empId:3,rut:'16.789.012-3',nom:'Manuel',a1:'Rojas',a2:'Herrera',cargo:'Vendedor',ing:'2023-04-15',suel:560000,afp:'Planvital',isa:'FONASA',sUF:0,jorn:'45',bco:'Falabella',tipoCta:'Cuenta RUT',cta:'6789012',email:'manuel@mail.cl',tel:'+56 9 9999 0000',sexo:'M',fnac:'1995-02-28',dir:'Calle Nueva 88',nac:'Chilena',activo:true}
+  ],
+  contratos:[
+    {id:1,trabId:1,tipo:'indefinido',ini:'2022-03-15',term:null,jorn:'45',dist:'Lunes a Viernes',lug:'Obra Vitacura',ciu:'Santiago',suel:820000,grat:'legal',col:2500,mov:3000,func:'Supervisión y ejecución de obras civiles.',claus:'',estado:'vigente',num:'CTR-2022-001'},
+    {id:2,trabId:2,tipo:'indefinido',ini:'2023-01-10',term:null,jorn:'45',dist:'Lunes a Viernes',lug:'Oficina Central',ciu:'Santiago',suel:650000,grat:'garantizada',col:2500,mov:3000,func:'Gestión administrativa.',claus:'',estado:'vigente',num:'CTR-2023-001'},
+    {id:3,trabId:3,tipo:'indefinido',ini:'2021-07-01',term:null,jorn:'45',dist:'Lunes a Viernes',lug:'Remoto / Oficina Alameda',ciu:'Santiago',suel:1850000,grat:'legal',col:0,mov:0,func:'Desarrollo de software.',claus:'Confidencialidad.',estado:'vigente',num:'CTR-2021-001'},
+    {id:4,trabId:5,tipo:'plazo_fijo',ini:'2023-04-15',term:'2024-04-14',jorn:'45',dist:'Lunes a Sábado',lug:'Tienda Concepción',ciu:'Concepción',suel:560000,grat:'legal',col:2500,mov:3000,func:'Atención y venta al cliente.',claus:'',estado:'vencido',num:'CTR-2023-002'}
+  ],
+  liquidaciones:[],finiquitos:[]
+};
+let CU=null,CE=null,eEmpId=null,eTrabId=null,eContId=null,eLiqId=null,LR=null,FR=null;
+
+// HELPERS
+function $i(id){return document.getElementById(id);}
+function gv(id){const e=$i(id);return e?e.value:'';}
+function pf(id){return parseFloat(gv(id))||0;}
+function fmt(n){return Math.round(n||0).toLocaleString('es-CL');}
+function fd(d){if(!d)return'—';try{const[y,m,dd]=d.split('-');return`${dd}/${m}/${y}`;}catch(e){return d;}}
+function nd(c){return`<tr class="empty-row"><td colspan="${c}">Sin registros para este período</td></tr>`;}
+function qAll(s){return document.querySelectorAll(s);}
+function toast(m,t='gn'){const el=document.createElement('div');const bg=t==='rd'?'#ef4444':t==='yl'?'#f59e0b':'#10b981';el.style.cssText=`position:fixed;bottom:20px;right:20px;background:${bg};color:#fff;padding:10px 20px;border-radius:8px;font-size:12px;z-index:9999;box-shadow:0 4px 20px #0005;font-family:Sora,sans-serif;max-width:380px;line-height:1.4`;el.textContent=m;document.body.appendChild(el);setTimeout(()=>el.remove(),4000);}
+
+// INIT
+window.onload=()=>{updPer();const h=new Date().toISOString().slice(0,7);$i('rMes').value=h;$i('rPrev').value=h;$i('rAnio').value=new Date().getFullYear();pobLoginEmps();renderPrev();generarDemo();};
+function pobLoginEmps(){const s=$i('lEmp');s.innerHTML='<option value="">— Seleccione empresa —</option>';DB.empresas.forEach(e=>s.innerHTML+=`<option value="${e.id}">${e.nombre}</option>`);}
+
+// AUTH
+function doLogin(){const empId=parseInt(gv('lEmp')),u=gv('lU').trim(),p=gv('lP');const usr=DB.usuarios.find(x=>x.user===u&&x.pass===p);if(!usr||!empId||!usr.empIds.includes(empId)){$i('lErr').style.display='block';return;}$i('lErr').style.display='none';CU=usr;CE=empId;$i('LS').style.display='none';$i('APP').style.display='block';$i('uBadge').textContent=(usr.rol==='admin'?'🛡️ ':'👤 ')+usr.nombre;pobEmpSel();renderParams();renderPrev();renderAll();}
+function doLogout(){CU=null;CE=null;$i('LS').style.display='flex';$i('APP').style.display='none';$i('lU').value='';$i('lP').value='';}
+function pobEmpSel(){const s=$i('aEmp');s.innerHTML='';DB.empresas.filter(e=>CU.empIds.includes(e.id)).forEach(e=>s.innerHTML+=`<option value="${e.id}">${e.nombre}</option>`);s.value=CE;}
+function chEmp(){CE=parseInt(gv('aEmp'));renderAll();}
+
+// NAV / MODAL / TAB
+function goNav(id,el){qAll('.panel').forEach(p=>p.classList.remove('on'));qAll('.nav').forEach(n=>n.classList.remove('on'));$i('panel-'+id).classList.add('on');el.classList.add('on');}
+function cerrar(id){$i(id).classList.remove('on');}
+function abrir(id){$i(id).classList.add('on');}
+function sTab(pre,n){[1,2,3].forEach(i=>{const tp=$i(`tp-${pre}${i}`),tb=$i(`t${pre}${i}`);if(tp)tp.classList.toggle('on',i===n);if(tb)tb.classList.toggle('on',i===n);});if(pre==='l'&&n===2)calcLiq();if(pre==='l'&&n===3){calcLiq();setTimeout(genLiqPrev,50);}if(pre==='f'&&n===2)calcFin();if(pre==='f'&&n===3){calcFin();genFinDoc();}}
+
+function renderAll(){updPer();renderDash();renderEmpresas();renderTrabajadores();renderContratos();renderLiqs();renderFins();}
+
+// DASHBOARD
+function renderDash(){
+  const emp=DB.empresas.find(e=>e.id===CE);$i('dSub').textContent=emp?emp.nombre:'';$i('dPerBadge').textContent=perNom(perStr(PER));
+  const trabs=DB.trabajadores.filter(t=>t.empId===CE&&t.activo);
+  const per=perStr(PER),liqs=DB.liquidaciones.filter(l=>l.empId===CE&&l.per===per);
+  const tL=liqs.reduce((s,l)=>s+l.liq,0),tH=liqs.reduce((s,l)=>s+l.hab,0);
+  const fins=DB.finiquitos.filter(f=>f.empId===CE);
+  $i('dStats').innerHTML=`
+    <div class="sc b"><div class="lbl">Trabajadores Activos</div><div class="val">${trabs.length}</div><div class="sub">en nómina</div></div>
+    <div class="sc g"><div class="lbl">Masa Líquida ${perNom(per)}</div><div class="val">$${fmt(tL)}</div><div class="sub">líquido a pagar</div></div>
+    <div class="sc y"><div class="lbl">Total Haberes ${perNom(per)}</div><div class="val">$${fmt(tH)}</div><div class="sub">bruto período</div></div>
+    <div class="sc r"><div class="lbl">IMF 2026</div><div class="val">$${fmt(P.IMF)}</div><div class="sub">Ingreso Mínimo</div></div>
+    <div class="sc c"><div class="lbl">Finiquitos Emitidos</div><div class="val">${fins.length}</div><div class="sub">todos los períodos</div></div>`;
+  const cols=['#3b82f6','#06b6d4','#10b981','#f59e0b','#ef4444','#8b5cf6'];
+  const maxS=Math.max(...trabs.map(t=>t.suel),1);
+  $i('dChart').innerHTML=trabs.slice(0,6).map((t,i)=>`<div class="cbr"><div class="cbl">${t.nom} ${t.a1}</div><div class="cbt"><div class="cbf" style="width:${~~(t.suel/maxS*100)}%;background:${cols[i%6]}"></div></div><div class="cbv">$${fmt(t.suel)}</div></div>`).join('');
+  $i('dLiqs').innerHTML=liqs.length?liqs.map(l=>{const t=DB.trabajadores.find(x=>x.id===l.trabId);return`<div class="liq-row"><span class="liq-name">${t?t.nom+' '+t.a1:'-'}</span><span class="liq-amt">$${fmt(l.liq)}</span></div>`;}).join(''):'<div style="color:var(--ink4);font-size:12px;padding:20px;text-align:center;font-weight:500">Sin liquidaciones en este período</div>';
+}
+
+// EMPRESAS
+function renderEmpresas(){const emps=CU.rol==='admin'?DB.empresas:DB.empresas.filter(e=>CU.empIds.includes(e.id));$i('tbEmp').innerHTML=emps.map(e=>{const n=DB.trabajadores.filter(t=>t.empId===e.id&&t.activo).length;return`<tr><td><code style="color:var(--ac2);font-size:10px">${e.rut}</code></td><td><b>${e.nombre}</b></td><td>${e.giro}</td><td>${e.rep}</td><td><span class="badge bb">${n}</span></td><td>${e.mut}</td><td style="display:flex;gap:4px"><button class="btn sm sec" onclick="editEmp(${e.id})">Editar</button><button class="btn sm sec" onclick="impEmpresaId(${e.id})">PDF</button></td></tr>`;}).join('');}
+function abrirEmp(){eEmpId=null;$i('moEmpT').textContent='Nueva Empresa';$i('btnDE').style.display='none';['eRut','eNom','eGiro','eSII','eRep','eRepRut','eDir','eCiu','eTel','eEmail'].forEach(id=>$i(id).value='');abrir('moEmp');}
+function editEmp(id){const e=DB.empresas.find(x=>x.id===id);if(!e)return;eEmpId=id;$i('moEmpT').textContent='Editar Empresa';$i('btnDE').style.display='inline-flex';$i('eRut').value=e.rut;$i('eNom').value=e.nombre;$i('eGiro').value=e.giro;$i('eSII').value=e.sii||'';$i('eRep').value=e.rep;$i('eRepRut').value=e.repRut||'';$i('eMut').value=e.mut;$i('eDir').value=e.dir;$i('eCiu').value=e.ciu||'';$i('eTel').value=e.tel;$i('eEmail').value=e.email;abrir('moEmp');}
+function elimEmp(){if(!eEmpId)return;const n=DB.trabajadores.filter(t=>t.empId===eEmpId&&t.activo).length;if(n>0){toast('No se puede eliminar: tiene '+n+' trabajadores activos','rd');return;}if(!confirm('¿Eliminar empresa?'))return;DB.empresas=DB.empresas.filter(e=>e.id!==eEmpId);CU.empIds=CU.empIds.filter(x=>x!==eEmpId);if(CE===eEmpId)CE=CU.empIds[0]||null;cerrar('moEmp');pobLoginEmps();pobEmpSel();renderAll();toast('Empresa eliminada');}
+function guardarEmp(){const o={rut:gv('eRut'),nombre:gv('eNom'),giro:gv('eGiro'),sii:gv('eSII'),rep:gv('eRep'),repRut:gv('eRepRut'),mut:gv('eMut'),dir:gv('eDir'),ciu:gv('eCiu'),tel:gv('eTel'),email:gv('eEmail')};if(!o.rut||!o.nombre){toast('RUT y Razón Social requeridos','rd');return;}if(eEmpId)Object.assign(DB.empresas.find(x=>x.id===eEmpId),o);else{o.id=Date.now();DB.empresas.push(o);CU.empIds.push(o.id);}cerrar('moEmp');pobLoginEmps();pobEmpSel();renderAll();toast('Empresa guardada');}
+
+// TRABAJADORES
+let tF='',tE='';
+function renderTrabajadores(f,e){if(f!==undefined)tF=f;if(e!==undefined)tE=e;let ts=DB.trabajadores.filter(t=>t.empId===CE);if(tF)ts=ts.filter(t=>`${t.nom} ${t.a1} ${t.rut}`.toLowerCase().includes(tF.toLowerCase()));if(tE==='1')ts=ts.filter(t=>t.activo);if(tE==='0')ts=ts.filter(t=>!t.activo);
+  $i('tbTrab').innerHTML=ts.map(t=>{const a=calcAnios(t.ing,new Date().toISOString().slice(0,10));return`<tr><td><code style="color:var(--ac2);font-size:10px">${t.rut}</code></td><td><b>${t.nom} ${t.a1} ${t.a2}</b></td><td>${t.cargo}</td><td>${fd(t.ing)}</td><td><span class="badge bc">${a.a}a ${a.m}m</span></td><td><span style="font-family:var(--mn)">$${fmt(t.suel)}</span></td><td>${t.afp}</td><td>${t.isa}${t.sUF>0?` <span class="badge by">+${t.sUF}UF</span>`:''}</td><td><span class="badge ${t.activo?'bg':'br'}">${t.activo?'Activo':'Inactivo'}</span></td><td style="display:flex;gap:3px"><button class="btn sm sec" onclick="editTrab(${t.id})">Editar</button><button class="btn sm sec" onclick="impFichaTrabId(${t.id})">PDF</button></td></tr>`;}).join('')||nd(10);}
+function filtT(v){renderTrabajadores(v);}
+function filtTE(v){renderTrabajadores(undefined,v);}
+function abrirTrab(){eTrabId=null;$i('moTrabT').textContent='Nuevo Trabajador';$i('btnDT').style.display='none';['tRut','tNom','tA1','tA2','tEmail','tTel','tDir','tCta'].forEach(id=>$i(id).value='');$i('tSuel').value='';$i('tSUF').value='0';abrir('moTrab');}
+function editTrab(id){const t=DB.trabajadores.find(x=>x.id===id);if(!t)return;eTrabId=id;$i('moTrabT').textContent='Editar Trabajador';$i('btnDT').style.display='inline-flex';$i('tRut').value=t.rut;$i('tNom').value=t.nom;$i('tA1').value=t.a1;$i('tA2').value=t.a2;$i('tEmail').value=t.email||'';$i('tTel').value=t.tel||'';$i('tDir').value=t.dir||'';$i('tSuel').value=t.suel;$i('tAFP').value=t.afp;$i('tIsa').value=t.isa;$i('tSUF').value=t.sUF||0;$i('tJorn').value=t.jorn;$i('tBco').value=t.bco;$i('tTipoCta').value=t.tipoCta||'Cuenta Corriente';$i('tCta').value=t.cta;$i('tSex').value=t.sexo||'M';$i('tFNac').value=t.fnac||'';$i('tIng').value=t.ing;$i('tCargo').value=t.cargo;$i('tNac').value=t.nac||'Chilena';abrir('moTrab');}
+function elimTrab(){if(!eTrabId)return;if(!confirm('¿Eliminar trabajador y todos sus registros?'))return;DB.trabajadores=DB.trabajadores.filter(x=>x.id!==eTrabId);DB.liquidaciones=DB.liquidaciones.filter(x=>x.trabId!==eTrabId);DB.contratos=DB.contratos.filter(x=>x.trabId!==eTrabId);cerrar('moTrab');renderAll();toast('Trabajador eliminado');}
+function guardarTrab(){const o={empId:CE,rut:gv('tRut'),nom:gv('tNom'),a1:gv('tA1'),a2:gv('tA2'),cargo:gv('tCargo'),ing:gv('tIng'),suel:pf('tSuel')||P.IMF,afp:gv('tAFP'),isa:gv('tIsa'),sUF:pf('tSUF'),jorn:gv('tJorn'),bco:gv('tBco'),tipoCta:gv('tTipoCta'),cta:gv('tCta'),email:gv('tEmail'),tel:gv('tTel'),dir:gv('tDir'),sexo:gv('tSex'),fnac:gv('tFNac'),nac:gv('tNac'),activo:true};if(!o.rut||!o.nom){toast('RUT y Nombres requeridos','rd');return;}if(eTrabId)Object.assign(DB.trabajadores.find(x=>x.id===eTrabId),o);else DB.trabajadores.push({id:Date.now(),...o});cerrar('moTrab');renderAll();toast('Trabajador guardado');}
+
+// CONTRATOS
+function renderContratos(){const tipos={indefinido:'Indefinido',plazo_fijo:'Plazo Fijo',obra_faena:'Obra/Faena',reemplazo:'Reemplazo'};const cs=DB.contratos.filter(c=>{const t=DB.trabajadores.find(x=>x.id===c.trabId);return t&&t.empId===CE;});const hoy=new Date();$i('tbCont').innerHTML=cs.map(c=>{const t=DB.trabajadores.find(x=>x.id===c.trabId);const dr=c.term?~~((new Date(c.term)-hoy)/864e5):null;const eb=c.estado==='vigente'?'bg':c.estado==='vencido'?'br':'by';return`<tr><td><code style="font-size:10px;color:var(--ac2)">${c.num}</code></td><td><b>${t?t.nom+' '+t.a1:'-'}</b></td><td><span class="badge bb">${tipos[c.tipo]||c.tipo}</span></td><td>${fd(c.ini)}</td><td>${c.term?fd(c.term)+' '+(dr!==null&&dr<0?'<span class="badge br">VENCIÓ</span>':dr<30?`<span class="badge by">⚠️${dr}d</span>`:''):'<span style="color:var(--tx3)">Indefinido</span>'}</td><td>${c.jorn}h</td><td><span style="font-family:var(--mn)">$${fmt(c.suel)}</span></td><td><span class="badge ${eb}">${c.estado}</span></td><td style="display:flex;gap:3px"><button class="btn sm sec" onclick="editCont(${c.id})">Editar</button><button class="btn sm sec" onclick="impContratoId(${c.id})">PDF</button><button class="btn sm sec" onclick="expContXLSId(${c.id})">Excel</button></td></tr>`;}).join('')||nd(9);}
+function pobTrabSel(sid){const ts=DB.trabajadores.filter(t=>t.empId===CE&&t.activo);$i(sid).innerHTML=ts.map(t=>`<option value="${t.id}">${t.nom} ${t.a1} — ${t.rut}</option>`).join('');}
+function abrirCont(){eContId=null;$i('moContT').textContent='Nuevo Contrato';$i('btnDC').style.display='none';pobTrabSel('cTrab');['cLug','cCiu','cFunc','cClaus'].forEach(id=>$i(id).value='');$i('cSuel').value='';$i('cCol').value='0';$i('cMov').value='0';$i('cTipo').value='indefinido';chTerm();abrir('moCont');}
+function editCont(id){const c=DB.contratos.find(x=>x.id===id);if(!c)return;eContId=id;pobTrabSel('cTrab');$i('moContT').textContent='Editar Contrato';$i('btnDC').style.display='inline-flex';$i('cTrab').value=c.trabId;$i('cTipo').value=c.tipo;$i('cIni').value=c.ini;$i('cTerm').value=c.term||'';$i('cJorn').value=c.jorn;$i('cDist').value=c.dist||'Lunes a Viernes';$i('cLug').value=c.lug;$i('cCiu').value=c.ciu||'';$i('cSuel').value=c.suel;$i('cGrat').value=c.grat;$i('cCol').value=c.col||0;$i('cMov').value=c.mov||0;$i('cFunc').value=c.func;$i('cClaus').value=c.claus;chTerm();abrir('moCont');}
+function elimCont(){if(!eContId)return;if(!confirm('¿Eliminar contrato?'))return;DB.contratos=DB.contratos.filter(x=>x.id!==eContId);cerrar('moCont');renderContratos();toast('Contrato eliminado');}
+function chTerm(){$i('cTermG').style.display=gv('cTipo')==='indefinido'?'none':'block';}
+function guardarCont(){const o={trabId:parseInt(gv('cTrab')),tipo:gv('cTipo'),ini:gv('cIni'),term:gv('cTerm')||null,jorn:gv('cJorn'),dist:gv('cDist'),lug:gv('cLug'),ciu:gv('cCiu'),suel:pf('cSuel')||P.IMF,grat:gv('cGrat'),col:pf('cCol'),mov:pf('cMov'),func:gv('cFunc'),claus:gv('cClaus'),estado:'vigente'};if(eContId)Object.assign(DB.contratos.find(x=>x.id===eContId),o);else{o.id=Date.now();o.num=`CTR-${new Date().getFullYear()}-${String(DB.contratos.length+1).padStart(3,'0')}`;DB.contratos.push(o);}cerrar('moCont');renderContratos();toast('Contrato guardado');}
+
+// CÁLCULO LIQUIDACIÓN
+function calcGrat(s){return Math.min(s*.25,P.IMF*P.GRATIF_TOPE)/12;}
+function calcIUT(base){const uf=base/P.UF;for(const tr of P.IUT)if(uf>=tr.d&&uf<tr.h)return Math.max(0,(uf*tr.t-tr.r)*P.UF);return 0;}
+function calcAnios(ing,term){
+  const i=new Date(ing),f=new Date(term),ms=f-i,dec=ms/(365.25*864e5);
+  let a=f.getFullYear()-i.getFullYear(),m=f.getMonth()-i.getMonth(),d=f.getDate()-i.getDate();
+  if(d<0)m--;if(m<0){a--;m+=12;}return{a,m:Math.abs(m),d:Math.abs(d),dec};
+}
+function causNom(c){const m={'159_1':'Art. 159 N°1 — Mutuo Acuerdo de las Partes','159_2':'Art. 159 N°2 — Renuncia Voluntaria','159_3':'Art. 159 N°3 — Muerte del Trabajador','159_4':'Art. 159 N°4 — Vencimiento del Plazo','159_5':'Art. 159 N°5 — Conclusión del Trabajo','159_6':'Art. 159 N°6 — Caso Fortuito o Fuerza Mayor','161':'Art. 161 — Necesidades de la Empresa','161b':'Art. 161 inc. 2° — Desahucio','160_1':'Art. 160 N°1 — Falta de Probidad','160_2':'Art. 160 N°2 — Acoso Sexual','160_3':'Art. 160 N°3 — No Concurrencia Injustificada','160_4':'Art. 160 N°4 — Abandono del Trabajo','160_5':'Art. 160 N°5 — Actos que Afectan el Proceso','160_6':'Art. 160 N°6 — Perjuicio Intencional','160_7':'Art. 160 N°7 — Incumplimiento Grave de Obligaciones'};return m[c]||c;}
+
+function abrirLiq(){eLiqId=null;LR=null;$i('btnDL').style.display='none';$i('moLiqT').textContent='Nueva Liquidación';pobTrabSel('lTrab');$i('lPer').value=perStr(PER);['lHE','lBon','lOH','lCol','lMov','lAnt','lPrest','lOD'].forEach(id=>$i(id).value='0');$i('lSUF').value='0';$i('lDias').value='30';clearConceptos();sTab('l',1);cargarTrab();abrir('moLiq');}
+function cargarTrab(){
+  const t=DB.trabajadores.find(x=>x.id===parseInt(gv('lTrab')));
+  if(!t)return;
+  // Populate AFP select dynamically with current rates from P.AFP
+  const afpSel=$i('lAFP');
+  afpSel.innerHTML=Object.entries(P.AFP).map(([n,r])=>`<option value="${r}" ${t.afp===n?'selected':''}>${n} — ${r}%</option>`).join('');
+  $i('lSuel').value=t.suel;
+  $i('lSUF').value=t.sUF||0;
+  $i('lIsa').value=t.isa;
+  calcLiq();
+}
+function calcLiq(){
+  const suel=pf('lSuel'),dias=pf('lDias'),hE=pf('lHE'),hET=pf('lHET');
+  const bon=pf('lBon'),oH=pf('lOH'),col=pf('lCol'),mov=pf('lMov');
+  const afpR=pf('lAFP'),sUF=pf('lSUF'),ant=pf('lAnt'),prest=pf('lPrest'),oD=pf('lOD');
+  const g=calcGrat(suel),suP=suel*(dias/30),vH=(suel/30/8)*hET,totHE=hE*vH;
+  let totH=0; const totI=suP+totHE+g+bon+oH,noI=col+mov; totH=totI+noI;
+  const topI=Math.min(totI,P.TOPE_AFP_UF*P.UF);
+  const dAFP=topI*(afpR/100),dS7=topI*(P.SALUD/100),dSUF=sUF*P.UF,dSal=dS7+dSUF;
+  const dCes=topI*(P.CES_T/100),bIUT=Math.max(0,totI-dAFP-dS7),dIUT=calcIUT(bIUT);
+  let totD=dAFP+dSal+dCes+dIUT+ant+prest+oD,liq=~~(totH-totD);
+  const cSIS=topI*(P.SIS/100),cMut=topI*(P.MUTUAL/100),cCesE=topI*(P.CES_E_PF/100);
+  const conceptosExtra=getConceptosExtra();
+  const extraHab=conceptosExtra.filter(c=>c.tipo==='haber').reduce((s,c)=>s+c.monto,0);
+  const extraDesc=conceptosExtra.filter(c=>c.tipo==='descuento').reduce((s,c)=>s+c.monto,0);
+  totH=~~totH+extraHab; totD=~~totD+extraDesc; liq=totH-~~totD;
+  LR={suel,dias,suP,hE,hET,totHE,g,bon,oH,col,mov,totI,noI,totH,topI,afpR,sUF,dAFP,dS7,dSUF,dSal,dCes,bIUT,dIUT,ant,prest,oD,totD,liq,cSIS,cMut,cCesE,conceptosExtra};
+  const u=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  u('ls-imp','$'+fmt(~~totI)); u('ls-afp','-$'+fmt(~~dAFP));
+  u('ls-sal','-$'+fmt(~~dS7)); u('ls-isa',sUF>0?'-$'+fmt(~~dSUF):'—');
+  u('ls-ces','-$'+fmt(~~dCes)); u('ls-iut',dIUT>0?'-$'+fmt(~~dIUT):'Exento');
+  u('ls-hab','$'+fmt(~~totH)); u('ls-desc','-$'+fmt(~~totD));
+  const ll=document.getElementById('ls-liq');
+  if(ll){ll.textContent='$'+fmt(liq);}
+  const pm_hab=$i('pm-hab'),pm_desc=$i('pm-desc'),pm_liq=$i('pm-liq');
+  if(pm_hab){pm_hab.textContent='$'+fmt(~~totH);pm_desc.textContent='-$'+fmt(~~totD);pm_liq.textContent='$'+fmt(liq);}
+  $i('lCalc').innerHTML=`<div class="lp">
+    <div style="text-align:center;font-weight:700;color:var(--ac2);margin-bottom:11px">HOJA DE CÁLCULO — LIQUIDACIÓN DE SUELDO</div>
+    <div class="lst">① HABERES IMPONIBLES</div>
+    <div class="lr i"><span>Sueldo Base × (${dias}/30 días)</span><span>$${fmt(~~suP)}</span></div>
+    <div class="lr i"><span>Gratificación legal (25% cap. ${P.GRATIF_TOPE}×IMF÷12)</span><span>$${fmt(~~g)}</span></div>
+    ${hE>0?`<div class="lr i"><span>Horas extras: ${hE} × $${fmt(~~vH)} (recargo ${hET==2?'100':'50'}%)</span><span>$${fmt(~~totHE)}</span></div>`:''}
+    ${bon>0?`<div class="lr i"><span>Bonos / Comisiones</span><span>$${fmt(bon)}</span></div>`:''}
+    ${oH>0?`<div class="lr i"><span>Otros haberes imponibles</span><span>$${fmt(oH)}</span></div>`:''}
+    <div class="lr b"><span>SUBTOTAL IMPONIBLE</span><span>$${fmt(~~totI)}</span></div>
+    ${topI<totI?`<div class="lr i" style="color:var(--yl)"><span>⚠️ Tope AFP/Salud (${P.TOPE_AFP_UF} UF)</span><span>$${fmt(~~topI)}</span></div>`:''}
+    ${noI>0?`<div class="lst">② HABERES NO IMPONIBLES</div>${col>0?`<div class="lr i"><span>Asig. Colación</span><span>$${fmt(col)}</span></div>`:''}${mov>0?`<div class="lr i"><span>Asig. Movilización</span><span>$${fmt(mov)}</span></div>`:''}`:''}
+    <div class="lr b"><span>TOTAL HABERES BRUTOS</span><span>$${fmt(~~totH)}</span></div>
+    <div class="lst" style="margin-top:8px">③ DESCUENTOS LEGALES</div>
+    <div class="lr i"><span>AFP ${afpR}%</span><span style="color:var(--rd)">-$${fmt(~~dAFP)}</span></div>
+    <div class="lr i"><span>Salud ${P.SALUD}% legal</span><span style="color:var(--rd)">-$${fmt(~~dS7)}</span></div>
+    ${sUF>0?`<div class="lr i"><span>Salud adicional Isapre: ${sUF} UF × $${fmt(P.UF)}</span><span style="color:var(--rd)">-$${fmt(~~dSUF)}</span></div>`:''}
+    <div class="lr i"><span>Seg. Cesantía trabajador ${P.CES_T}%</span><span style="color:var(--rd)">-$${fmt(~~dCes)}</span></div>
+    ${dIUT>0?`<div class="lr i"><span>Impuesto Único (base: $${fmt(~~bIUT)})</span><span style="color:var(--rd)">-$${fmt(~~dIUT)}</span></div>`:`<div class="lr i"><span>Impuesto Único — Exento (base &lt; tramo)</span><span style="color:var(--tx3)">$0</span></div>`}
+    ${ant>0?`<div class="lr i"><span>Anticipos</span><span style="color:var(--rd)">-$${fmt(ant)}</span></div>`:''}
+    ${prest>0?`<div class="lr i"><span>Cuota préstamo</span><span style="color:var(--rd)">-$${fmt(prest)}</span></div>`:''}
+    ${oD>0?`<div class="lr i"><span>Otras deducciones</span><span style="color:var(--rd)">-$${fmt(oD)}</span></div>`:''}
+    <div class="lr b"><span>TOTAL DESCUENTOS</span><span style="color:var(--rd)">-$${fmt(~~totD)}</span></div>
+    <div class="lr b" style="font-size:16px;margin-top:12px;padding:12px 0;border-top:2px solid var(--brd)"><span>💵 LÍQUIDO A PAGAR</span><span style="color:var(--gn);font-size:20px;font-weight:800">$${fmt(liq)}</span></div>
+    <div class="lst" style="margin-top:12px">④ COSTOS ADICIONALES EMPLEADOR (solo referencial)</div>
+    <div class="lr i"><span>SIS ${P.SIS}%</span><span>$${fmt(~~cSIS)}</span></div>
+    <div class="lr i"><span>Mutual ${P.MUTUAL}%</span><span>$${fmt(~~cMut)}</span></div>
+    <div class="lr i"><span>Cesantía empleador ${P.CES_E_PF}%</span><span>$${fmt(~~cCesE)}</span></div>
+    <div class="lr b"><span>COSTO TOTAL EMPRESA</span><span>$${fmt(~~(totH+cSIS+cMut+cCesE))}</span></div>
+  </div>`;return LR;
+}
+
+function genLiqPrev(){
+  if(!LR){calcLiq();}
+  if(!LR){$i('lPrev').innerHTML='<div style="padding:32px;text-align:center;color:#6b7280;font-size:13px">Seleccione un trabajador e ingrese el período para generar el documento.</div>';return;}
+  const trabId=parseInt(gv('lTrab')),t=DB.trabajadores.find(x=>x.id===trabId);
+  const emp=DB.empresas.find(e=>e.id===CE),per=gv('lPer');
+  $i('lPrev').innerHTML=`
+<div id="printLiqDiv" style="background:#fff;color:#1a1d2e;padding:32px 36px;font-family:'Segoe UI',system-ui,sans-serif;font-size:11px;line-height:1.6;max-width:760px;margin:0 auto;border:1px solid #e2e5f0;border-radius:10px">
+
+  <!-- HEADER CORPORATIVO -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:18px;border-bottom:3px solid #1d4ed8;margin-bottom:18px">
+    <div>
+      <div style="font-size:18px;font-weight:800;color:#1a1d2e;letter-spacing:-.5px">${emp?.nombre||'EMPRESA'}</div>
+      <div style="font-size:10px;color:#6b7280;margin-top:3px">RUT ${emp?.rut} &nbsp;·&nbsp; ${emp?.giro}</div>
+      <div style="font-size:10px;color:#6b7280">${emp?.dir}, ${emp?.ciu||'Santiago'}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="background:#1d4ed8;color:#fff;font-size:13px;font-weight:800;padding:7px 16px;border-radius:7px;letter-spacing:.5px">LIQUIDACIÓN DE SUELDO</div>
+      <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-top:6px">${perNom(per).toUpperCase()}</div>
+      <div style="font-size:9px;color:#9ca3af;margin-top:2px">DFL-1 Código del Trabajo</div>
+    </div>
+  </div>
+
+  <!-- DATOS TRABAJADOR -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
+    <div style="background:#f8faff;border:1px solid #dbeafe;border-radius:8px;padding:12px 16px">
+      <div style="font-size:9px;font-weight:800;color:#1d4ed8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px">Datos del Trabajador</div>
+      <div style="font-size:12px;font-weight:700;color:#1a1d2e;margin-bottom:4px">${t?t.nom+' '+t.a1+' '+(t.a2||''):'-'}</div>
+      <div style="color:#4b5563"><b>RUT:</b> ${t?.rut}</div>
+      <div style="color:#4b5563"><b>Cargo:</b> ${t?.cargo}</div>
+      <div style="color:#4b5563"><b>Fecha ingreso:</b> ${fd(t?.ing)}</div>
+    </div>
+    <div style="background:#f8faff;border:1px solid #dbeafe;border-radius:8px;padding:12px 16px">
+      <div style="font-size:9px;font-weight:800;color:#1d4ed8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px">Condiciones Laborales</div>
+      <div style="color:#4b5563"><b>Jornada:</b> ${t?.jorn} hrs/semana</div>
+      <div style="color:#4b5563"><b>AFP:</b> ${t?.afp} (${LR.afpR}%)</div>
+      <div style="color:#4b5563"><b>Salud:</b> ${t?.isa}${LR.sUF>0?' (+'+LR.sUF+' UF/mes)':''}</div>
+      <div style="color:#4b5563"><b>Banco:</b> ${t?.bco} · ${t?.tipoCta} N°${t?.cta}</div>
+    </div>
+  </div>
+
+  <!-- TABLA HABERES / DESCUENTOS -->
+  <div style="margin-bottom:18px">
+    <div style="font-size:9px;font-weight:800;color:#374151;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Detalle de Haberes y Descuentos</div>
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead>
+        <tr>
+          <th style="background:#1e293b;color:#fff;padding:8px 12px;text-align:left;font-size:9px;letter-spacing:.6px;text-transform:uppercase;border-radius:6px 0 0 0">HABERES</th>
+          <th style="background:#1e293b;color:#fff;padding:8px 12px;text-align:right;font-size:9px;letter-spacing:.6px;text-transform:uppercase">MONTO</th>
+          <th style="background:#1e293b;color:#fff;padding:8px 12px;text-align:left;font-size:9px;letter-spacing:.6px;text-transform:uppercase">DESCUENTOS</th>
+          <th style="background:#1e293b;color:#fff;padding:8px 12px;text-align:right;font-size:9px;letter-spacing:.6px;text-transform:uppercase;border-radius:0 6px 0 0">MONTO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid #f1f5f9">
+          <td style="padding:7px 12px;color:#374151">Sueldo Base (${LR.dias}/30 días)</td>
+          <td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600">$${fmt(~~LR.suP)}</td>
+          <td style="padding:7px 12px;color:#374151">AFP ${LR.afpR}%</td>
+          <td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600;color:#dc2626">-$${fmt(~~LR.dAFP)}</td>
+        </tr>
+        <tr style="background:#fafbff;border-bottom:1px solid #f1f5f9">
+          <td style="padding:7px 12px;color:#374151">Gratificación Legal (Art.50 CT)</td>
+          <td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600">$${fmt(~~LR.g)}</td>
+          <td style="padding:7px 12px;color:#374151">Salud ${P.SALUD}% legal</td>
+          <td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600;color:#dc2626">-$${fmt(~~LR.dS7)}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #f1f5f9">
+          <td style="padding:7px 12px;color:#374151">Horas Extras${LR.hE>0?' ('+LR.hE+' hrs)':''}</td>
+          <td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600">${LR.totHE>0?'$'+fmt(~~LR.totHE):'—'}</td>
+          <td style="padding:7px 12px;color:#374151">Isapre adicional</td>
+          <td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600;color:#dc2626">${LR.dSUF>0?'-$'+fmt(~~LR.dSUF):'—'}</td>
+        </tr>
+        <tr style="background:#fafbff;border-bottom:1px solid #f1f5f9">
+          <td style="padding:7px 12px;color:#374151">Bonos / Comisiones</td>
+          <td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600">${LR.bon>0?'$'+fmt(LR.bon):'—'}</td>
+          <td style="padding:7px 12px;color:#374151">Seg. Cesantía ${P.CES_T}%</td>
+          <td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600;color:#dc2626">-$${fmt(~~LR.dCes)}</td>
+        </tr>
+        <tr style="border-bottom:1px solid #f1f5f9">
+          <td style="padding:7px 12px;color:#6b7280;font-style:italic">Colación (no imponible)</td>
+          <td style="padding:7px 12px;text-align:right;font-family:monospace;color:#6b7280">${LR.col>0?'$'+fmt(LR.col):'—'}</td>
+          <td style="padding:7px 12px;color:#374151">Impuesto Único Trab.</td>
+          <td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600;color:#dc2626">${LR.dIUT>0?'-$'+fmt(~~LR.dIUT):'Exento'}</td>
+        </tr>
+        <tr style="background:#fafbff;border-bottom:1px solid #f1f5f9">
+          <td style="padding:7px 12px;color:#6b7280;font-style:italic">Movilización (no imponible)</td>
+          <td style="padding:7px 12px;text-align:right;font-family:monospace;color:#6b7280">${LR.mov>0?'$'+fmt(LR.mov):'—'}</td>
+          <td style="padding:7px 12px;color:#374151">Anticipos</td>
+          <td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600;color:#dc2626">${LR.ant>0?'-$'+fmt(LR.ant):'—'}</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 12px"></td><td></td>
+          <td style="padding:7px 12px;color:#374151">Cuota Préstamo</td>
+          <td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600;color:#dc2626">${LR.prest>0?'-$'+fmt(LR.prest):'—'}</td>
+        </tr>
+        <!-- TOTALES -->
+        <tr style="border-top:2px solid #1d4ed8">
+          <td style="padding:9px 12px;font-weight:800;font-size:12px;color:#1a1d2e;background:#eff4ff">TOTAL HABERES</td>
+          <td style="padding:9px 12px;text-align:right;font-family:monospace;font-weight:800;font-size:12px;color:#1d4ed8;background:#eff4ff">$${fmt(~~LR.totH)}</td>
+          <td style="padding:9px 12px;font-weight:800;font-size:12px;color:#1a1d2e;background:#fff1f2">TOTAL DESCUENTOS</td>
+          <td style="padding:9px 12px;text-align:right;font-family:monospace;font-weight:800;font-size:12px;color:#dc2626;background:#fff1f2">-$${fmt(~~LR.totD)}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- LÍQUIDO DESTACADO -->
+  <div style="display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#1d4ed8,#0891b2);border-radius:10px;padding:16px 24px;margin-bottom:20px">
+    <div>
+      <div style="color:rgba(255,255,255,.7);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Líquido a Pagar — ${perNom(per)}</div>
+      <div style="color:rgba(255,255,255,.8);font-size:10px;margin-top:2px">Días trabajados: ${LR.dias}/30 &nbsp;·&nbsp; Tope imponible: $${fmt(~~LR.topI)}</div>
+    </div>
+    <div style="color:#fff;font-size:28px;font-weight:800;font-family:monospace;letter-spacing:-1px">$${fmt(LR.liq)}</div>
+  </div>
+
+  <!-- FIRMAS -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:36px">
+    <div style="text-align:center">
+      <div style="border-top:1.5px solid #374151;padding-top:9px">
+        <div style="font-weight:700;color:#1a1d2e">${t?t.nom+' '+t.a1:''}</div>
+        <div style="color:#6b7280;font-size:10px">RUT: ${t?.rut||''}</div>
+        <div style="color:#9ca3af;font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-top:2px">El Trabajador</div>
+      </div>
+    </div>
+    <div style="text-align:center">
+      <div style="border-top:1.5px solid #374151;padding-top:9px">
+        <div style="font-weight:700;color:#1a1d2e">${emp?.rep||''}</div>
+        <div style="color:#6b7280;font-size:10px">RUT: ${emp?.repRut||''} &nbsp;·&nbsp; ${emp?.nombre}</div>
+        <div style="color:#9ca3af;font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-top:2px">Por el Empleador</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="border-top:1px solid #e5e7eb;margin-top:20px;padding-top:10px;display:flex;justify-content:space-between;align-items:center">
+    <div style="font-size:8.5px;color:#9ca3af">SistemRem Chile 2026 &nbsp;·&nbsp; Código del Trabajo DFL-1</div>
+    <div style="font-size:8.5px;color:#9ca3af">IMF $${fmt(P.IMF)} &nbsp;·&nbsp; UF $${fmt(P.UF)} &nbsp;·&nbsp; UTM $${fmt(P.UTM)}</div>
+  </div>
+
+</div>`;
+}
+
+function guardarLiq(){
+  if(!LR)calcLiq();if(!LR){toast('Ingrese datos primero','rd');return;}
+  const trabId=parseInt(gv('lTrab')),per=gv('lPer');
+  const existe=DB.liquidaciones.find(l=>l.trabId===trabId&&l.per===per&&l.empId===CE);
+  if(existe&&!confirm('Ya existe liquidación para este período. ¿Reemplazar?'))return;
+  if(existe)DB.liquidaciones=DB.liquidaciones.filter(l=>!(l.trabId===trabId&&l.per===per&&l.empId===CE));
+  DB.liquidaciones.push({id:Date.now(),empId:CE,trabId,per,hab:~~LR.totH,desc:~~LR.totD,liq:LR.liq,d:{...LR},fecha:new Date().toISOString().slice(0,10),estado:'pagada'});
+  cerrar('moLiq');renderAll();toast('Liquidación guardada');
+}
+function elimLiq(){if(!eLiqId)return;if(!confirm('¿Eliminar?'))return;DB.liquidaciones=DB.liquidaciones.filter(x=>x.id!==eLiqId);cerrar('moLiq');renderLiqs();toast('Eliminado');}
+function renderLiqs(){
+  const per=perStr(PER);$i('liqPerBadge').textContent=perNom(per);
+  const liqs=DB.liquidaciones.filter(l=>l.empId===CE&&l.per===per);
+  $i('tbLiq').innerHTML=liqs.map(l=>{const t=DB.trabajadores.find(x=>x.id===l.trabId),d=l.d||{};
+    return`<tr><td><span class="badge bb">${perNom(l.per)}</span></td><td><b>${t?t.nom+' '+t.a1:'-'}</b></td><td>${d.dias||30}</td><td><span style="font-family:var(--mn)">$${fmt(d.suel||0)}</span></td><td><span style="font-family:var(--mn)">$${fmt(l.hab)}</span></td><td><span style="font-family:var(--mn);color:var(--rd)">$${fmt(~~(d.dAFP||0))}</span></td><td><span style="font-family:var(--mn);color:var(--rd)">$${fmt(~~(d.dSal||d.dS7||0))}</span></td><td><span style="font-family:var(--mn);color:var(--rd)">$${fmt(~~(d.dIUT||0))}</span></td><td><span style="font-family:var(--mn);color:var(--rd)">$${fmt(~~((d.ant||0)+(d.prest||0)+(d.oD||0)))}</span></td><td><strong style="font-family:var(--mn);color:var(--gn);font-size:13px">$${fmt(l.liq)}</strong></td><td><span class="badge bg">${l.estado}</span></td><td style="display:flex;gap:3px"><button class="btn sm sec" onclick="impLiqId(${l.id})">PDF</button><button class="btn sm sec" onclick="expLiqXLSId(${l.id})">Excel</button></td></tr>`;
+  }).join('')||nd(12);
+  if(liqs.length){const tH=liqs.reduce((s,l)=>s+l.hab,0),tD=liqs.reduce((s,l)=>s+l.desc,0),tL=liqs.reduce((s,l)=>s+l.liq,0);
+    $i('liqRes').innerHTML=`<div class="sum-grid"><div class="sum-card"><div class="s-lbl">Total Haberes</div><div class="s-val" style="color:var(--amb)">$${fmt(tH)}</div></div><div class="sum-card"><div class="s-lbl">Total Descuentos</div><div class="s-val" style="color:var(--red)">$${fmt(tD)}</div></div><div class="sum-card"><div class="s-lbl">Líquido a Pagar</div><div class="s-val" style="color:var(--grn)">$${fmt(tL)}</div></div></div>`;
+  }else $i('liqRes').innerHTML='';
+}
+
+// FINIQUITO
+function abrirFin(){pobTrabSel('fTrab');$i('fFec').value=new Date().toISOString().slice(0,10);$i('fProm').value='';$i('fVac').value='0';$i('fSP').value='0';$i('fGP').value='0';$i('fOtros').value='0';FR=null;sTab('f',1);abrir('moFin');setTimeout(calcFin,100);}
+function calcFin(){
+  const trabId=parseInt(gv('fTrab')),t=DB.trabajadores.find(x=>x.id===trabId);if(!t)return;
+  const fec=gv('fFec');if(!fec)return;
+  const caus=gv('fCaus'),aviso=gv('fAviso'),tCont=gv('fTCont');
+  const prom=pf('fProm')||t.suel,vacD=pf('fVac'),sP=pf('fSP'),gP=pf('fGP'),otros=pf('fOtros');
+  const A=calcAnios(t.ing,fec);
+  const conIndem=['161','161b','159_1'].includes(caus)&&tCont==='indefinido';
+  const aTop=Math.min(A.dec,11),promBase=Math.min(prom,90*P.UF);
+  const indem=conIndem?~~(promBase*aTop):0;
+  const avisoP=['161','161b'].includes(caus)&&aviso==='no'?~~prom:0;
+  const ferP=vacD>0?~~((prom/30)*vacD*1.2):0;
+  const vacAcum=~~(A.dec*15);
+  const subLegal=indem+avisoP+ferP,subHab=sP+gP+otros,totalBruto=subLegal+subHab;
+  const afpR=P.AFP[t.afp]||11.44,baseD=sP+gP;
+  const dAFP_f=~~(baseD*(afpR/100)),dSal_f=~~(baseD*(P.SALUD/100));
+  const totalDesc=dAFP_f+dSal_f,totalNeto=totalBruto-totalDesc;
+  FR={t,fec,caus,aviso,tCont,prom,promBase,vacD,sP,gP,otros,A,aTop,conIndem,indem,avisoP,ferP,vacAcum,subLegal,subHab,totalBruto,dAFP_f,dSal_f,totalDesc,totalNeto,afpR};
+  const fr=$i('fResumen'); if(fr&&t){
+    fr.innerHTML=`<div class="flv-rows">
+      <div class="flv-r"><span>Trabajador</span><b>${t.nom} ${t.a1}</b></div>
+      <div class="flv-r"><span>Años de servicio</span><b>${A.a}a ${A.m}m ${A.d}d</b></div>
+      <div class="flv-r hi"><span>Indem. años serv.</span><b>${indem>0?'$'+fmt(indem):'No aplica'}</b></div>
+      <div class="flv-r"><span>Aviso previo</span><b>${avisoP>0?'$'+fmt(avisoP):'Otorgado'}</b></div>
+      <div class="flv-r"><span>Feriado prop.</span><b>${ferP>0?'$'+fmt(ferP):'—'}</b></div>
+      <div class="flv-r"><span>Haberes pendientes</span><b>${subHab>0?'$'+fmt(subHab):'—'}</b></div>
+      <div class="flv-r rd"><span>Descuentos previs.</span><b>-$${fmt(totalDesc)}</b></div>
+    </div>
+    <div class="flv-bruto"><div class="flv-bl">Total Bruto</div><div class="flv-bv">$${fmt(totalBruto)}</div></div>
+    <div class="flv-neto"><div class="flv-nl">Líquido a Pagar</div><div class="flv-nv">$${fmt(totalNeto)}</div></div>`;}
+  const fres=$i('fResumen');
+  if(fres&&t){fres.innerHTML=`<div class="fin-resumen">
+    <div class="fin-res-item"><div class="fri-lbl">Años Servicio</div><div class="fri-val">${A.a}a ${A.m}m</div></div>
+    <div class="fin-res-divider"></div>
+    <div class="fin-res-item"><div class="fri-lbl">Indem. Años</div><div class="fri-val" style="color:var(--blue)">$${fmt(indem)}</div></div>
+    <div class="fin-res-divider"></div>
+    <div class="fin-res-item"><div class="fri-lbl">Aviso Previo</div><div class="fri-val" style="color:var(--amb)">$${fmt(avisoP)}</div></div>
+    <div class="fin-res-divider"></div>
+    <div class="fin-res-item"><div class="fri-lbl">Feriado Prop.</div><div class="fri-val" style="color:var(--teal)">$${fmt(ferP)}</div></div>
+    <div class="fin-res-divider"></div>
+    <div class="fin-res-item total"><div class="fri-lbl">Total Neto</div><div class="fri-val">$${fmt(totalNeto)}</div></div>
+  </div>`;}
+  const cN=causNom(caus);
+  $i('fCalc').innerHTML=`<div class="lp">
+    <div style="text-align:center;font-weight:700;color:var(--ac2);margin-bottom:11px">HOJA DE CÁLCULO — FINIQUITO DE TRABAJO</div>
+    <div style="background:var(--bg3);border-radius:7px;padding:12px;margin-bottom:11px">
+      <div class="lr"><span style="color:var(--tx2)">Trabajador</span><span><b>${t.nom} ${t.a1} ${t.a2}</b></span></div>
+      <div class="lr"><span style="color:var(--tx2)">RUT</span><span>${t.rut}</span></div>
+      <div class="lr"><span style="color:var(--tx2)">Ingreso / Término</span><span>${fd(t.ing)} → ${fd(fec)}</span></div>
+      <div class="lr b" style="margin-top:5px;padding-top:8px"><span style="color:var(--ac)">AÑOS DE SERVICIO</span><span style="color:var(--ac)"><b>${A.a} año(s), ${A.m} mes(es), ${A.d} día(s)</b> <span style="font-size:9px;color:var(--tx3)">(${A.dec.toFixed(8)} exactos)</span></span></div>
+      <div class="lr"><span style="color:var(--tx2)">Causal</span><span style="font-size:10px;text-align:right;max-width:280px">${cN}</span></div>
+      <div class="lr"><span style="color:var(--tx2)">Promedio remuneraciones</span><span>$${fmt(~~prom)}</span></div>
+      ${promBase<prom?`<div class="lr"><span style="color:var(--yl)">⚠️ Limitado a tope 90 UF</span><span style="color:var(--yl)">$${fmt(~~promBase)}</span></div>`:''}
+      ${aTop<A.dec?`<div class="lr"><span style="color:var(--yl)">⚠️ Años limitados a tope legal 11</span><span style="color:var(--yl)">${aTop.toFixed(4)} meses</span></div>`:''}
+    </div>
+    <div class="lst">① INDEMNIZACIONES LEGALES</div>
+    <div class="lr i"><span>Indem. x Años Serv.${conIndem?` (${aTop.toFixed(4)} meses × $${fmt(~~promBase)})`:' — SIN DERECHO (causal/tipo contrato no aplica)'}</span><span style="color:${indem>0?'var(--gn)':'var(--tx3)'}">$${fmt(indem)}</span></div>
+    <div class="lr i"><span>Aviso Previo (Art. 161)${avisoP>0?' — 30 días no otorgados':' — no aplica o ya otorgado'}</span><span style="color:${avisoP>0?'var(--gn)':'var(--tx3)'}">$${fmt(avisoP)}</span></div>
+    <div class="lr i"><span>Feriado Prop. — ${vacD} días háb. × $${fmt(~~(prom/30*1.2))}</span><span style="color:${ferP>0?'var(--gn)':'var(--tx3)'}">$${fmt(ferP)}</span></div>
+    <div style="font-size:9px;color:var(--tx3);padding-left:12px;margin-bottom:4px">Días acumulados estimados (15/año): ~${vacAcum} días hábiles</div>
+    <div class="lr b"><span>SUBTOTAL INDEMNIZACIONES</span><span style="color:var(--gn)">$${fmt(subLegal)}</span></div>
+    ${subHab>0?`<div class="lst" style="margin-top:7px">② HABERES PENDIENTES DEL MES</div>
+    ${sP>0?`<div class="lr i"><span>Sueldo proporcional</span><span>$${fmt(sP)}</span></div>`:''}
+    ${gP>0?`<div class="lr i"><span>Gratificación proporcional</span><span>$${fmt(gP)}</span></div>`:''}
+    ${otros>0?`<div class="lr i"><span>Otros haberes pendientes</span><span>$${fmt(otros)}</span></div>`:''}
+    <div class="lr b"><span>SUBTOTAL HABERES</span><span>$${fmt(subHab)}</span></div>
+    <div class="lst" style="margin-top:7px">③ DESCUENTOS (sobre haberes del mes)</div>
+    <div class="lr i"><span>AFP ${afpR}%</span><span style="color:var(--rd)">-$${fmt(dAFP_f)}</span></div>
+    <div class="lr i"><span>Salud ${P.SALUD}%</span><span style="color:var(--rd)">-$${fmt(dSal_f)}</span></div>
+    <div class="lr b"><span>TOTAL DESCUENTOS</span><span style="color:var(--rd)">-$${fmt(totalDesc)}</span></div>`:''}
+    <div class="lr b" style="font-size:15px;margin-top:12px;padding:11px 0;border-top:2px solid var(--brd)"><span>TOTAL FINIQUITO BRUTO</span><span style="color:var(--gn)">$${fmt(totalBruto)}</span></div>
+    ${totalDesc>0?`<div class="lr b" style="font-size:15px"><span>TOTAL NETO (con descuentos)</span><span style="color:var(--ac2)">$${fmt(totalNeto)}</span></div>`:''}
+  </div>`;return FR;
+}
+
+function genFinDoc(){
+  if(!FR)calcFin();if(!FR)return;
+  const r=FR,emp=DB.empresas.find(e=>e.id===CE);
+  const fO=new Date(r.fec),mES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const fechaLeg=`${emp?.ciu||'Santiago'}, ${fO.getDate()} de ${mES[fO.getMonth()]} de ${fO.getFullYear()}`;
+  $i('fDoc').innerHTML=`
+<div id="printFinDiv" style="background:#fff;color:#1a1d2e;padding:36px 40px;font-family:'Segoe UI',system-ui,sans-serif;font-size:11px;line-height:1.7;max-width:780px;margin:0 auto;border:1px solid #e2e5f0;border-radius:10px">
+
+  <!-- MEMBRETE -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:20px;border-bottom:3px solid #dc2626;margin-bottom:22px">
+    <div>
+      <div style="font-size:19px;font-weight:800;color:#1a1d2e;letter-spacing:-.5px">${emp?.nombre||'EMPRESA'}</div>
+      <div style="font-size:10px;color:#6b7280;margin-top:3px">RUT ${emp?.rut} &nbsp;·&nbsp; ${emp?.giro}</div>
+      <div style="font-size:10px;color:#6b7280">${emp?.dir}, ${emp?.ciu||'Santiago'}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="background:#dc2626;color:#fff;font-size:14px;font-weight:800;padding:8px 18px;border-radius:7px;letter-spacing:.5px">FINIQUITO DE TRABAJO</div>
+      <div style="font-size:9px;font-weight:600;color:#6b7280;margin-top:5px">Art. 177 del Código del Trabajo</div>
+      <div style="font-size:10px;color:#374151;margin-top:3px">${fechaLeg}</div>
+    </div>
+  </div>
+
+  <!-- INTRO -->
+  <p style="margin-bottom:14px;color:#374151;line-height:1.8">En <strong>${fechaLeg}</strong>, comparecen ante el Ministro de Fe que suscribe el presente instrumento:</p>
+
+  <!-- PARTES -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
+    <div style="border:1.5px solid #fca5a5;border-left:4px solid #dc2626;border-radius:8px;padding:13px 16px;background:#fff8f8">
+      <div style="font-size:9px;font-weight:800;color:#dc2626;text-transform:uppercase;letter-spacing:.9px;margin-bottom:7px">&#9632; Empleador</div>
+      <div style="font-weight:700;font-size:12px;color:#1a1d2e;margin-bottom:4px">${emp?.nombre}</div>
+      <div style="color:#4b5563">RUT: <strong>${emp?.rut}</strong></div>
+      <div style="color:#4b5563">Giro: ${emp?.giro}</div>
+      <div style="color:#4b5563">Rep. Legal: <strong>${emp?.rep}</strong></div>
+      <div style="color:#4b5563">Domicilio: ${emp?.dir}, ${emp?.ciu||'Santiago'}</div>
+    </div>
+    <div style="border:1.5px solid #bfdbfe;border-left:4px solid #1d4ed8;border-radius:8px;padding:13px 16px;background:#f8faff">
+      <div style="font-size:9px;font-weight:800;color:#1d4ed8;text-transform:uppercase;letter-spacing:.9px;margin-bottom:7px">&#9632; Trabajador/a</div>
+      <div style="font-weight:700;font-size:12px;color:#1a1d2e;margin-bottom:4px">${r.t.nom} ${r.t.a1} ${r.t.a2||''}</div>
+      <div style="color:#4b5563">RUT: <strong>${r.t.rut}</strong></div>
+      <div style="color:#4b5563">Cargo: ${r.t.cargo}</div>
+      <div style="color:#4b5563">Domicilio: ${r.t.dir||'—'}</div>
+      <div style="color:#4b5563">Nacionalidad: ${r.t.nac||'Chilena'}</div>
+    </div>
+  </div>
+
+  <!-- ANTECEDENTES LABORALES -->
+  <div style="margin-bottom:18px">
+    <div style="font-size:9px;font-weight:800;color:#374151;text-transform:uppercase;letter-spacing:.8px;margin-bottom:9px">Antecedentes de la Relación Laboral</div>
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <tr>
+        <td style="padding:7px 12px;background:#f8faff;border:1px solid #e2e5f0;font-weight:600;color:#374151;width:22%">Fecha de Ingreso</td>
+        <td style="padding:7px 12px;border:1px solid #e2e5f0;width:28%">${fd(r.t.ing)}</td>
+        <td style="padding:7px 12px;background:#f8faff;border:1px solid #e2e5f0;font-weight:600;color:#374151;width:22%">Fecha de Término</td>
+        <td style="padding:7px 12px;border:1px solid #e2e5f0;font-weight:700;color:#dc2626">${fd(r.fec)}</td>
+      </tr>
+      <tr>
+        <td style="padding:7px 12px;background:#f8faff;border:1px solid #e2e5f0;font-weight:600;color:#374151">Cargo</td>
+        <td style="padding:7px 12px;border:1px solid #e2e5f0">${r.t.cargo}</td>
+        <td style="padding:7px 12px;background:#f8faff;border:1px solid #e2e5f0;font-weight:600;color:#374151">Tipo Contrato</td>
+        <td style="padding:7px 12px;border:1px solid #e2e5f0">${r.tCont}</td>
+      </tr>
+      <tr>
+        <td style="padding:7px 12px;background:#f8faff;border:1px solid #e2e5f0;font-weight:600;color:#374151">AFP / Salud</td>
+        <td style="padding:7px 12px;border:1px solid #e2e5f0">${r.t.afp} / ${r.t.isa}</td>
+        <td style="padding:7px 12px;background:#f8faff;border:1px solid #e2e5f0;font-weight:600;color:#374151">Jornada</td>
+        <td style="padding:7px 12px;border:1px solid #e2e5f0">${r.t.jorn} hrs/semana</td>
+      </tr>
+      <tr style="background:#1e293b">
+        <td style="padding:9px 12px;color:#fff;font-weight:700;border:1px solid #374151" colspan="2">AÑOS DE SERVICIO</td>
+        <td style="padding:9px 12px;border:1px solid #374151;font-weight:800;font-size:13px;color:#1a1d2e;background:#dbeafe" colspan="2">${r.A.a} año(s), ${r.A.m} mes(es), ${r.A.d} día(s) &nbsp;<span style="font-size:9px;color:#6b7280;font-weight:400">(${r.A.dec.toFixed(4)} años exactos)</span></td>
+      </tr>
+      <tr style="background:#1e293b">
+        <td style="padding:9px 12px;color:#fff;font-weight:700;border:1px solid #374151" colspan="2">CAUSAL DE TÉRMINO</td>
+        <td style="padding:9px 12px;border:1px solid #374151;font-weight:600;color:#1a1d2e;background:#fff" colspan="2">${causNom(r.caus)}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- LIQUIDACIÓN FINAL -->
+  <div style="margin-bottom:18px">
+    <div style="font-size:9px;font-weight:800;color:#374151;text-transform:uppercase;letter-spacing:.8px;margin-bottom:9px">Liquidación Final — Desglose Detallado</div>
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead>
+        <tr style="background:#1e293b">
+          <th style="padding:8px 12px;color:#fff;text-align:left;font-size:9px;letter-spacing:.6px;text-transform:uppercase;border:1px solid #374151">Concepto</th>
+          <th style="padding:8px 12px;color:#9ca3af;text-align:center;font-size:9px;letter-spacing:.6px;text-transform:uppercase;border:1px solid #374151">Base de Cálculo</th>
+          <th style="padding:8px 12px;color:#fff;text-align:right;font-size:9px;letter-spacing:.6px;text-transform:uppercase;border:1px solid #374151">Monto ($)</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${r.conIndem?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px;color:#374151">Indemnización por Años de Servicio (Art.163 CT)</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">$${fmt(~~r.promBase)} × ${r.aTop.toFixed(3)} meses (tope 11 años, max 90 UF/mes)</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#1d4ed8">$${fmt(r.indem)}</td></tr>`:'<tr><td style="padding:8px 12px;color:#9ca3af;font-style:italic">Indemnización por Años de Servicio</td><td style="padding:8px 12px;text-align:center;color:#9ca3af;font-size:10px">No aplica a esta causal</td><td style="padding:8px 12px;text-align:right;font-family:monospace;color:#9ca3af">—</td></tr>'}
+        ${r.avisoP>0?`<tr style="background:#fafbff;border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px;color:#374151">Indemnización Sustitutiva Aviso Previo (Art.161 CT)</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">1 mes de remuneración promedio</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#1d4ed8">$${fmt(r.avisoP)}</td></tr>`:''}
+        ${r.ferP>0?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px;color:#374151">Feriado Proporcional (Art.73 CT)</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">${r.vacD} días hábiles × ($${fmt(~~r.prom)}/30) × 1.2</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#1d4ed8">$${fmt(r.ferP)}</td></tr>`:''}
+        ${r.sP>0?`<tr style="background:#fafbff;border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px;color:#374151">Remuneración Proporcional mes en curso</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">Días trabajados / días del mes</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#059669">$${fmt(r.sP)}</td></tr>`:''}
+        ${r.gP>0?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px;color:#374151">Gratificación Proporcional mes en curso</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">Proporcional al período</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#059669">$${fmt(r.gP)}</td></tr>`:''}
+        ${r.otros>0?`<tr style="background:#fafbff;border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px;color:#374151">Otros Haberes y Beneficios Pendientes</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">—</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#059669">$${fmt(r.otros)}</td></tr>`:''}
+        <tr style="border-bottom:1px solid #f1f5f9;background:#fff1f2">
+          <td style="padding:8px 12px;color:#374151">AFP ${r.afpR}% sobre remuneración proporcional</td>
+          <td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">Solo sobre sueldo del período</td>
+          <td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#dc2626">-$${fmt(r.dAFP_f)}</td>
+        </tr>
+        <tr style="background:#fff1f2">
+          <td style="padding:8px 12px;color:#374151">Salud ${P.SALUD}% sobre remuneración proporcional</td>
+          <td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">Solo sobre sueldo del período</td>
+          <td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#dc2626">-$${fmt(r.dSal_f)}</td>
+        </tr>
+        <tr style="border-top:2px solid #1e293b">
+          <td style="padding:10px 12px;font-weight:800;font-size:12px;background:#f8faff;color:#1a1d2e">TOTAL BRUTO</td>
+          <td style="padding:10px 12px;background:#f8faff"></td>
+          <td style="padding:10px 12px;text-align:right;font-family:monospace;font-weight:800;font-size:13px;color:#1d4ed8;background:#f8faff">$${fmt(r.totalBruto)}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TOTAL NETO -->
+  <div style="display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#dc2626,#b91c1c);border-radius:10px;padding:18px 26px;margin-bottom:22px">
+    <div>
+      <div style="color:rgba(255,255,255,.75);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Total Líquido a Pagar — Finiquito</div>
+      <div style="color:rgba(255,255,255,.6);font-size:9px;margin-top:2px">Bruto $${fmt(r.totalBruto)} &nbsp;·&nbsp; Descuentos -$${fmt(r.totalDesc)} &nbsp;·&nbsp; ${causNom(r.caus)}</div>
+    </div>
+    <div style="color:#fff;font-size:30px;font-weight:800;font-family:monospace;letter-spacing:-1.5px">$${fmt(r.totalNeto)}</div>
+  </div>
+
+  <!-- DECLARACIÓN LEGAL -->
+  <div style="background:#fafbff;border:1.5px solid #dbeafe;border-radius:8px;padding:14px 18px;margin-bottom:22px;font-size:10.5px;color:#374151;line-height:1.9">
+    <p>Las partes declaran que con el pago de las sumas indicadas, quedan recíprocamente saldadas y liquidadas todas las obligaciones emanadas del contrato de trabajo que los ligó, sin que existan diferencias, reclamos ni demandas pendientes entre ellas, de ninguna naturaleza.</p>
+    <p style="margin-top:8px">El trabajador/a declara que ha recibido a su entera satisfacción todas las sumas y beneficios que le corresponden según la ley y el contrato de trabajo, otorgando al empleador el más amplio y completo finiquito, con plena eficacia legal.</p>
+  </div>
+
+  <!-- FIRMAS 3 COLUMNAS -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px;margin-top:40px">
+    <div style="text-align:center">
+      <div style="height:48px;border-bottom:1.5px solid #374151;margin-bottom:8px"></div>
+      <div style="font-weight:700;color:#1a1d2e;font-size:11px">${r.t.nom} ${r.t.a1}</div>
+      <div style="color:#6b7280;font-size:10px">RUT: ${r.t.rut}</div>
+      <div style="color:#9ca3af;font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-top:3px">El Trabajador</div>
+    </div>
+    <div style="text-align:center">
+      <div style="height:48px;border-bottom:1.5px solid #374151;margin-bottom:8px"></div>
+      <div style="font-weight:700;color:#1a1d2e;font-size:11px">${emp?.rep||'Representante Legal'}</div>
+      <div style="color:#6b7280;font-size:10px">RUT: ${emp?.repRut||'—'}</div>
+      <div style="color:#9ca3af;font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-top:3px">Por el Empleador</div>
+    </div>
+    <div style="text-align:center">
+      <div style="height:48px;border-bottom:1.5px solid #374151;margin-bottom:8px"></div>
+      <div style="font-weight:700;color:#1a1d2e;font-size:11px">Ministro de Fe</div>
+      <div style="color:#6b7280;font-size:10px">Timbre y Firma</div>
+      <div style="color:#9ca3af;font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-top:3px">Art. 177 C. del Trabajo</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="border-top:1px solid #e5e7eb;margin-top:22px;padding-top:10px;display:flex;justify-content:space-between;align-items:center">
+    <div style="font-size:8.5px;color:#9ca3af">SistemRem Chile 2026 &nbsp;·&nbsp; Art. 177 Código del Trabajo</div>
+    <div style="font-size:8.5px;color:#9ca3af">IMF $${fmt(P.IMF)} &nbsp;·&nbsp; UF $${fmt(P.UF)} &nbsp;·&nbsp; ${fechaLeg}</div>
+  </div>
+
+</div>`;
+}
+
+function guardarFin(){
+  if(!FR)calcFin();if(!FR){toast('Complete los datos','rd');return;}
+  const r=FR;if(!confirm(`¿Registrar finiquito y desvincular a ${r.t.nom} ${r.t.a1}?\nEl trabajador quedará como Inactivo.`))return;
+  DB.finiquitos.push({id:Date.now(),empId:CE,trabId:r.t.id,fec:r.fec,caus:r.caus,tCont:r.tCont,anA:r.A.a,anM:r.A.m,anD:r.A.d,anDec:r.A.dec,indem:r.indem,avisoP:r.avisoP,ferP:r.ferP,vacD:r.vacD,sP:r.sP,gP:r.gP,otros:r.otros,totalBruto:r.totalBruto,totalDesc:r.totalDesc,totalNeto:r.totalNeto,estado:'firmado'});
+  const idx=DB.trabajadores.findIndex(x=>x.id===r.t.id);if(idx>=0)DB.trabajadores[idx].activo=false;
+  cerrar('moFin');renderAll();toast(`Finiquito de ${r.t.nom} ${r.t.a1} registrado`);
+}
+function renderFins(){
+  const fins=DB.finiquitos.filter(f=>f.empId===CE);
+  $i('tbFin').innerHTML=fins.map(f=>{const t=DB.trabajadores.find(x=>x.id===f.trabId);const cS=causNom(f.caus).split('—')[1]?.trim().substring(0,28)||causNom(f.caus).substring(0,28);
+    return`<tr><td>${fd(f.fec)}</td><td><b>${t?t.nom+' '+t.a1:'-'}</b></td><td><code style="font-size:10px">${t?.rut||'-'}</code></td><td style="font-size:10px">${cS}...</td><td><span class="badge bc">${f.anA}a ${f.anM}m ${f.anD}d</span></td><td><span style="font-family:var(--mn)">$${fmt(f.indem)}</span></td><td><span style="font-family:var(--mn)">$${fmt(f.avisoP)}</span></td><td><span style="font-family:var(--mn)">$${fmt(f.ferP)}</span></td><td><b style="font-family:var(--mn)">$${fmt(f.totalBruto)}</b></td><td><b style="font-family:var(--mn);color:var(--gn)">$${fmt(f.totalNeto)}</b></td><td><span class="badge bg">${f.estado}</span></td><td style="display:flex;gap:3px"><button class="btn sm sec" onclick="impFinId(${f.id})">PDF</button><button class="btn sm sec" onclick="expFinXLSId(${f.id})">Excel</button></td></tr>`;
+  }).join('')||nd(12);
+}
+
+// PARÁMETROS
+function renderParams(){
+  $i('pRem').innerHTML=[['IMF ($)','IMF'],['Valor UF ($)','UF'],['UTM ($)','UTM'],['Tope Gratif. (×IMF)','GRATIF_TOPE'],['Tope AFP/Salud (UF)','TOPE_AFP_UF']].map(([l,k])=>`<div class="pm"><span style="color:var(--tx2);font-size:11px">${l}</span><input class="einp" type="number" step="any" value="${P[k]}" id="pk_${k}" onchange="P['${k}']=parseFloat(this.value)||P['${k}']"></div>`).join('');
+  $i('pPrev').innerHTML=[['Salud trab. (%)','SALUD'],['SIS empl. (%)','SIS'],['Mutual (%)','MUTUAL'],['Cesantía trab. (%)','CES_T'],['Ces. empl. indef. (%)','CES_E_IND'],['Ces. empl. p.fijo (%)','CES_E_PF']].map(([l,k])=>`<div class="pm"><span style="color:var(--tx2);font-size:11px">${l}</span><input class="einp" type="number" step="0.01" value="${P[k]}" id="pk_${k}" onchange="P['${k}']=parseFloat(this.value)||P['${k}']"></div>`).join('');
+  $i('pAFP').innerHTML=Object.entries(P.AFP).map(([a,r])=>`<div class="pm"><span style="color:var(--tx2);font-size:11px">${a}</span><input class="einp" type="number" step="0.01" value="${r}" id="pk_AFP_${a}" onchange="P.AFP['${a}']=parseFloat(this.value)||${r}"></div>`).join('');
+  $i('pIUT').innerHTML='<div style="margin-bottom:8px;font-size:10px;color:var(--ink3)">Tramos vigentes — edita tasas y rebajas según resolución SII</div>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:11px">'
+    +'<thead><tr style="background:var(--surf2)">'
+    +'<th style="padding:7px 10px;border:1px solid var(--brd);font-size:9px;text-align:left;letter-spacing:.6px;text-transform:uppercase">Desde (UF)</th>'
+    +'<th style="padding:7px 10px;border:1px solid var(--brd);font-size:9px;text-align:left;letter-spacing:.6px;text-transform:uppercase">Hasta (UF)</th>'
+    +'<th style="padding:7px 10px;border:1px solid var(--brd);font-size:9px;text-align:left;letter-spacing:.6px;text-transform:uppercase">Tasa %</th>'
+    +'<th style="padding:7px 10px;border:1px solid var(--brd);font-size:9px;text-align:left;letter-spacing:.6px;text-transform:uppercase">Rebaja (UF)</th>'
+    +'</tr></thead><tbody>'
+    +P.IUT.map((tr,i)=>`<tr style="border-bottom:1px solid var(--brd2)">
+      <td style="padding:5px 8px;border:1px solid var(--brd);font-family:var(--mono);font-size:11px;color:var(--ink2)">${tr.d}</td>
+      <td style="padding:5px 8px;border:1px solid var(--brd);font-family:var(--mono);font-size:11px;color:var(--ink2)">${tr.h>=9999?'∞':tr.h}</td>
+      <td style="padding:5px 8px;border:1px solid var(--brd)">
+        <div style="display:flex;align-items:center;gap:4px">
+          <input type="number" class="einp" style="width:70px" value="${(tr.t*100).toFixed(1)}"
+            onchange="P.IUT[${i}].t=parseFloat(this.value)/100||0;toast('Tramo ${i+1} actualizado','gn')" step="0.1" min="0" max="50">
+          <span style="font-size:10px;color:var(--ink3)">%</span>
+        </div>
+      </td>
+      <td style="padding:5px 8px;border:1px solid var(--brd)">
+        <input type="number" class="einp" style="width:80px" value="${tr.r.toFixed(4)}"
+          onchange="P.IUT[${i}].r=parseFloat(this.value)||0;toast('Tramo ${i+1} actualizado','gn')" step="0.0001" min="0">
+      </td>
+    </tr>`).join('')
+    +'</tbody></table>'
+    +'<div style="margin-top:10px;padding:9px 12px;background:var(--blue-lt);border:1px solid #bfdbfe;border-radius:7px;font-size:10px;color:var(--blue-dk)">'
+    +'Actualiza tasas y rebajas según Circular SII vigente. Los cambios aplican inmediatamente al calcular liquidaciones.'
+    +'</div>';
+}
+function guardarP(){['IMF','UF','UTM','GRATIF_TOPE','TOPE_AFP_UF','SALUD','SIS','MUTUAL','CES_T','CES_E_IND','CES_E_PF'].forEach(k=>{const e=$i('pk_'+k);if(e)P[k]=parseFloat(e.value)||P[k];});Object.keys(P.AFP).forEach(a=>{const e=$i('pk_AFP_'+a);if(e)P.AFP[a]=parseFloat(e.value)||P.AFP[a];});renderAll();toast('Parámetros guardados');}
+function renderPrev(){if(!$i('tbAFP'))return;$i('tbAFP').innerHTML=Object.entries(P.AFP).map(([a,r])=>`<tr><td><b>${a}</b></td><td>${r}%</td><td>${P.SIS}%</td><td><b>${(r+P.SIS).toFixed(2)}%</b></td></tr>`).join('');const iss=[['FONASA','7.0%','—','Pública'],['Banmédica','7.0%','~1.50 UF','Isapre'],['Colmena','7.0%','~1.80 UF','Isapre'],['Cruz Blanca','7.0%','~1.60 UF','Isapre'],['Consalud','7.0%','~2.00 UF','Isapre'],['Vida Tres','7.0%','~2.20 UF','Isapre'],['Nueva Masvida','7.0%','~1.40 UF','Isapre']];$i('tbIsa').innerHTML=iss.map(([n,c,u,t])=>`<tr><td><b>${n}</b></td><td>${c}</td><td>${u}</td><td><span class="badge ${t==='Pública'?'bb':'bg'}">${t}</span></td></tr>`).join('');}
+
+// DEMO DATA
+function generarDemo(){
+  const meses=['2025-11','2025-12','2026-01','2026-02'];
+  [[1,1],[2,1],[3,2],[4,2]].forEach(([tid])=>{
+    const t=DB.trabajadores.find(x=>x.id===tid);if(!t)return;
+    meses.forEach(per=>{
+      const afpR=P.AFP[t.afp]||11.44,sUF=t.sUF||0;
+      const g=calcGrat(t.suel),totI=t.suel+g,topI=Math.min(totI,P.TOPE_AFP_UF*P.UF);
+      const dAFP=topI*(afpR/100),dS7=topI*(P.SALUD/100),dSUF=sUF*P.UF,dSal=dS7+dSUF;
+      const dCes=topI*(P.CES_T/100),bIUT=Math.max(0,totI-dAFP-dS7),dIUT=calcIUT(bIUT);
+      const totD=dAFP+dSal+dCes+dIUT,liq=~~(totI-totD);
+      const cSIS=topI*(P.SIS/100),cMut=topI*(P.MUTUAL/100),cCesE=topI*(P.CES_E_PF/100);
+      DB.liquidaciones.push({id:Date.now()+Math.random()*1e9|0,empId:t.empId,trabId:tid,per,hab:~~totI,desc:~~totD,liq,d:{suel:t.suel,dias:30,suP:t.suel,hE:0,hET:1.5,totHE:0,g,bon:0,oH:0,col:0,mov:0,totI,noI:0,totH:totI,topI,afpR,sUF,dAFP,dS7,dSUF,dSal,dCes,bIUT,dIUT,ant:0,prest:0,oD:0,totD,liq,cSIS,cMut,cCesE},fecha:per+'-28',estado:'pagada'});
+    });
+  });
+}
+
+// EXCEL
+function mkXLS(rows,cols,nombre){const wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet(rows);if(cols)ws['!cols']=cols.map(w=>({wch:w}));XLSX.utils.book_append_sheet(wb,ws,'Datos');XLSX.writeFile(wb,nombre+'.xlsx');toast('Excel descargado: '+nombre+'.xlsx');}
+function cabXLS(e){return[[e?.nombre||'EMPRESA'],[`RUT: ${e?.rut} | ${e?.giro} | ${e?.dir}, ${e?.ciu}`],[]];}
+function expLibroXLS(){expLibroXLSMes();}
+function expLibroXLSMes(){const per=$i('rMes').value||perStr(PER),emp=DB.empresas.find(e=>e.id===CE),liqs=DB.liquidaciones.filter(l=>l.empId===CE&&l.per===per);const rows=[...cabXLS(emp),[`LIBRO DE REMUNERACIONES — ${perNom(per)}`],[],['RUT','Nombre','Cargo','AFP','Salud','Días','Sueldo','Gratif.','H.Extra','Bonos','T.Impon.','No Imp.','T.Hab.','AFP $','Sal 7%','Sal+UF','Ces.','IUT','Otros','T.Desc.','LÍQUIDO']];liqs.forEach(l=>{const t=DB.trabajadores.find(x=>x.id===l.trabId),d=l.d||{};rows.push([t?.rut,t?`${t.a1} ${t.nom}`:'-',t?.cargo,t?.afp,t?.isa,d.dias||30,d.suel||0,~~(d.g||0),~~(d.totHE||0),d.bon||0,~~(d.totI||0),~~(d.noI||0),l.hab,~~(d.dAFP||0),~~(d.dS7||0),~~(d.dSUF||0),~~(d.dCes||0),~~(d.dIUT||0),~~((d.ant||0)+(d.prest||0)+(d.oD||0)),l.desc,l.liq]);});rows.push([],[,'','','','','','','','','','','','','','','','','','','Total:',liqs.reduce((s,l)=>s+l.liq,0)]);mkXLS(rows,[12,22,16,10,12,5,12,10,7,10,12,11,12,10,9,9,9,8,8,11,12],`LibroRem_${per}`);}
+function expNominaXLS(){const emp=DB.empresas.find(e=>e.id===CE),ts=DB.trabajadores.filter(t=>t.empId===CE);const rows=[...cabXLS(emp),['NÓMINA DE PERSONAL'],[],['RUT','Apellidos','Nombres','Cargo','Ingreso','Antigüedad','Sueldo','AFP','Isapre','UF Sal.','Banco','Tipo Cta','N°Cta','Email','Tel','Estado']];ts.forEach(t=>{const a=calcAnios(t.ing,new Date().toISOString().slice(0,10));rows.push([t.rut,`${t.a1} ${t.a2}`,t.nom,t.cargo,t.ing,`${a.a}a ${a.m}m`,t.suel,t.afp,t.isa,t.sUF||0,t.bco,t.tipoCta||'',t.cta,t.email||'',t.tel||'',t.activo?'Activo':'Inactivo']);});mkXLS(rows,[12,20,14,18,11,9,12,10,13,7,15,14,12,22,13,9],'NominaPersonal');}
+function expPrevXLS(){const per=$i('rPrev').value||perStr(PER),emp=DB.empresas.find(e=>e.id===CE),liqs=DB.liquidaciones.filter(l=>l.empId===CE&&l.per===per);const rows=[...cabXLS(emp),[`PREVIRED — ${perNom(per)}`],[],['RUT','Ap.Paterno','Ap.Materno','Nombres','AFP','Cotiz.AFP','Salud 7%','Sal.Isap.','Ces.Trab.','SIS Emp.','Ces.Emp.','Total']];liqs.forEach(l=>{const t=DB.trabajadores.find(x=>x.id===l.trabId),d=l.d||{};rows.push([t?.rut,t?.a1,t?.a2,t?.nom,t?.afp,~~(d.dAFP||0),~~(d.dS7||0),~~(d.dSUF||0),~~(d.dCes||0),~~(d.cSIS||0),~~(d.cCesE||0),~~((d.dAFP||0)+(d.dSal||0)+(d.dCes||0)+(d.cSIS||0)+(d.cCesE||0))]);});mkXLS(rows,[13,15,13,13,10,12,10,10,10,10,10,13],`Previred_${per}`);}
+function expContsXLS(){const hoy=new Date(),emp=DB.empresas.find(e=>e.id===CE),cs=DB.contratos.filter(c=>{const t=DB.trabajadores.find(x=>x.id===c.trabId);return t&&t.empId===CE;});const rows=[...cabXLS(emp),['CONTRATOS'],[],['N° Contrato','Trabajador','RUT','Tipo','Inicio','Término','Jornada','Sueldo','Estado','Días Rest.','Alerta']];cs.forEach(c=>{const t=DB.trabajadores.find(x=>x.id===c.trabId),dr=c.term?~~((new Date(c.term)-hoy)/864e5):null;rows.push([c.num,t?`${t.nom} ${t.a1}`:'-',t?.rut,c.tipo,c.ini,c.term||'Indefinido',c.jorn+'h',c.suel,c.estado,dr!==null?dr:'-',dr===null?'OK':dr<0?'VENCIDO':dr<30?'POR VENCER':'OK']);});mkXLS(rows,[14,20,12,13,11,11,7,12,10,10,12],'Contratos');}
+function expFinListaXLS(){const emp=DB.empresas.find(e=>e.id===CE),fins=DB.finiquitos.filter(f=>f.empId===CE);const rows=[...cabXLS(emp),['FINIQUITOS EMITIDOS'],[],['Fecha','Trabajador','RUT','Causal','Años','Mes','Días','Indem.','Aviso','Feriado','Suel.Prop.','Grat.Prop.','Otros','Total Bruto','Desctos.','Total Neto','Estado']];fins.forEach(f=>{const t=DB.trabajadores.find(x=>x.id===f.trabId);rows.push([f.fec,t?`${t.nom} ${t.a1}`:'-',t?.rut,causNom(f.caus),f.anA,f.anM,f.anD,f.indem,f.avisoP,f.ferP,f.sP||0,f.gP||0,f.otros||0,f.totalBruto,f.totalDesc||0,f.totalNeto,f.estado]);});mkXLS(rows,[11,20,12,35,5,5,5,13,12,12,11,11,11,13,11,13,10],'Finiquitos');}
+function expAnualXLS(){const anio=parseInt($i('rAnio').value)||new Date().getFullYear(),emp=DB.empresas.find(e=>e.id===CE),mN=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];const rows=[...cabXLS(emp),[`CONSOLIDADO ANUAL ${anio}`],[],['Período','Liquidaciones','Total Haberes','Total Desc.','Total Líquido']];let tH=0,tD=0,tL=0;for(let m=1;m<=12;m++){const per=`${anio}-${String(m).padStart(2,'0')}`,ls=DB.liquidaciones.filter(l=>l.empId===CE&&l.per===per),h=ls.reduce((s,l)=>s+l.hab,0),d=ls.reduce((s,l)=>s+l.desc,0),l=ls.reduce((s,x)=>s+x.liq,0);tH+=h;tD+=d;tL+=l;rows.push([mN[m-1]+' '+anio,ls.length,h,d,l]);}rows.push([],[`TOTAL ${anio}`,'',tH,tD,tL]);mkXLS(rows,[18,12,16,16,16],`Consolidado_${anio}`);}
+function expLiqXLS(){if(!LR){toast('Calcule la liquidación primero','rd');return;}const trabId=parseInt(gv('lTrab')),t=DB.trabajadores.find(x=>x.id===trabId),emp=DB.empresas.find(e=>e.id===CE),per=gv('lPer');const rows=[...cabXLS(emp),[`LIQUIDACIÓN — ${perNom(per)}`],[],['Trabajador:',t?`${t.nom} ${t.a1} ${t.a2}`:'-'],['RUT:',t?.rut],['Cargo:',t?.cargo],['Período:',per],['AFP:',`${t?.afp} (${LR.afpR}%)`],[],['CONCEPTO','HABER','DESCUENTO'],['Sueldo Base ('+LR.dias+'/30)',~~LR.suP,''],['Gratificación Legal',~~LR.g,''],['Horas Extras',~~LR.totHE,''],['Bonos/Comisiones',LR.bon,''],['Otros Hab. Imp.',LR.oH,''],['Colación (NI)',LR.col,''],['Movilización (NI)',LR.mov,''],['AFP '+LR.afpR+'%','',~~LR.dAFP],['Salud '+P.SALUD+'%','',~~LR.dS7],['Salud Isapre (UF)','',~~LR.dSUF],['Cesantía '+P.CES_T+'%','',~~LR.dCes],['Imp. Único','',~~LR.dIUT],['Anticipos','',LR.ant],['Préstamos','',LR.prest],['Otras Deduc.','',LR.oD],['','',''],['TOTAL HABERES',~~LR.totH,''],['TOTAL DESCUENTOS','',~~LR.totD],['LÍQUIDO A PAGAR',LR.liq,''],['','',''],['--- COSTOS EMPLEADOR ---','',''],['SIS',~~LR.cSIS,''],['Mutual',~~LR.cMut,''],['Cesantía Empl.',~~LR.cCesE,''],['COSTO EMPRESA',~~(LR.totH+LR.cSIS+LR.cMut+LR.cCesE),'']];mkXLS(rows,[28,14,14],`Liq_${t?.a1}_${per}`);}
+function expLiqXLSId(id){const l=DB.liquidaciones.find(x=>x.id===id);if(!l)return;const t=DB.trabajadores.find(x=>x.id===l.trabId),emp=DB.empresas.find(e=>e.id===CE),d=l.d||{};const rows=[...cabXLS(emp),[`LIQUIDACIÓN — ${perNom(l.per)}`],[],['Trab.:',t?`${t.nom} ${t.a1}`:'-'],['RUT:',t?.rut],['Período:',l.per],[],['Sueldo Base',d.suel||0],['Gratificación',~~(d.g||0)],['Total Haberes',l.hab],['AFP',-~~(d.dAFP||0)],['Salud',-~~(d.dSal||0)],['Cesantía',-~~(d.dCes||0)],['IUT',-~~(d.dIUT||0)],['Total Desc.',-l.desc],['LÍQUIDO',l.liq]];mkXLS(rows,[28,14],`Liq_${t?.a1}_${l.per}`);}
+function expFinXLS(){if(!FR){toast('Calcule el finiquito primero','rd');return;}const r=FR,emp=DB.empresas.find(e=>e.id===CE);const rows=[...cabXLS(emp),['FINIQUITO DE TRABAJO'],[],['Trabajador:',`${r.t.nom} ${r.t.a1} ${r.t.a2}`],['RUT:',r.t.rut],['Cargo:',r.t.cargo],['Ingreso:',r.t.ing],['Término:',r.fec],['Años Servicio:',`${r.A.a}a ${r.A.m}m ${r.A.d}d (${r.A.dec.toFixed(8)} exactos)`],['Meses cómputo:',r.aTop.toFixed(4)],['Causal:',causNom(r.caus)],[],['CONCEPTO','MONTO'],['Indem. x Años Servicio',r.indem],['Indem. Aviso Previo',r.avisoP],['Feriado Proporcional',r.ferP],['Sueldo Proporcional',r.sP],['Gratificación Proporcional',r.gP],['Otros Haberes Pendientes',r.otros],['TOTAL BRUTO',r.totalBruto],['Descuentos Previsionales',-r.totalDesc],['TOTAL NETO',r.totalNeto]];mkXLS(rows,[35,18],`Finiquito_${r.t.a1}_${r.fec}`);}
+function expFinXLSId(id){const f=DB.finiquitos.find(x=>x.id===id);if(!f)return;const t=DB.trabajadores.find(x=>x.id===f.trabId),emp=DB.empresas.find(e=>e.id===CE);const rows=[...cabXLS(emp),['FINIQUITO'],[],['Trab.:',t?`${t.nom} ${t.a1}`:'-'],['RUT:',t?.rut],['Fecha:',f.fec],['Antigüedad:',`${f.anA}a ${f.anM}m ${f.anD}d`],['Indem. Años:',f.indem],['Aviso Previo:',f.avisoP],['Feriado Prop.:',f.ferP],['Haberes mes:',f.sP+f.gP+f.otros],['Total Bruto:',f.totalBruto],['Descuentos:',-f.totalDesc||0],['Total Neto:',f.totalNeto]];mkXLS(rows,[28,16],`Fin_${t?.a1}_${f.fec}`);}
+function expContXLSId(id){const c=id&&DB.contratos.find(x=>x.id===id);if(!c)return;const t=DB.trabajadores.find(x=>x.id===c.trabId),emp=DB.empresas.find(e=>e.id===CE);const rows=[...cabXLS(emp),['CONTRATO — '+c.num],[],['Empresa:',emp?.nombre],['Trabajador:',t?`${t.nom} ${t.a1}`:'-'],['RUT:',t?.rut],['Tipo:',c.tipo],['Inicio:',c.ini],['Término:',c.term||'Indefinido'],['Sueldo:',c.suel],['Jornada:',c.jorn+'h'],['Distribución:',c.dist],['Funciones:',c.func]];mkXLS(rows,[25,36],`Contrato_${c.num}`);}
+
+// PDF / PRINT
+function pw(html,titulo){
+  const w=window.open('','_blank','width=900,height=850');
+  if(!w){toast('Permita ventanas emergentes en el navegador','rd');return;}
+  w.document.write(`<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<title>${titulo}</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#f1f5f9;color:#1a1d2e}
+  .toolbar{
+    position:fixed;top:0;left:0;right:0;z-index:999;
+    background:#1e293b;padding:10px 20px;
+    display:flex;align-items:center;justify-content:space-between;
+    box-shadow:0 2px 12px rgba(0,0,0,.3);
+  }
+  .toolbar-left{display:flex;align-items:center;gap:10px}
+  .toolbar-title{color:#e2e8f0;font-size:13px;font-weight:600;letter-spacing:-.2px}
+  .toolbar-sub{color:#64748b;font-size:11px;margin-top:1px}
+  .tbtn{
+    padding:8px 18px;border:none;border-radius:7px;cursor:pointer;
+    font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;
+    transition:all .15s;
+  }
+  .tbtn-print{background:#2563eb;color:#fff}
+  .tbtn-print:hover{background:#1d4ed8;transform:translateY(-1px)}
+  .tbtn-close{background:#374151;color:#9ca3af}
+  .tbtn-close:hover{background:#475569;color:#fff}
+  .tbtn-save{background:#059669;color:#fff}
+  .tbtn-save:hover{background:#047857}
+  .doc-wrap{
+    margin:70px auto 40px;
+    max-width:860px;
+    background:#fff;
+    border-radius:10px;
+    box-shadow:0 4px 24px rgba(0,0,0,.1);
+    overflow:hidden;
+  }
+  @media print{
+    *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+    .toolbar{display:none!important}
+    body{background:#fff}
+    .doc-wrap{margin:0;max-width:none;box-shadow:none;border-radius:0}
+    @page{margin:10mm 12mm;size:A4}
+  }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <div class="toolbar-left">
+    <div>
+      <div class="toolbar-title">&#x1F4C4; ${titulo}</div>
+      <div class="toolbar-sub">Vista previa del documento</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="tbtn tbtn-save" onclick="window.print()">
+      &#x1F4BE; Guardar como PDF
+    </button>
+    <button class="tbtn tbtn-print" onclick="window.print()">
+      &#x1F5A8; Imprimir
+    </button>
+    <button class="tbtn tbtn-close" onclick="window.close()">
+      &#x2715; Cerrar
+    </button>
+  </div>
+</div>
+<div class="doc-wrap">${html}</div>
+</body></html>`);
+  w.document.close();
+}
+
+function cabPDF(emp,titulo,subtit){
+  const color=titulo.includes('FINIQUITO')?'#dc2626':titulo.includes('NÓMINA')||titulo.includes('NOMINA')?'#059669':titulo.includes('PREVIRED')?'#7c3aed':'#1d4ed8';
+  return `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:16px;border-bottom:3px solid ${color};margin-bottom:20px;font-family:'Segoe UI',system-ui,sans-serif">
+    <div>
+      <div style="font-size:18px;font-weight:800;color:#1a1d2e;letter-spacing:-.5px">${emp?.nombre||'EMPRESA'}</div>
+      <div style="font-size:10px;color:#6b7280;margin-top:3px">RUT ${emp?.rut} &nbsp;·&nbsp; ${emp?.giro}</div>
+      <div style="font-size:10px;color:#6b7280">${emp?.dir||''}, ${emp?.ciu||'Santiago'}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="background:${color};color:#fff;font-size:12px;font-weight:800;padding:7px 16px;border-radius:7px;letter-spacing:.3px">${titulo}</div>
+      ${subtit?`<div style="font-size:10px;color:#6b7280;margin-top:5px">${subtit}</div>`:''}
+      <div style="font-size:9px;color:#9ca3af;margin-top:3px">${new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'long',year:'numeric'})}</div>
+    </div>
+  </div>`;
+}
+
+function expLibroPDF(){expLibroPDFMes();}
+function expLibroPDFMes(){
+  const per=$i('rMes').value||perStr(PER);
+  const emp=DB.empresas.find(e=>e.id===CE);
+  const liqs=DB.liquidaciones.filter(l=>l.empId===CE&&l.per===per);
+  const tH=liqs.reduce((s,l)=>s+l.hab,0);
+  const tD=liqs.reduce((s,l)=>s+l.desc,0);
+  const tL=liqs.reduce((s,l)=>s+l.liq,0);
+  const tAfp=liqs.reduce((s,l)=>s+~~(l.d?.dAFP||0),0);
+  const tSal=liqs.reduce((s,l)=>s+~~((l.d?.dS7||0)+(l.d?.dSUF||0)),0);
+  const tCes=liqs.reduce((s,l)=>s+~~(l.d?.dCes||0),0);
+  const tIut=liqs.reduce((s,l)=>s+~~(l.d?.dIUT||0),0);
+
+  const rows=liqs.map((l,i)=>{
+    const t=DB.trabajadores.find(x=>x.id===l.trabId),d=l.d||{};
+    const bg=i%2===0?'#fff':'#f8faff';
+    const extras=(d.conceptosExtra||[]);
+    const eH=extras.filter(c=>c.tipo==='haber').reduce((s,c)=>s+c.monto,0);
+    const eD=extras.filter(c=>c.tipo==='descuento').reduce((s,c)=>s+c.monto,0);
+    return `<tr style="background:${bg};border-bottom:1px solid #eef0f6">
+      <td style="padding:8px 10px;font-family:monospace;font-size:10px;color:#6b7280;white-space:nowrap">${t?.rut||'—'}</td>
+      <td style="padding:8px 10px;font-weight:600;color:#1a1d2e;white-space:nowrap">${t?t.nom+' '+t.a1:'-'}</td>
+      <td style="padding:8px 10px;color:#4b5563;font-size:10px">${t?.cargo||'—'}</td>
+      <td style="padding:8px 10px;text-align:center;color:#4b5563">${d.dias||30}</td>
+      <td style="padding:8px 10px;text-align:right;font-family:monospace">$${fmt(~~(d.suP||0))}</td>
+      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#374151">$${fmt(~~(d.g||0))}</td>
+      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#374151">${(d.totHE||0)>0?'$'+fmt(~~d.totHE):'—'}</td>
+      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#374151">${(d.bon||0)>0?'$'+fmt(~~d.bon):'—'}</td>
+      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#374151">${((d.col||0)+(d.mov||0))>0?'$'+fmt((d.col||0)+(d.mov||0)):'—'}</td>
+      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#0891b2">${eH>0?'$'+fmt(eH):'—'}</td>
+      <td style="padding:8px 10px;text-align:right;font-family:monospace;font-weight:700;color:#1d4ed8">$${fmt(l.hab)}</td>
+      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#dc2626">-$${fmt(~~(d.dAFP||0))}</td>
+      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#dc2626">-$${fmt(~~((d.dS7||0)+(d.dSUF||0)))}</td>
+      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#dc2626">-$${fmt(~~(d.dCes||0))}</td>
+      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#dc2626">${(d.dIUT||0)>0?'-$'+fmt(~~d.dIUT):'Exento'}</td>
+      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#dc2626">${((d.ant||0)+(d.prest||0)+(d.oD||0)+eD)>0?'-$'+fmt((d.ant||0)+(d.prest||0)+(d.oD||0)+eD):'—'}</td>
+      <td style="padding:8px 10px;text-align:right;font-family:monospace;font-weight:800;color:#059669;font-size:12px">$${fmt(l.liq)}</td>
+    </tr>`;
+  }).join('');
+
+  pw(`<div style="font-family:'Segoe UI',system-ui,sans-serif;padding:28px 32px;color:#1a1d2e;font-size:11px;background:#fff">
+    ${cabPDF(emp,'LIBRO DE REMUNERACIONES',perNom(per).toUpperCase())}
+
+    ${liqs.length===0
+      ?`<div style="padding:40px;text-align:center;color:#9ca3af;border:1.5px dashed #e5e7eb;border-radius:10px;font-size:13px">No hay liquidaciones registradas para este período</div>`
+      :`<div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;min-width:1100px">
+          <thead>
+            <tr style="background:#1e293b">
+              <th colspan="11" style="padding:7px 10px;color:#93c5fd;text-align:left;font-size:9px;letter-spacing:.8px;text-transform:uppercase;border-right:2px solid #374151">▲ HABERES</th>
+              <th colspan="6" style="padding:7px 10px;color:#fca5a5;text-align:left;font-size:9px;letter-spacing:.8px;text-transform:uppercase">▼ DESCUENTOS</th>
+            </tr>
+            <tr style="background:#334155">
+              <th style="padding:7px 10px;color:#94a3b8;text-align:left;font-size:9px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">RUT</th>
+              <th style="padding:7px 10px;color:#e2e8f0;text-align:left;font-size:9px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">Nombre</th>
+              <th style="padding:7px 10px;color:#94a3b8;text-align:left;font-size:9px;letter-spacing:.5px;text-transform:uppercase">Cargo</th>
+              <th style="padding:7px 10px;color:#94a3b8;text-align:center;font-size:9px;letter-spacing:.5px;text-transform:uppercase">Días</th>
+              <th style="padding:7px 10px;color:#94a3b8;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">S. Base</th>
+              <th style="padding:7px 10px;color:#94a3b8;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase">Gratif.</th>
+              <th style="padding:7px 10px;color:#94a3b8;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase">H. Extra</th>
+              <th style="padding:7px 10px;color:#94a3b8;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase">Bonos</th>
+              <th style="padding:7px 10px;color:#94a3b8;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">Col+Mov</th>
+              <th style="padding:7px 10px;color:#67e8f9;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">Extras</th>
+              <th style="padding:7px 10px;color:#7dd3fc;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;border-right:2px solid #374151">TOT. HAB.</th>
+              <th style="padding:7px 10px;color:#fca5a5;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase">AFP</th>
+              <th style="padding:7px 10px;color:#fca5a5;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase">Salud</th>
+              <th style="padding:7px 10px;color:#fca5a5;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase">Ces.</th>
+              <th style="padding:7px 10px;color:#fca5a5;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase">IUT</th>
+              <th style="padding:7px 10px;color:#fca5a5;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase">Otros</th>
+              <th style="padding:7px 10px;color:#6ee7b7;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">LÍQUIDO</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+          <tfoot>
+            <tr style="background:#1e293b;border-top:2px solid #475569">
+              <td colspan="3" style="padding:10px 10px;color:#fff;font-weight:700;font-size:11px">TOTALES — ${liqs.length} trabajador(es)</td>
+              <td style="padding:10px;color:#94a3b8;text-align:center;font-size:10px">—</td>
+              <td colspan="6" style="padding:10px;color:#94a3b8;text-align:right;font-size:10px">Total haberes:</td>
+              <td style="padding:10px 10px;text-align:right;font-family:monospace;font-weight:800;color:#7dd3fc;border-right:2px solid #374151">$${fmt(tH)}</td>
+              <td style="padding:10px 10px;text-align:right;font-family:monospace;font-weight:700;color:#fca5a5">-$${fmt(tAfp)}</td>
+              <td style="padding:10px 10px;text-align:right;font-family:monospace;font-weight:700;color:#fca5a5">-$${fmt(tSal)}</td>
+              <td style="padding:10px 10px;text-align:right;font-family:monospace;font-weight:700;color:#fca5a5">-$${fmt(tCes)}</td>
+              <td style="padding:10px 10px;text-align:right;font-family:monospace;font-weight:700;color:#fca5a5">-$${fmt(tIut)}</td>
+              <td style="padding:10px 10px;text-align:right;font-family:monospace;font-weight:700;color:#fca5a5">-$${fmt(tD-tAfp-tSal-tCes-tIut)}</td>
+              <td style="padding:10px 10px;text-align:right;font-family:monospace;font-weight:800;font-size:14px;color:#6ee7b7">$${fmt(tL)}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-top:16px">
+        <div style="background:#eff4ff;border:1.5px solid #bfdbfe;border-radius:8px;padding:12px 16px">
+          <div style="font-size:9px;font-weight:800;color:#1d4ed8;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px">Total Haberes</div>
+          <div style="font-size:20px;font-weight:800;font-family:monospace;color:#1d4ed8">$${fmt(tH)}</div>
+          <div style="font-size:9px;color:#6b7280;margin-top:2px">${liqs.length} trabajador(es)</div>
+        </div>
+        <div style="background:#f5f3ff;border:1.5px solid #ddd6fe;border-radius:8px;padding:12px 16px">
+          <div style="font-size:9px;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px">Total AFP</div>
+          <div style="font-size:20px;font-weight:800;font-family:monospace;color:#7c3aed">$${fmt(tAfp)}</div>
+          <div style="font-size:9px;color:#6b7280;margin-top:2px">Cotización previsional</div>
+        </div>
+        <div style="background:#fff1f2;border:1.5px solid #fca5a5;border-radius:8px;padding:12px 16px">
+          <div style="font-size:9px;font-weight:800;color:#dc2626;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px">Total Descuentos</div>
+          <div style="font-size:20px;font-weight:800;font-family:monospace;color:#dc2626">$${fmt(tD)}</div>
+          <div style="font-size:9px;color:#6b7280;margin-top:2px">AFP+Salud+Ces+IUT+Otros</div>
+        </div>
+        <div style="background:#f0fdf4;border:1.5px solid #6ee7b7;border-radius:8px;padding:12px 16px">
+          <div style="font-size:9px;font-weight:800;color:#059669;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px">Total Líquido</div>
+          <div style="font-size:20px;font-weight:800;font-family:monospace;color:#059669">$${fmt(tL)}</div>
+          <div style="font-size:9px;color:#6b7280;margin-top:2px">A transferir</div>
+        </div>
+      </div>`}
+
+    <div style="border-top:1px solid #e5e7eb;margin-top:16px;padding-top:10px;display:flex;justify-content:space-between;font-size:8.5px;color:#9ca3af">
+      <span>SistemRem Chile 2026 · Código del Trabajo DFL-1</span>
+      <span>IMF $${fmt(P.IMF)} · UF $${fmt(P.UF)} · UTM $${fmt(P.UTM)}</span>
+    </div>
+  </div>`,`Libro_${perNom(per)}`);
+}
+
+function expNominaPDF(){const emp=DB.empresas.find(e=>e.id===CE),ts=DB.trabajadores.filter(t=>t.empId===CE);const rows=ts.map(t=>{const a=calcAnios(t.ing,new Date().toISOString().slice(0,10));return`<tr><td>${t.rut}</td><td><b>${t.nom} ${t.a1} ${t.a2}</b></td><td>${t.cargo}</td><td>${t.ing}</td><td>${a.a}a ${a.m}m</td><td align="right">$${fmt(t.suel)}</td><td>${t.afp}</td><td>${t.isa}${t.sUF>0?` +${t.sUF}UF`:''}</td><td>${t.activo?'Activo':'Inactivo'}</td></tr>`;}).join('');pw(`${cabPDF(emp,'NÓMINA DE PERSONAL')}<table border="1" cellpadding="5" cellspacing="0" style="font-size:9px"><thead><tr style="background:#333;color:white"><th>RUT</th><th>Nombre</th><th>Cargo</th><th>Ingreso</th><th>Antigüed.</th><th>Sueldo</th><th>AFP</th><th>Salud</th><th>Estado</th></tr></thead><tbody>${rows}</tbody></table>`,'Nómina');}
+function expPrevPDF(){const per=$i('rPrev').value||perStr(PER),emp=DB.empresas.find(e=>e.id===CE),liqs=DB.liquidaciones.filter(l=>l.empId===CE&&l.per===per);const rows=liqs.map(l=>{const t=DB.trabajadores.find(x=>x.id===l.trabId),d=l.d||{};return`<tr><td>${t?.rut}</td><td>${t?`${t.a1} ${t.nom}`:'-'}</td><td>${t?.afp}</td><td align="right">$${fmt(~~(d.dAFP||0))}</td><td align="right">$${fmt(~~(d.dS7||0))}</td><td align="right">$${fmt(~~(d.dCes||0))}</td><td align="right">$${fmt(~~((d.dAFP||0)+(d.dSal||0)+(d.dCes||0)+(d.cSIS||0)+(d.cCesE||0)))}</td></tr>`;}).join('');pw(`${cabPDF(emp,'PREVIRED — '+perNom(per).toUpperCase())}<table border="1" cellpadding="5" cellspacing="0" style="font-size:9px"><thead><tr style="background:#333;color:white"><th>RUT</th><th>Nombre</th><th>AFP</th><th>Cotiz.AFP</th><th>Salud 7%</th><th>Cesantía</th><th>Total Cotiz.</th></tr></thead><tbody>${rows}</tbody></table>`,`Previred ${perNom(per)}`);}
+function expContsPDF(){const hoy=new Date(),emp=DB.empresas.find(e=>e.id===CE),cs=DB.contratos.filter(c=>{const t=DB.trabajadores.find(x=>x.id===c.trabId);return t&&t.empId===CE;});const rows=cs.map(c=>{const t=DB.trabajadores.find(x=>x.id===c.trabId),dr=c.term?~~((new Date(c.term)-hoy)/864e5):null;const al=dr===null?'OK':dr<0?'<span style="color:red">VENCIDO</span>':dr<30?`<span style="color:orange">⚠️ ${dr}d</span>`:'OK';return`<tr><td>${c.num}</td><td>${t?`${t.nom} ${t.a1}`:'-'}</td><td>${c.tipo}</td><td>${c.ini}</td><td>${c.term||'Indefinido'}</td><td align="right">$${fmt(c.suel)}</td><td>${c.estado}</td><td>${al}</td></tr>`;}).join('');pw(`${cabPDF(emp,'INFORME DE CONTRATOS')}<table border="1" cellpadding="5" cellspacing="0" style="font-size:9px"><thead><tr style="background:#333;color:white"><th>N°</th><th>Trabajador</th><th>Tipo</th><th>Inicio</th><th>Término</th><th>Sueldo</th><th>Estado</th><th>Alerta</th></tr></thead><tbody>${rows}</tbody></table>`,'Contratos');}
+function expFinListaPDF(){const emp=DB.empresas.find(e=>e.id===CE),fins=DB.finiquitos.filter(f=>f.empId===CE);const rows=fins.map(f=>{const t=DB.trabajadores.find(x=>x.id===f.trabId);return`<tr><td>${f.fec}</td><td>${t?`${t.nom} ${t.a1}`:'-'}</td><td>${t?.rut||'-'}</td><td style="font-size:8px">${causNom(f.caus).substring(0,30)}...</td><td>${f.anA}a ${f.anM}m</td><td align="right">$${fmt(f.indem)}</td><td align="right">$${fmt(f.totalBruto)}</td><td align="right">$${fmt(f.totalNeto)}</td></tr>`;}).join('');pw(`${cabPDF(emp,'FINIQUITOS EMITIDOS')}<table border="1" cellpadding="5" cellspacing="0" style="font-size:9px"><thead><tr style="background:#333;color:white"><th>Fecha</th><th>Trabajador</th><th>RUT</th><th>Causal</th><th>Antig.</th><th>Indem.</th><th>Bruto</th><th>Neto</th></tr></thead><tbody>${rows}</tbody></table>`,'Finiquitos');}
+function expAnualPDF(){const anio=parseInt($i('rAnio').value)||new Date().getFullYear(),emp=DB.empresas.find(e=>e.id===CE);const mN=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];let rows='',tH=0,tD=0,tL=0;for(let m=1;m<=12;m++){const per=`${anio}-${String(m).padStart(2,'0')}`,ls=DB.liquidaciones.filter(l=>l.empId===CE&&l.per===per),h=ls.reduce((s,l)=>s+l.hab,0),d=ls.reduce((s,l)=>s+l.desc,0),l=ls.reduce((s,x)=>s+x.liq,0);tH+=h;tD+=d;tL+=l;rows+=`<tr><td>${mN[m-1]} ${anio}</td><td align="center">${ls.length}</td><td align="right">$${fmt(h)}</td><td align="right">$${fmt(d)}</td><td align="right"><b>$${fmt(l)}</b></td></tr>`;}rows+=`<tr style="background:#eee"><td><b>TOTAL ${anio}</b></td><td></td><td align="right"><b>$${fmt(tH)}</b></td><td align="right"><b>$${fmt(tD)}</b></td><td align="right"><b>$${fmt(tL)}</b></td></tr>`;pw(`${cabPDF(emp,`CONSOLIDADO ANUAL ${anio}`)}<table border="1" cellpadding="5" cellspacing="0" style="font-size:10px"><thead><tr style="background:#333;color:white"><th>Período</th><th>Liquidaciones</th><th>Total Haberes</th><th>Total Desc.</th><th>Total Líquido</th></tr></thead><tbody>${rows}</tbody></table>`,`Consolidado ${anio}`);}
+
+// PDF individuales
+function expLiqPDF(){if(!LR)return;genLiqPrev();const div=$i('printLiqDiv');if(div)pw(div.innerHTML,'Liquidación');}
+function expFinPDF(){if(!FR)return;genFinDoc();const div=$i('printFinDiv');if(div)pw(div.innerHTML,'Finiquito');}
+function impLiqId(id){
+  const l=DB.liquidaciones.find(x=>x.id===id);if(!l)return;
+  const t=DB.trabajadores.find(x=>x.id===l.trabId),emp=DB.empresas.find(e=>e.id===CE),d=l.d||{};
+  const per=perNom(l.per);
+  pw(`
+<div style="background:#fff;color:#1a1d2e;padding:32px 36px;font-family:'Segoe UI',system-ui,sans-serif;font-size:11px;line-height:1.6;max-width:760px;margin:0 auto">
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:18px;border-bottom:3px solid #1d4ed8;margin-bottom:20px">
+    <div>
+      <div style="font-size:18px;font-weight:800;color:#1a1d2e;letter-spacing:-.5px">${emp?.nombre||'EMPRESA'}</div>
+      <div style="font-size:10px;color:#6b7280;margin-top:2px">RUT ${emp?.rut} &nbsp;·&nbsp; ${emp?.giro}</div>
+      <div style="font-size:10px;color:#6b7280">${emp?.dir}, ${emp?.ciu||'Santiago'}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="background:#1d4ed8;color:#fff;font-size:13px;font-weight:800;padding:8px 18px;border-radius:7px;letter-spacing:.3px">LIQUIDACIÓN DE SUELDO</div>
+      <div style="font-size:12px;font-weight:700;color:#1d4ed8;margin-top:6px">${per.toUpperCase()}</div>
+      <div style="font-size:9px;color:#9ca3af;margin-top:2px">DFL-1 Código del Trabajo</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+    <div style="background:#f8faff;border:1.5px solid #dbeafe;border-radius:8px;padding:12px 16px">
+      <div style="font-size:9px;font-weight:800;color:#1d4ed8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px">Datos del Trabajador</div>
+      <div style="font-size:12px;font-weight:700;margin-bottom:4px">${t?t.nom+' '+t.a1+' '+(t.a2||''):'-'}</div>
+      <div style="color:#4b5563"><b>RUT:</b> ${t?.rut}</div>
+      <div style="color:#4b5563"><b>Cargo:</b> ${t?.cargo}</div>
+      <div style="color:#4b5563"><b>Fecha Ingreso:</b> ${fd(t?.ing)}</div>
+    </div>
+    <div style="background:#f8faff;border:1.5px solid #dbeafe;border-radius:8px;padding:12px 16px">
+      <div style="font-size:9px;font-weight:800;color:#1d4ed8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px">Condiciones Laborales</div>
+      <div style="color:#4b5563"><b>Jornada:</b> ${t?.jorn} hrs/semana</div>
+      <div style="color:#4b5563"><b>AFP:</b> ${t?.afp} (${d.afpR||''}%)</div>
+      <div style="color:#4b5563"><b>Salud:</b> ${t?.isa}${(d.sUF||0)>0?' (+'+d.sUF+' UF/mes)':''}</div>
+      <div style="color:#4b5563"><b>Banco:</b> ${t?.bco} · ${t?.tipoCta} N°${t?.cta}</div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:20px">
+    <div style="font-size:9px;font-weight:800;color:#374151;text-transform:uppercase;letter-spacing:.8px;margin-bottom:9px">Detalle de Haberes y Descuentos</div>
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead>
+        <tr>
+          <th style="background:#1e293b;color:#fff;padding:8px 12px;text-align:left;font-size:9px;letter-spacing:.6px;text-transform:uppercase">HABERES</th>
+          <th style="background:#1e293b;color:#9ca3af;padding:8px 12px;text-align:right;font-size:9px;letter-spacing:.6px;text-transform:uppercase">MONTO</th>
+          <th style="background:#1e293b;color:#fff;padding:8px 12px;text-align:left;font-size:9px;letter-spacing:.6px;text-transform:uppercase">DESCUENTOS</th>
+          <th style="background:#1e293b;color:#9ca3af;padding:8px 12px;text-align:right;font-size:9px;letter-spacing:.6px;text-transform:uppercase">MONTO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:7px 12px;color:#374151">Sueldo Base (${d.dias||30}/30 días)</td><td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600">$${fmt(~~(d.suP||0))}</td><td style="padding:7px 12px;color:#374151">AFP ${d.afpR||''}%</td><td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600;color:#dc2626">-$${fmt(~~(d.dAFP||0))}</td></tr>
+        <tr style="background:#fafbff;border-bottom:1px solid #f1f5f9"><td style="padding:7px 12px;color:#374151">Gratificación Legal (Art.50 CT)</td><td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600">$${fmt(~~(d.g||0))}</td><td style="padding:7px 12px;color:#374151">Salud ${P.SALUD}% legal</td><td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600;color:#dc2626">-$${fmt(~~(d.dS7||0))}</td></tr>
+        <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:7px 12px;color:#374151">Horas Extras</td><td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600">${(d.totHE||0)>0?'$'+fmt(~~d.totHE):'—'}</td><td style="padding:7px 12px;color:#374151">Isapre adicional</td><td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600;color:#dc2626">${(d.dSUF||0)>0?'-$'+fmt(~~d.dSUF):'—'}</td></tr>
+        <tr style="background:#fafbff;border-bottom:1px solid #f1f5f9"><td style="padding:7px 12px;color:#374151">Bonos / Comisiones</td><td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600">${(d.bon||0)>0?'$'+fmt(d.bon):'—'}</td><td style="padding:7px 12px;color:#374151">Seg. Cesantía ${P.CES_T||0.6}%</td><td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600;color:#dc2626">-$${fmt(~~(d.dCes||0))}</td></tr>
+        <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:7px 12px;color:#6b7280;font-style:italic">Colación (no imponible)</td><td style="padding:7px 12px;text-align:right;font-family:monospace;color:#6b7280">${(d.col||0)>0?'$'+fmt(d.col):'—'}</td><td style="padding:7px 12px;color:#374151">Imp. Único Trabajador</td><td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600;color:#dc2626">${(d.dIUT||0)>0?'-$'+fmt(~~d.dIUT):'Exento'}</td></tr>
+        <tr style="background:#fafbff;border-bottom:1px solid #f1f5f9"><td style="padding:7px 12px;color:#6b7280;font-style:italic">Movilización (no imponible)</td><td style="padding:7px 12px;text-align:right;font-family:monospace;color:#6b7280">${(d.mov||0)>0?'$'+fmt(d.mov):'—'}</td><td style="padding:7px 12px;color:#374151">Anticipos</td><td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600;color:#dc2626">${(d.ant||0)>0?'-$'+fmt(d.ant):'—'}</td></tr>
+        <tr><td style="padding:7px 12px"></td><td></td><td style="padding:7px 12px;color:#374151">Cuota Préstamo</td><td style="padding:7px 12px;text-align:right;font-family:monospace;font-weight:600;color:#dc2626">${(d.prest||0)>0?'-$'+fmt(d.prest):'—'}</td></tr>
+        <tr style="border-top:2px solid #1d4ed8">
+          <td style="padding:9px 12px;font-weight:800;font-size:12px;color:#1a1d2e;background:#eff4ff">TOTAL HABERES</td>
+          <td style="padding:9px 12px;text-align:right;font-family:monospace;font-weight:800;font-size:13px;color:#1d4ed8;background:#eff4ff">$${fmt(l.hab)}</td>
+          <td style="padding:9px 12px;font-weight:800;font-size:12px;color:#1a1d2e;background:#fff1f2">TOTAL DESCUENTOS</td>
+          <td style="padding:9px 12px;text-align:right;font-family:monospace;font-weight:800;font-size:13px;color:#dc2626;background:#fff1f2">-$${fmt(l.desc)}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#1d4ed8,#0891b2);border-radius:10px;padding:18px 26px;margin-bottom:24px">
+    <div>
+      <div style="color:rgba(255,255,255,.75);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Líquido a Pagar — ${per}</div>
+      <div style="color:rgba(255,255,255,.6);font-size:9px;margin-top:3px">Días trabajados: ${d.dias||30}/30 &nbsp;·&nbsp; IMF $${fmt(P.IMF)} &nbsp;·&nbsp; UF $${fmt(P.UF)}</div>
+    </div>
+    <div style="color:#fff;font-size:30px;font-weight:800;font-family:monospace;letter-spacing:-1.5px">$${fmt(l.liq)}</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:40px">
+    <div style="text-align:center">
+      <div style="height:52px;border-bottom:1.5px solid #374151;margin-bottom:9px"></div>
+      <div style="font-weight:700">${t?t.nom+' '+t.a1:''}</div>
+      <div style="color:#6b7280;font-size:10px">RUT: ${t?.rut||''}</div>
+      <div style="color:#9ca3af;font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-top:3px">El Trabajador</div>
+    </div>
+    <div style="text-align:center">
+      <div style="height:52px;border-bottom:1.5px solid #374151;margin-bottom:9px"></div>
+      <div style="font-weight:700">${emp?.rep||''}</div>
+      <div style="color:#6b7280;font-size:10px">RUT: ${emp?.repRut||''} &nbsp;·&nbsp; ${emp?.nombre}</div>
+      <div style="color:#9ca3af;font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-top:3px">Por el Empleador</div>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid #e5e7eb;margin-top:20px;padding-top:10px;display:flex;justify-content:space-between">
+    <div style="font-size:8.5px;color:#9ca3af">SistemRem Chile 2026 · Código del Trabajo DFL-1</div>
+    <div style="font-size:8.5px;color:#9ca3af">IMF $${fmt(P.IMF)} · UF $${fmt(P.UF)} · UTM $${fmt(P.UTM)}</div>
+  </div>
+</div>`,'Liquidacion_'+perNom(l.per));
+}
+
+function impFinId(id){
+  const f=DB.finiquitos.find(x=>x.id===id);if(!f)return;
+  FR={t:DB.trabajadores.find(x=>x.id===f.trabId),fec:f.fec,caus:f.caus,aviso:f.aviso,tCont:f.tCont,
+      prom:f.prom,promBase:f.prom,vacD:f.vacD,sP:f.sP||0,gP:f.gP||0,otros:f.otros||0,
+      A:calcAnios(DB.trabajadores.find(x=>x.id===f.trabId)?.ing||f.fec,f.fec),
+      aTop:f.aTop||0,conIndem:f.conIndem||false,indem:f.indem||0,avisoP:f.avisoP||0,
+      ferP:f.ferP||0,vacAcum:0,subLegal:0,subHab:f.subHab||0,
+      totalBruto:f.totalBruto||0,dAFP_f:f.dAFP_f||0,dSal_f:f.dSal_f||0,
+      totalDesc:f.totalDesc||0,totalNeto:f.totalNeto||0,afpR:f.afpR||0};
+  genFinDoc();
+  const div=$i('printFinDiv');
+  if(div)pw(div.innerHTML,'Finiquito_'+fd(f.fec));
+}
+
+function impContratoId(id){const c=id&&DB.contratos.find(x=>x.id===id);if(!c)return;const t=DB.trabajadores.find(x=>x.id===c.trabId),emp=DB.empresas.find(e=>e.id===CE),hoy=new Date();const fecLeg=`Santiago, ${hoy.getDate()} de ${['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'][hoy.getMonth()]} de ${hoy.getFullYear()}`;pw(`<div style="font-family:Arial,sans-serif;font-size:10px;line-height:1.8;color:#000">
+<div style="text-align:center;margin-bottom:18px"><div style="font-size:15px;font-weight:bold;text-decoration:underline">CONTRATO INDIVIDUAL DE TRABAJO</div><div style="font-size:11px;margin-top:4px">N° ${c.num} — En conformidad al artículo 10 del Código del Trabajo</div></div>
+<p style="margin-bottom:8px">En <b>${fecLeg}</b>, entre:</p>
+<p style="margin-bottom:8px;padding:7px 10px;background:#f5f5f5;border-left:3px solid #333"><b>EMPLEADOR:</b> ${emp?.nombre}, RUT ${emp?.rut}, representada por ${emp?.rep}, RUT ${emp?.repRut||'—'}, domicilio: ${emp?.dir}, ${emp?.ciu}.</p>
+<p style="margin-bottom:10px;padding:7px 10px;background:#f5f5f5;border-left:3px solid #333"><b>TRABAJADOR/A:</b> ${t?t.nom+' '+t.a1+' '+t.a2:'—'}, RUT ${t?.rut||'—'}, domicilio: ${t?.dir||'—'}.</p>
+<p><b>PRIMERO — FUNCIONES:</b> El/La Trabajador/a se desempeñará como <b>${t?.cargo}</b>. ${c.func}</p>
+<p><b>SEGUNDO — LUGAR:</b> Las funciones se desempeñarán en ${c.lug}, ${c.ciu}.</p>
+<p><b>TERCERO — JORNADA:</b> La jornada ordinaria será de <b>${c.jorn} horas semanales</b>, distribuidas de ${c.dist}.</p>
+<p><b>CUARTO — REMUNERACIÓN:</b></p>
+<table border="1" cellpadding="5" cellspacing="0" style="font-size:10px;margin:8px 0;width:60%">
+<tr><td><b>Sueldo Base:</b></td><td align="right"><b>$${fmt(c.suel)}</b>/mes</td></tr>
+${c.col>0?`<tr><td>Asignación Colación (NI):</td><td align="right">$${fmt(c.col)}/mes</td></tr>`:''}
+${c.mov>0?`<tr><td>Asignación Movilización (NI):</td><td align="right">$${fmt(c.mov)}/mes</td></tr>`:''}
+<tr><td>Gratificación:</td><td>${c.grat==='legal'?'Legal 25% (tope 4.75 IMF anual)':'Garantizada mensual 1/12'}</td></tr>
+</table>
+<p><b>QUINTO — DURACIÓN:</b> El presente contrato es de tipo <b>${c.tipo}</b>${c.tipo==='plazo_fijo'?`, con fecha de término el <b>${fd(c.term)}</b>`:''}.</p>
+${c.claus?`<p><b>SEXTO — CLÁUSULAS ESPECIALES:</b> ${c.claus}</p>`:''}
+<table style="width:100%;margin-top:50px;font-size:9px">
+<tr>
+<td style="width:45%;text-align:center;border-top:1px solid #000;padding-top:6px">${t?t.nom+' '+t.a1+' '+t.a2:''}<br>RUT: ${t?.rut||''}<br><i>EL TRABAJADOR</i></td>
+<td style="width:10%"></td>
+<td style="width:45%;text-align:center;border-top:1px solid #000;padding-top:6px">${emp?.rep||''}<br>RUT: ${emp?.repRut||''}<br><i>POR EL EMPLEADOR</i></td>
+</tr>
+</table>
+<div style="text-align:center;font-size:8px;color:#999;margin-top:12px">Art. 10 Código del Trabajo · DFL-1 · SistemRem Chile 2026</div>
+</div>`,`Contrato ${c.num}`);}
+function impFichaTrabId(id){const t=id&&DB.trabajadores.find(x=>x.id===id);if(!t)return;const emp=DB.empresas.find(e=>e.id===CE),a=calcAnios(t.ing,new Date().toISOString().slice(0,10));const ls=DB.liquidaciones.filter(l=>l.trabId===t.id&&l.empId===CE).slice(-6);pw(`${cabPDF(emp,'FICHA DEL TRABAJADOR')}<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:10px;margin-bottom:12px"><div><b>Nombre:</b> ${t.nom} ${t.a1} ${t.a2}<br><b>RUT:</b> ${t.rut}<br><b>Cargo:</b> ${t.cargo}<br><b>Ingreso:</b> ${fd(t.ing)}<br><b>Antigüedad:</b> ${a.a}a ${a.m}m ${a.d}d<br><b>Estado:</b> ${t.activo?'Activo':'Inactivo'}</div><div><b>AFP:</b> ${t.afp}<br><b>Salud:</b> ${t.isa}${t.sUF>0?` +${t.sUF}UF`:''}<br><b>Banco:</b> ${t.bco}<br><b>Tipo Cta:</b> ${t.tipoCta||'-'}<br><b>N° Cuenta:</b> ${t.cta}<br><b>Sueldo Base:</b> $${fmt(t.suel)}</div></div>${ls.length?`<div style="font-size:10px;font-weight:bold;margin-bottom:5px">Últimas liquidaciones:</div><table border="1" cellpadding="4" cellspacing="0" style="font-size:9px"><thead><tr style="background:#333;color:white"><th>Período</th><th>Total Haberes</th><th>Total Desc.</th><th>Líquido</th></tr></thead><tbody>${ls.map(l=>`<tr><td>${perNom(l.per)}</td><td align="right">$${fmt(l.hab)}</td><td align="right">$${fmt(l.desc)}</td><td align="right"><b>$${fmt(l.liq)}</b></td></tr>`).join('')}</tbody></table>`:''}`,'Ficha '+t.nom);}
+function impEmpresaId(id){const e=id&&DB.empresas.find(x=>x.id===id);if(!e)return;const ts=DB.trabajadores.filter(t=>t.empId===e.id);pw(`${cabPDF(e,'FICHA DE EMPRESA')}<table border="0" cellpadding="4" style="font-size:10px;margin-bottom:12px"><tr><td><b>Giro:</b> ${e.giro}</td><td><b>Código SII:</b> ${e.sii||'—'}</td></tr><tr><td><b>Rep. Legal:</b> ${e.rep}</td><td><b>RUT Rep.:</b> ${e.repRut||'—'}</td></tr><tr><td><b>Dirección:</b> ${e.dir}</td><td><b>Ciudad:</b> ${e.ciu}</td></tr><tr><td><b>Tel:</b> ${e.tel}</td><td><b>Email:</b> ${e.email}</td></tr><tr><td><b>Mutual:</b> ${e.mut}</td></tr></table><div style="font-size:10px;font-weight:bold;margin-bottom:5px">Trabajadores (${ts.length}):</div><table border="1" cellpadding="4" cellspacing="0" style="font-size:9px"><thead><tr style="background:#333;color:white"><th>RUT</th><th>Nombre</th><th>Cargo</th><th>Ingreso</th><th>Sueldo</th><th>AFP</th><th>Estado</th></tr></thead><tbody>${ts.map(t=>`<tr><td>${t.rut}</td><td>${t.nom} ${t.a1}</td><td>${t.cargo}</td><td>${fd(t.ing)}</td><td align="right">$${fmt(t.suel)}</td><td>${t.afp}</td><td>${t.activo?'Activo':'Inactivo'}</td></tr>`).join('')}</tbody></table>`,'Ficha Empresa '+e.nombre);}
+
+// WORD / RTF
+function rtf(body,nombre){
+  const c='{\\rtf1\\ansi\\deff0{\\fonttbl{\\f0 Arial;}}\\f0\\fs20 '+body.replace(/[<>]/g,'')+'}';
+  const b=new Blob([c],{type:'application/rtf'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=nombre+'.rtf';a.click();
+  toast('Word descargado: '+nombre+'.rtf');
+}
+function rtfB(t){return '{\\\\b '+t+'}';}
+function rtfBU(t){return '{\\\\b\\\\ul '+t+'}';}
+function rtfLine(t){return (t||'')+' \\\\line ';}
+
+function expLibroRTFMes(){
+  const per=$i('rMes').value||perStr(PER),emp=DB.empresas.find(e=>e.id===CE);
+  const liqs=DB.liquidaciones.filter(l=>l.empId===CE&&l.per===per);
+  let b=rtfB(emp?.nombre||'')+' \\\\line RUT: '+(emp?.rut||'')+' \\\\line\\\\line '+rtfBU('LIBRO DE REMUNERACIONES - '+perNom(per).toUpperCase())+' \\\\line\\\\line ';
+  liqs.forEach(l=>{const t=DB.trabajadores.find(x=>x.id===l.trabId);b+=rtfB(t?t.nom+' '+t.a1:'-')+' ('+t?.rut+') - Liquido: $'+fmt(l.liq)+' \\\\line ';});
+  b+=' \\\\line Total liquido: $'+fmt(liqs.reduce((s,l)=>s+l.liq,0));
+  rtf(b,'LibroRem_'+per);
+}
+function expLibroRTF(){expLibroRTFMes();}
+function expNominaRTF(){
+  const emp=DB.empresas.find(e=>e.id===CE),ts=DB.trabajadores.filter(t=>t.empId===CE);
+  let b=rtfB(emp?.nombre||'')+' \\\\line\\\\line '+rtfBU('NOMINA DE PERSONAL')+' \\\\line\\\\line ';
+  ts.forEach(t=>{const a=calcAnios(t.ing,new Date().toISOString().slice(0,10));b+=rtfB(t.nom+' '+t.a1+' '+t.a2)+' - '+t.rut+' - '+t.cargo+' - $'+fmt(t.suel)+' - '+a.a+'a '+a.m+'m - '+(t.activo?'Activo':'Inactivo')+' \\\\line ';});
+  rtf(b,'NominaPersonal');
+}
+function expContsRTF(){
+  const emp=DB.empresas.find(e=>e.id===CE),cs=DB.contratos.filter(c=>{const t=DB.trabajadores.find(x=>x.id===c.trabId);return t&&t.empId===CE;});
+  let b=rtfB(emp?.nombre||'')+' \\\\line\\\\line '+rtfBU('CONTRATOS')+' \\\\line\\\\line ';
+  cs.forEach(c=>{const t=DB.trabajadores.find(x=>x.id===c.trabId);b+=c.num+' - '+rtfB(t?t.nom+' '+t.a1:'-')+' - '+c.tipo+' - Inicio: '+c.ini+' - Sueldo: $'+fmt(c.suel)+' \\\\line ';});
+  rtf(b,'Contratos');
+}
+function expFinRTF(){
+  if(!FR)return;const r=FR,emp=DB.empresas.find(e=>e.id===CE);
+  let b=rtfB(emp?.nombre||'')+' \\\\line RUT: '+(emp?.rut||'')+' \\\\line\\\\line '+rtfBU('FINIQUITO DE TRABAJO - ART. 177 CT')+' \\\\line\\\\line ';
+  b+=rtfB('Trabajador:')+' '+r.t.nom+' '+r.t.a1+' '+r.t.a2+' - RUT: '+r.t.rut+' \\\\line ';
+  b+=rtfB('Cargo:')+' '+r.t.cargo+' \\\\line ';
+  b+=rtfB('Ingreso:')+' '+fd(r.t.ing)+' - '+rtfB('Termino:')+' '+fd(r.fec)+' \\\\line ';
+  b+=rtfB('Anios Servicio:')+' '+r.A.a+'a '+r.A.m+'m '+r.A.d+'d ('+r.A.dec.toFixed(6)+' exactos) \\\\line ';
+  b+=rtfB('Causal:')+' '+causNom(r.caus)+' \\\\line\\\\line ';
+  b+=rtfB('LIQUIDACION FINAL:')+' \\\\line ';
+  b+='Indem. x Anios: $'+fmt(r.indem)+' \\\\line ';
+  b+='Aviso Previo: $'+fmt(r.avisoP)+' \\\\line ';
+  b+='Feriado Prop.: $'+fmt(r.ferP)+' \\\\line ';
+  b+='Sueldo Prop.: $'+fmt(r.sP)+' \\\\line ';
+  b+='Gratif. Prop.: $'+fmt(r.gP)+' \\\\line ';
+  b+='Otros Haberes: $'+fmt(r.otros)+' \\\\line ';
+  b+=rtfB('TOTAL BRUTO: $'+fmt(r.totalBruto))+' \\\\line ';
+  b+='Descuentos: -$'+fmt(r.totalDesc)+' \\\\line ';
+  b+='{\\\\b\\\\fs24 TOTAL NETO: $'+fmt(r.totalNeto)+'} \\\\line\\\\line ';
+  b+='Firma trabajador: _________________________ \\\\line ';
+  b+='Firma empleador: _________________________ \\\\line ';
+  b+='Ministro de Fe: _________________________';
+  rtf(b,'Finiquito_'+r.t.a1);
+}
+function expLiqRTF(){
+  if(!LR)return;
+  const trabId=parseInt(gv('lTrab')),t=DB.trabajadores.find(x=>x.id===trabId);
+  const emp=DB.empresas.find(e=>e.id===CE),per=gv('lPer');
+  let b=rtfB(emp?.nombre||'')+' \\\\line\\\\line '+rtfBU('LIQUIDACION DE SUELDO - '+perNom(per).toUpperCase())+' \\\\line\\\\line ';
+  b+=rtfB('Trabajador:')+' '+(t?t.nom+' '+t.a1+' '+t.a2:'-')+' - RUT: '+(t?.rut||'')+' \\\\line ';
+  b+=rtfB('Cargo:')+' '+(t?.cargo||'')+' - AFP: '+(t?.afp||'')+' ('+LR.afpR+'%) \\\\line\\\\line ';
+  b+=rtfB('HABERES:')+' \\\\line ';
+  b+='Sueldo Base ('+LR.dias+'/30): $'+fmt(~~LR.suP)+' \\\\line ';
+  b+='Gratificacion: $'+fmt(~~LR.g)+' \\\\line ';
+  b+='H.Extras: $'+fmt(~~LR.totHE)+' \\\\line ';
+  b+='Colacion: $'+fmt(LR.col)+' \\\\line ';
+  b+='Movilizacion: $'+fmt(LR.mov)+' \\\\line ';
+  b+=rtfB('TOTAL HABERES: $'+fmt(~~LR.totH))+' \\\\line\\\\line ';
+  b+=rtfB('DESCUENTOS:')+' \\\\line ';
+  b+='AFP '+LR.afpR+'%: -$'+fmt(~~LR.dAFP)+' \\\\line ';
+  b+='Salud '+P.SALUD+'%: -$'+fmt(~~LR.dS7)+' \\\\line ';
+  b+='Salud Isapre: -$'+fmt(~~LR.dSUF)+' \\\\line ';
+  b+='Cesantia: -$'+fmt(~~LR.dCes)+' \\\\line ';
+  b+='IUT: -$'+fmt(~~LR.dIUT)+' \\\\line ';
+  b+=rtfB('TOTAL DESCUENTOS: -$'+fmt(~~LR.totD))+' \\\\line\\\\line ';
+  b+='{\\\\b\\\\fs28 LIQUIDO A PAGAR: $'+fmt(LR.liq)+'} \\\\line\\\\line ';
+  b+='Firma trabajador: ______________________  Firma empleador: ______________________';
+  rtf(b,'Liq_'+(t?.a1||'')+'_'+per);
+}
+
+
+
+
+
+
+</script>
+</body>
+</html>
