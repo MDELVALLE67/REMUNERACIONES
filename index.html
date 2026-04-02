@@ -1125,7 +1125,7 @@ tbody tr:hover td{background:#f7f9ff}
   <div class="mh">
    <div class="mh-left">
     <div class="mh-top"><span class="mh-badge rd">FINIQUITO</span><h3>Finiquito de Trabajo</h3></div>
-    <div class="mh-sub">Art&#237;culo 177 C&#243;digo del Trabajo &#8212; Documento Legal con Ministro de Fe</div>
+    <div class="mh-sub">Art&#237;culo 177 C&#243;digo del Trabajo &#8212; C&#225;lculo completo seg&#250;n normativa chilena vigente</div>
    </div>
    <button class="mh-close" onclick="cerrar('moFin')">&#x2715;</button>
   </div>
@@ -1135,15 +1135,26 @@ tbody tr:hover td{background:#f7f9ff}
     <div class="tab" id="tf2" onclick="sTab('f',2)">&#9313;&ensp;C&#225;lculo Legal</div>
     <div class="tab" id="tf3" onclick="sTab('f',3)">&#9314;&ensp;Documento</div>
    </div>
+
+   <!-- TAB 1: DATOS -->
    <div class="tp on" id="tp-f1">
     <div class="fin-layout">
      <div class="fin-left">
+
+      <!-- SECCIÓN 01: IDENTIFICACIÓN -->
       <div class="fsec">
        <div class="fsec-title"><span class="fsec-num">01</span>Identificaci&#243;n de las Partes</div>
-       <div class="fr"><div class="fg"><label>Trabajador a Desvincular</label><select id="fTrab" onchange="calcFin()"></select></div><div class="fg"><label>Fecha de T&#233;rmino</label><input type="date" id="fFec" onchange="calcFin()"></div></div>
+       <div class="fr">
+        <div class="fg"><label>Trabajador a Desvincular</label><select id="fTrab" onchange="autoFillFin()"></select></div>
+        <div class="fg"><label>Fecha de T&#233;rmino</label><input type="date" id="fFec" onchange="calcFin()"></div>
+       </div>
+       <!-- Info auto-llenada del trabajador -->
+       <div id="fTrabInfo" style="display:none;background:var(--blue-lt);border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;font-size:11px;color:var(--blue-dk);margin-top:4px"></div>
       </div>
+
+      <!-- SECCIÓN 02: CAUSAL -->
       <div class="fsec">
-       <div class="fsec-title"><span class="fsec-num">02</span>Causal y Modalidad</div>
+       <div class="fsec-title"><span class="fsec-num">02</span>Causal y Modalidad de T&#233;rmino</div>
        <div class="fg"><label>Causal de T&#233;rmino del Contrato</label>
         <select id="fCaus" onchange="calcFin()">
          <optgroup label="Art. 159 — T&#233;rmino sin responsabilidad del empleador">
@@ -1169,24 +1180,93 @@ tbody tr:hover td{background:#f7f9ff}
          </optgroup>
         </select>
        </div>
-       <div class="fr"><div class="fg"><label>Tipo de Contrato</label><select id="fTCont" onchange="calcFin()"><option value="indefinido">Indefinido</option><option value="plazo_fijo">Plazo Fijo</option><option value="obra">Por Obra o Faena</option></select></div><div class="fg"><label>Aviso Previo de 30 D&#237;as</label><select id="fAviso" onchange="calcFin()"><option value="si">S&#237;, fue otorgado oportunamente</option><option value="no">No se otorg&#243; — se pagar&#225; indemnizaci&#243;n</option></select></div></div>
+       <div class="fr">
+        <div class="fg"><label>Tipo de Contrato</label><select id="fTCont" onchange="calcFin()"><option value="indefinido">Indefinido</option><option value="plazo_fijo">Plazo Fijo</option><option value="obra">Por Obra o Faena</option></select></div>
+        <div class="fg"><label>Aviso Previo de 30 D&#237;as</label><select id="fAviso" onchange="calcFin()"><option value="si">S&#237;, fue otorgado oportunamente</option><option value="no">No se otorg&#243; — se pagar&#225; indemnizaci&#243;n</option></select></div>
+       </div>
+       <!-- Alerta causal -->
+       <div id="fCausAlert" style="display:none;border-radius:7px;padding:8px 12px;font-size:11px;font-weight:600;margin-top:4px"></div>
       </div>
+
+      <!-- SECCIÓN 03: BASE DE CÁLCULO INDEMNIZACIÓN -->
       <div class="fsec">
-       <div class="fsec-title"><span class="fsec-num">03</span>Montos y Haberes Pendientes</div>
-       <div class="fin-mrow"><label>Promedio &#250;ltimas 3 remuneraciones <em>(tope 90 UF/mes)</em></label><div class="fin-$wrap"><span class="fin-$sym">$</span><input type="number" id="fProm" placeholder="820.000" oninput="calcFin()"></div></div>
-       <div class="fin-mrow"><label>D&#237;as feriado pendientes <em>(d&#237;as h&#225;biles)</em></label><input type="number" id="fVac" value="0" min="0" oninput="calcFin()"></div>
-       <div class="fin-mrow"><label>Remuneraci&#243;n proporcional mes en curso</label><div class="fin-$wrap"><span class="fin-$sym">$</span><input type="number" id="fSP" value="0" oninput="calcFin()"></div></div>
-       <div class="fin-mrow"><label>Gratificaci&#243;n proporcional mes en curso</label><div class="fin-$wrap"><span class="fin-$sym">$</span><input type="number" id="fGP" value="0" oninput="calcFin()"></div></div>
-       <div class="fin-mrow"><label>Otros haberes y beneficios pendientes</label><div class="fin-$wrap"><span class="fin-$sym">$</span><input type="number" id="fOtros" value="0" oninput="calcFin()"></div></div>
+       <div class="fsec-title"><span class="fsec-num">03</span>Base de C&#225;lculo — Indemnizaci&#243;n por A&#241;os de Servicio</div>
+       <div style="background:var(--amb-lt);border:1px solid #fcd34d;border-radius:7px;padding:9px 13px;font-size:10.5px;color:var(--amb);margin-bottom:10px">
+        &#9432; Se usa el <b>promedio de las &#250;ltimas 3 remuneraciones</b> ordinarias devengadas. Tope legal: 90 UF/mes. M&#237;nimo: 1 mes por a&#241;o con tope 11 a&#241;os (Art.163 CT).
+       </div>
+       <div class="fr3">
+        <div class="fg"><label>Rem. Mes -1 ($)</label><input type="number" id="fRem1" value="0" min="0" oninput="calcPromFin()"></div>
+        <div class="fg"><label>Rem. Mes -2 ($)</label><input type="number" id="fRem2" value="0" min="0" oninput="calcPromFin()"></div>
+        <div class="fg"><label>Rem. Mes -3 ($)</label><input type="number" id="fRem3" value="0" min="0" oninput="calcPromFin()"></div>
+       </div>
+       <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+        <div style="flex:1;background:var(--surf2);border:1.5px solid var(--brd);border-radius:8px;padding:9px 13px;font-size:12px;font-weight:700;color:var(--blue)">
+         Promedio calculado: <span id="fPromCalc">$0</span> <span id="fPromTope" style="font-size:10px;color:var(--red);display:none">⚠️ Limitado a 90 UF = <span id="fPromTopeVal"></span></span>
+        </div>
+        <div class="fg" style="width:170px;margin:0"><label>O ingrese promedio manual ($)</label><input type="number" id="fProm" value="0" min="0" oninput="calcFin()" placeholder="Dejar en 0 para usar calculado"></div>
+       </div>
       </div>
-     </div>
-     <!-- live panel -->
+
+      <!-- SECCIÓN 04: FERIADO PROPORCIONAL -->
+      <div class="fsec">
+       <div class="fsec-title"><span class="fsec-num">04</span>Feriado Proporcional (Art. 73 CT)</div>
+       <div style="background:var(--surf2);border:1px solid var(--brd);border-radius:7px;padding:9px 13px;font-size:10.5px;color:var(--ink3);margin-bottom:10px">
+        F&#243;rmula: D&#237;as h&#225;biles pendientes &#215; (Promedio/30) &#215; 1.2 (factor feriado). Los domingos y festivos no se cuentan.
+       </div>
+       <div class="fr">
+        <div class="fg"><label>D&#237;as H&#225;biles Feriado Pendientes</label><input type="number" id="fVac" value="0" min="0" oninput="calcFin()"></div>
+        <div class="fg"><label>D&#237;as feriado acumulado (estimado auto)</label><input type="number" id="fVacAcum" value="0" min="0" readonly style="background:var(--surf3);color:var(--ink3)"></div>
+       </div>
+      </div>
+
+      <!-- SECCIÓN 05: HABERES PENDIENTES DEL MES -->
+      <div class="fsec">
+       <div class="fsec-title"><span class="fsec-num">05</span>Haberes Pendientes del Mes en Curso</div>
+       <div class="fr">
+        <div class="fg"><label>D&#237;as Trabajados en el Mes</label><input type="number" id="fDiasTrab" value="0" min="0" max="31" oninput="calcFin()"></div>
+        <div class="fg"><label>Sueldo Base del Trabajador ($)</label><input type="number" id="fSueldo" value="0" min="0" oninput="calcFin()"></div>
+       </div>
+       <div class="fr">
+        <div class="fg"><label>Gratificaci&#243;n Proporcional ($)</label><input type="number" id="fGP" value="0" min="0" oninput="calcFin()"></div>
+        <div class="fg"><label>Asig. Colaci&#243;n (No Imponible) ($)</label><input type="number" id="fCol" value="0" min="0" oninput="calcFin()"></div>
+       </div>
+       <div class="fr">
+        <div class="fg"><label>Asig. Movilizaci&#243;n (No Imponible) ($)</label><input type="number" id="fMov" value="0" min="0" oninput="calcFin()"></div>
+        <div class="fg"><label>Bonos / Comisiones pendientes ($)</label><input type="number" id="fBono" value="0" min="0" oninput="calcFin()"></div>
+       </div>
+       <div class="fr">
+        <div class="fg"><label>Horas Extras pendientes ($)</label><input type="number" id="fHExt" value="0" min="0" oninput="calcFin()"></div>
+        <div class="fg"><label>Otros Haberes pendientes ($)</label><input type="number" id="fOtros" value="0" min="0" oninput="calcFin()"></div>
+       </div>
+      </div>
+
+      <!-- SECCIÓN 06: DESCUENTOS PREVISIONALES -->
+      <div class="fsec">
+       <div class="fsec-title"><span class="fsec-num">06</span>Descuentos Previsionales (sobre haberes del mes)</div>
+       <div style="background:var(--red-lt);border:1px solid #fca5a5;border-radius:7px;padding:9px 13px;font-size:10.5px;color:var(--red);margin-bottom:10px">
+        &#9888; Las indemnizaciones por a&#241;os de servicio, aviso previo y feriado NO est&#225;n afectas a cotizaciones. Solo se descuenta sobre haberes del mes en curso.
+       </div>
+       <div class="fr3">
+        <div class="fg"><label>AFP del Trabajador (%)</label><select id="fAFP" onchange="calcFin()"></select></div>
+        <div class="fg"><label>Salud Legal (%) — fijo 7%</label><input type="number" id="fSalud" value="7" min="0" max="20" step="0.1" oninput="calcFin()" readonly style="background:var(--surf3)"></div>
+        <div class="fg"><label>Isapre adicional (UF/mes)</label><input type="number" id="fIsapre" value="0" min="0" step="0.1" oninput="calcFin()"></div>
+       </div>
+       <div class="fr">
+        <div class="fg"><label>Cesant&#237;a Trabajador (%)</label><input type="number" id="fCesT" value="0.6" min="0" step="0.01" oninput="calcFin()"></div>
+        <div class="fg"><label>Anticipos / Pr&#233;stamos pendientes ($)</label><input type="number" id="fAnt" value="0" min="0" oninput="calcFin()"></div>
+       </div>
+      </div>
+
+     </div><!-- fin fin-left -->
+
+     <!-- PANEL RESUMEN EN VIVO -->
      <div class="fin-live">
       <div class="fin-live-hdr">&#9646; Resumen Autom&#225;tico</div>
-      <div id="fResumen"><div class="fin-live-empty">Complete los datos y el sistema calcular&#225; autom&#225;ticamente los montos del finiquito.</div></div>
+      <div id="fResumen"><div class="fin-live-empty">Seleccione un trabajador y fecha de t&#233;rmino para calcular.</div></div>
      </div>
     </div>
-   </div>
+   </div><!-- fin tp-f1 -->
+
    <div class="tp" id="tp-f2"><div id="fCalc"></div></div>
    <div class="tp" id="tp-f3">
     <div id="fDoc"></div>
@@ -1668,78 +1748,196 @@ function renderLiqs(){
 }
 
 // FINIQUITO
-function abrirFin(){pobTrabSel('fTrab');$i('fFec').value=new Date().toISOString().slice(0,10);$i('fProm').value='';$i('fVac').value='0';$i('fSP').value='0';$i('fGP').value='0';$i('fOtros').value='0';FR=null;sTab('f',1);abrir('moFin');setTimeout(calcFin,100);}
+function abrirFin(){
+  pobTrabSel('fTrab');
+  $i('fFec').value=new Date().toISOString().slice(0,10);
+  ['fRem1','fRem2','fRem3','fProm','fVac','fVacAcum','fDiasTrab','fGP','fCol','fMov','fBono','fHExt','fOtros','fAnt'].forEach(id=>{const e=$i(id);if(e)e.value='0';});
+  $i('fSalud').value='7';$i('fIsapre').value='0';$i('fCesT').value='0.6';
+  $i('fTrabInfo').style.display='none';
+  FR=null;sTab('f',1);abrir('moFin');
+  setTimeout(autoFillFin,100);
+}
+
+function autoFillFin(){
+  const trabId=parseInt(gv('fTrab'));
+  const t=DB.trabajadores.find(x=>x.id===trabId);if(!t)return;
+  // Auto-fill AFP
+  const afpSel=$i('fAFP');
+  if(afpSel){afpSel.innerHTML=Object.entries(P.AFP).map(([n,r])=>`<option value="${r}" ${t.afp===n?'selected':''}>${n} — ${r}%</option>`).join('');}
+  // Auto-fill sueldo
+  $i('fSueldo').value=t.suel;
+  // Auto-fill isapre
+  $i('fIsapre').value=t.sUF||0;
+  // Auto-fill remuneraciones últimas 3 desde liquidaciones
+  const lqs=DB.liquidaciones.filter(l=>l.trabId===t.id&&l.empId===CE).sort((a,b)=>b.per.localeCompare(a.per));
+  if(lqs[0])$i('fRem1').value=lqs[0].hab||t.suel;
+  if(lqs[1])$i('fRem2').value=lqs[1].hab||t.suel;
+  if(lqs[2])$i('fRem3').value=lqs[2].hab||t.suel;
+  if(!lqs.length){$i('fRem1').value=t.suel;$i('fRem2').value=t.suel;$i('fRem3').value=t.suel;}
+  // Mostrar info trabajador
+  const A=calcAnios(t.ing,gv('fFec')||new Date().toISOString().slice(0,10));
+  $i('fTrabInfo').style.display='block';
+  $i('fTrabInfo').innerHTML=`<b>${t.nom} ${t.a1} ${t.a2}</b> · RUT ${t.rut} · Cargo: ${t.cargo} · Ingreso: ${fd(t.ing)} · Antigüedad: <b>${A.a}a ${A.m}m ${A.d}d</b> · AFP: ${t.afp} · Salud: ${t.isa}`;
+  calcPromFin();
+  calcFin();
+}
+
+function calcPromFin(){
+  const r1=pf('fRem1'),r2=pf('fRem2'),r3=pf('fRem3');
+  const cnt=[r1,r2,r3].filter(x=>x>0).length||1;
+  const prom=(r1+r2+r3)/cnt;
+  const tope=90*P.UF;
+  $i('fPromCalc').textContent='$'+fmt(~~prom);
+  if(prom>tope){
+    $i('fPromTope').style.display='inline';
+    $i('fPromTopeVal').textContent='$'+fmt(~~tope);
+  } else {
+    $i('fPromTope').style.display='none';
+  }
+  calcFin();
+}
+
 function calcFin(){
   const trabId=parseInt(gv('fTrab')),t=DB.trabajadores.find(x=>x.id===trabId);if(!t)return;
   const fec=gv('fFec');if(!fec)return;
   const caus=gv('fCaus'),aviso=gv('fAviso'),tCont=gv('fTCont');
-  const prom=pf('fProm')||t.suel,vacD=pf('fVac'),sP=pf('fSP'),gP=pf('fGP'),otros=pf('fOtros');
+
+  // Promedio: manual o calculado desde los 3 meses
+  const r1=pf('fRem1'),r2=pf('fRem2'),r3=pf('fRem3');
+  const cnt=[r1,r2,r3].filter(x=>x>0).length||1;
+  const promCalc=(r1+r2+r3)/cnt;
+  const promManual=pf('fProm');
+  const prom=promManual>0?promManual:promCalc;
+  const promBase=Math.min(prom,90*P.UF);
+
+  // Datos del mes
+  const vacD=pf('fVac');
+  const diasTrab=pf('fDiasTrab');
+  const sueldo=pf('fSueldo')||t.suel;
+  const sP=diasTrab>0?~~(sueldo*(diasTrab/30)):0;
+  const gP=pf('fGP'),col=pf('fCol'),mov=pf('fMov'),bono=pf('fBono'),hext=pf('fHExt'),otros=pf('fOtros');
+  const ant=pf('fAnt');
+
   const A=calcAnios(t.ing,fec);
-  const conIndem=['161','161b','159_1'].includes(caus)&&tCont==='indefinido';
-  const aTop=Math.min(A.dec,11),promBase=Math.min(prom,90*P.UF);
-  const indem=conIndem?~~(promBase*aTop):0;
-  const avisoP=['161','161b'].includes(caus)&&aviso==='no'?~~prom:0;
-  const ferP=vacD>0?~~((prom/30)*vacD*1.2):0;
   const vacAcum=~~(A.dec*15);
-  const subLegal=indem+avisoP+ferP,subHab=sP+gP+otros,totalBruto=subLegal+subHab;
-  const afpR=P.AFP[t.afp]||11.44,baseD=sP+gP;
-  const dAFP_f=~~(baseD*(afpR/100)),dSal_f=~~(baseD*(P.SALUD/100));
-  const totalDesc=dAFP_f+dSal_f,totalNeto=totalBruto-totalDesc;
-  FR={t,fec,caus,aviso,tCont,prom,promBase,vacD,sP,gP,otros,A,aTop,conIndem,indem,avisoP,ferP,vacAcum,subLegal,subHab,totalBruto,dAFP_f,dSal_f,totalDesc,totalNeto,afpR};
-  const fr=$i('fResumen'); if(fr&&t){
-    fr.innerHTML=`<div class="flv-rows">
-      <div class="flv-r"><span>Trabajador</span><b>${t.nom} ${t.a1}</b></div>
-      <div class="flv-r"><span>Años de servicio</span><b>${A.a}a ${A.m}m ${A.d}d</b></div>
-      <div class="flv-r hi"><span>Indem. años serv.</span><b>${indem>0?'$'+fmt(indem):'No aplica'}</b></div>
-      <div class="flv-r"><span>Aviso previo</span><b>${avisoP>0?'$'+fmt(avisoP):'Otorgado'}</b></div>
-      <div class="flv-r"><span>Feriado prop.</span><b>${ferP>0?'$'+fmt(ferP):'—'}</b></div>
-      <div class="flv-r"><span>Haberes pendientes</span><b>${subHab>0?'$'+fmt(subHab):'—'}</b></div>
-      <div class="flv-r rd"><span>Descuentos previs.</span><b>-$${fmt(totalDesc)}</b></div>
-    </div>
-    <div class="flv-bruto"><div class="flv-bl">Total Bruto</div><div class="flv-bv">$${fmt(totalBruto)}</div></div>
-    <div class="flv-neto"><div class="flv-nl">Líquido a Pagar</div><div class="flv-nv">$${fmt(totalNeto)}</div></div>`;}
+  $i('fVacAcum').value=vacAcum;
+
+  // Alerta causal
+  const alertEl=$i('fCausAlert');
+  if(caus.startsWith('160')){
+    alertEl.style.display='block';alertEl.style.background='#fff1f1';alertEl.style.border='1px solid #fca5a5';alertEl.style.color='var(--red)';
+    alertEl.innerHTML='⛔ Art. 160 — <b>NO corresponde indemnización</b> por años de servicio ni aviso previo.';
+  } else if(caus==='161'||caus==='161b'){
+    alertEl.style.display='block';alertEl.style.background='#fffbeb';alertEl.style.border='1px solid #fcd34d';alertEl.style.color='var(--amb)';
+    alertEl.innerHTML='⚠️ Art. 161 — <b>Corresponde indemnización</b> por años de servicio. Se requiere mínimo 1 año de servicio.';
+  } else if(caus==='159_1'){
+    alertEl.style.display='block';alertEl.style.background='#ecfdf5';alertEl.style.border='1px solid #6ee7b7';alertEl.style.color='var(--grn)';
+    alertEl.innerHTML='✅ Art. 159 N°1 Mutuo Acuerdo — Las partes pueden acordar pago voluntario de indemnización.';
+  } else { alertEl.style.display='none'; }
+
+  // Cálculos indemnización
+  const conIndem=['161','161b','159_1'].includes(caus)&&tCont==='indefinido';
+  const aTop=Math.min(A.dec,11);
+  const indem=conIndem&&A.dec>=1?~~(promBase*aTop):0;
+  const avisoP=['161','161b'].includes(caus)&&aviso==='no'?~~promBase:0;
+  const ferP=vacD>0?~~((promBase/30)*vacD*1.2):0;
+
+  // Haberes pendientes imponibles y no imponibles
+  const habImpon=sP+gP+bono+hext;
+  const habNoImpon=col+mov+otros;
+  const subHab=habImpon+habNoImpon;
+  const subLegal=indem+avisoP+ferP;
+  const totalBruto=subLegal+subHab;
+
+  // Descuentos solo sobre haberes imponibles del mes
+  const afpR=pf('fAFP')||P.AFP[t.afp]||11.44;
+  const saludR=pf('fSalud')||7;
+  const isapre=pf('fIsapre');
+  const cesR=pf('fCesT')||0.6;
+  const topeI=Math.min(habImpon,P.TOPE_AFP_UF*P.UF);
+  const dAFP_f=~~(topeI*(afpR/100));
+  const dSal_f=~~(topeI*(saludR/100));
+  const dIsa_f=~~(isapre*P.UF);
+  const dCes_f=~~(topeI*(cesR/100));
+  const totalDesc=dAFP_f+dSal_f+dIsa_f+dCes_f+ant;
+  const totalNeto=totalBruto-totalDesc;
+
+  FR={t,fec,caus,aviso,tCont,prom,promBase,promCalc,vacD,sP,gP,col,mov,bono,hext,otros,ant,diasTrab,A,aTop,conIndem,indem,avisoP,ferP,vacAcum,subLegal,subHab,habImpon,habNoImpon,totalBruto,dAFP_f,dSal_f,dIsa_f,dCes_f,totalDesc,totalNeto,afpR,saludR,isapre,cesR};
+
+  // Panel resumen en vivo
   const fres=$i('fResumen');
-  if(fres&&t){fres.innerHTML=`<div class="fin-resumen">
+  if(fres){fres.innerHTML=`<div class="fin-resumen">
     <div class="fin-res-item"><div class="fri-lbl">Años Servicio</div><div class="fri-val">${A.a}a ${A.m}m</div></div>
     <div class="fin-res-divider"></div>
-    <div class="fin-res-item"><div class="fri-lbl">Indem. Años</div><div class="fri-val" style="color:var(--blue)">$${fmt(indem)}</div></div>
+    <div class="fin-res-item"><div class="fri-lbl">Indem. Años</div><div class="fri-val" style="color:var(--blue)">${indem>0?'$'+fmt(indem):'No aplica'}</div></div>
     <div class="fin-res-divider"></div>
-    <div class="fin-res-item"><div class="fri-lbl">Aviso Previo</div><div class="fri-val" style="color:var(--amb)">$${fmt(avisoP)}</div></div>
+    <div class="fin-res-item"><div class="fri-lbl">Aviso Previo</div><div class="fri-val" style="color:var(--amb)">${avisoP>0?'$'+fmt(avisoP):'Otorgado'}</div></div>
     <div class="fin-res-divider"></div>
-    <div class="fin-res-item"><div class="fri-lbl">Feriado Prop.</div><div class="fri-val" style="color:var(--teal)">$${fmt(ferP)}</div></div>
+    <div class="fin-res-item"><div class="fri-lbl">Feriado Prop.</div><div class="fri-val" style="color:var(--teal)">${ferP>0?'$'+fmt(ferP):'—'}</div></div>
     <div class="fin-res-divider"></div>
-    <div class="fin-res-item total"><div class="fri-lbl">Total Neto</div><div class="fri-val">$${fmt(totalNeto)}</div></div>
+    <div class="fin-res-item"><div class="fri-lbl">Haberes Mes</div><div class="fri-val" style="color:var(--grn)">${subHab>0?'$'+fmt(subHab):'—'}</div></div>
+    <div class="fin-res-divider"></div>
+    <div class="fin-res-item"><div class="fri-lbl">Descuentos</div><div class="fri-val" style="color:var(--red)">-$${fmt(totalDesc)}</div></div>
+    <div class="fin-res-divider"></div>
+    <div class="fin-res-item total"><div class="fri-lbl">Total Bruto</div><div class="fri-val">$${fmt(totalBruto)}</div></div>
+    <div class="fin-res-divider"></div>
+    <div class="fin-res-item total" style="background:var(--red-lt)"><div class="fri-lbl" style="color:var(--red)">💵 Líquido</div><div class="fri-val" style="color:var(--red);font-size:18px">$${fmt(totalNeto)}</div></div>
   </div>`;}
+
   const cN=causNom(caus);
   $i('fCalc').innerHTML=`<div class="lp">
-    <div style="text-align:center;font-weight:700;color:var(--ac2);margin-bottom:11px">HOJA DE CÁLCULO — FINIQUITO DE TRABAJO</div>
-    <div style="background:var(--bg3);border-radius:7px;padding:12px;margin-bottom:11px">
-      <div class="lr"><span style="color:var(--tx2)">Trabajador</span><span><b>${t.nom} ${t.a1} ${t.a2}</b></span></div>
-      <div class="lr"><span style="color:var(--tx2)">RUT</span><span>${t.rut}</span></div>
-      <div class="lr"><span style="color:var(--tx2)">Ingreso / Término</span><span>${fd(t.ing)} → ${fd(fec)}</span></div>
-      <div class="lr b" style="margin-top:5px;padding-top:8px"><span style="color:var(--ac)">AÑOS DE SERVICIO</span><span style="color:var(--ac)"><b>${A.a} año(s), ${A.m} mes(es), ${A.d} día(s)</b> <span style="font-size:9px;color:var(--tx3)">(${A.dec.toFixed(8)} exactos)</span></span></div>
-      <div class="lr"><span style="color:var(--tx2)">Causal</span><span style="font-size:10px;text-align:right;max-width:280px">${cN}</span></div>
-      <div class="lr"><span style="color:var(--tx2)">Promedio remuneraciones</span><span>$${fmt(~~prom)}</span></div>
-      ${promBase<prom?`<div class="lr"><span style="color:var(--yl)">⚠️ Limitado a tope 90 UF</span><span style="color:var(--yl)">$${fmt(~~promBase)}</span></div>`:''}
-      ${aTop<A.dec?`<div class="lr"><span style="color:var(--yl)">⚠️ Años limitados a tope legal 11</span><span style="color:var(--yl)">${aTop.toFixed(4)} meses</span></div>`:''}
+    <div style="text-align:center;font-weight:700;color:var(--ink2);margin-bottom:14px;font-size:13px;letter-spacing:-.3px">HOJA DE CÁLCULO — FINIQUITO DE TRABAJO</div>
+
+    <!-- DATOS GENERALES -->
+    <div style="background:var(--surf2);border:1px solid var(--brd);border-radius:8px;padding:12px 14px;margin-bottom:14px">
+      <div class="lr"><span style="color:var(--ink3)">Trabajador</span><span><b>${t.nom} ${t.a1} ${t.a2}</b> — RUT ${t.rut}</span></div>
+      <div class="lr"><span style="color:var(--ink3)">Fecha Ingreso / Término</span><span>${fd(t.ing)} → ${fd(fec)}</span></div>
+      <div class="lr b"><span style="color:var(--blue)">Años de Servicio Exactos</span><span style="color:var(--blue)"><b>${A.a} año(s), ${A.m} mes(es), ${A.d} día(s)</b> <small style="color:var(--ink4)">(${A.dec.toFixed(6)} decimales)</small></span></div>
+      <div class="lr"><span style="color:var(--ink3)">Causal</span><span style="font-size:10px;text-align:right;max-width:320px">${cN}</span></div>
+      <div class="lr"><span style="color:var(--ink3)">Promedio 3 meses (base cálculo)</span><span>$${fmt(~~prom)} ${promBase<prom?`<span style="color:var(--red);font-size:10px">→ Tope 90 UF: $${fmt(~~promBase)}</span>`:''}</span></div>
+      ${aTop<A.dec?`<div class="lr"><span style="color:var(--amb)">⚠️ Años limitados tope legal</span><span style="color:var(--amb)">${aTop} de ${A.dec.toFixed(2)} (máx. 11)</span></div>`:''}
     </div>
+
+    <!-- I. INDEMNIZACIONES -->
     <div class="lst">① INDEMNIZACIONES LEGALES</div>
-    <div class="lr i"><span>Indem. x Años Serv.${conIndem?` (${aTop.toFixed(4)} meses × $${fmt(~~promBase)})`:' — SIN DERECHO (causal/tipo contrato no aplica)'}</span><span style="color:${indem>0?'var(--gn)':'var(--tx3)'}">$${fmt(indem)}</span></div>
-    <div class="lr i"><span>Aviso Previo (Art. 161)${avisoP>0?' — 30 días no otorgados':' — no aplica o ya otorgado'}</span><span style="color:${avisoP>0?'var(--gn)':'var(--tx3)'}">$${fmt(avisoP)}</span></div>
-    <div class="lr i"><span>Feriado Prop. — ${vacD} días háb. × $${fmt(~~(prom/30*1.2))}</span><span style="color:${ferP>0?'var(--gn)':'var(--tx3)'}">$${fmt(ferP)}</span></div>
-    <div style="font-size:9px;color:var(--tx3);padding-left:12px;margin-bottom:4px">Días acumulados estimados (15/año): ~${vacAcum} días hábiles</div>
-    <div class="lr b"><span>SUBTOTAL INDEMNIZACIONES</span><span style="color:var(--gn)">$${fmt(subLegal)}</span></div>
-    ${subHab>0?`<div class="lst" style="margin-top:7px">② HABERES PENDIENTES DEL MES</div>
-    ${sP>0?`<div class="lr i"><span>Sueldo proporcional</span><span>$${fmt(sP)}</span></div>`:''}
-    ${gP>0?`<div class="lr i"><span>Gratificación proporcional</span><span>$${fmt(gP)}</span></div>`:''}
-    ${otros>0?`<div class="lr i"><span>Otros haberes pendientes</span><span>$${fmt(otros)}</span></div>`:''}
-    <div class="lr b"><span>SUBTOTAL HABERES</span><span>$${fmt(subHab)}</span></div>
-    <div class="lst" style="margin-top:7px">③ DESCUENTOS (sobre haberes del mes)</div>
-    <div class="lr i"><span>AFP ${afpR}%</span><span style="color:var(--rd)">-$${fmt(dAFP_f)}</span></div>
-    <div class="lr i"><span>Salud ${P.SALUD}%</span><span style="color:var(--rd)">-$${fmt(dSal_f)}</span></div>
-    <div class="lr b"><span>TOTAL DESCUENTOS</span><span style="color:var(--rd)">-$${fmt(totalDesc)}</span></div>`:''}
-    <div class="lr b" style="font-size:15px;margin-top:12px;padding:11px 0;border-top:2px solid var(--brd)"><span>TOTAL FINIQUITO BRUTO</span><span style="color:var(--gn)">$${fmt(totalBruto)}</span></div>
-    ${totalDesc>0?`<div class="lr b" style="font-size:15px"><span>TOTAL NETO (con descuentos)</span><span style="color:var(--ac2)">$${fmt(totalNeto)}</span></div>`:''}
+    <div class="lr i"><span>Indemnización por Años de Servicio${conIndem?` — ${aTop.toFixed(4)} años × $${fmt(~~promBase)}`:' — NO corresponde por causal/contrato'}</span><span style="color:${indem>0?'var(--grn)':'var(--ink4)'}"><b>$${fmt(indem)}</b></span></div>
+    <div class="lr i"><span>Indemnización Sustitutiva Aviso Previo (Art.161)${avisoP>0?' — 30 días no otorgados':' — no aplica o ya otorgado'}</span><span style="color:${avisoP>0?'var(--grn)':'var(--ink4)'}"><b>$${fmt(avisoP)}</b></span></div>
+    <div class="lr i"><span>Feriado Proporcional (Art.73) — ${vacD} días háb. × ($${fmt(~~promBase)}/30) × 1.2</span><span style="color:${ferP>0?'var(--grn)':'var(--ink4)'}"><b>$${fmt(ferP)}</b></span></div>
+    <div style="font-size:9px;color:var(--ink4);padding-left:14px;margin-bottom:6px">Feriado acumulado estimado (15 días/año): ~${vacAcum} días hábiles</div>
+    <div class="lr b"><span>SUBTOTAL INDEMNIZACIONES</span><span style="color:var(--grn)"><b>$${fmt(subLegal)}</b></span></div>
+
+    <!-- II. HABERES DEL MES -->
+    <div class="lst" style="margin-top:10px">② HABERES PENDIENTES DEL MES EN CURSO</div>
+    ${sP>0?`<div class="lr i"><span>Sueldo Proporcional (${diasTrab} días trabajados × $${fmt(sueldo||t.suel)}/30)</span><span>$${fmt(sP)}</span></div>`:''}
+    ${gP>0?`<div class="lr i"><span>Gratificación Proporcional</span><span>$${fmt(gP)}</span></div>`:''}
+    ${bono>0?`<div class="lr i"><span>Bonos / Comisiones</span><span>$${fmt(bono)}</span></div>`:''}
+    ${hext>0?`<div class="lr i"><span>Horas Extras pendientes</span><span>$${fmt(hext)}</span></div>`:''}
+    ${col>0?`<div class="lr i"><span>Asig. Colación (no imponible)</span><span>$${fmt(col)}</span></div>`:''}
+    ${mov>0?`<div class="lr i"><span>Asig. Movilización (no imponible)</span><span>$${fmt(mov)}</span></div>`:''}
+    ${otros>0?`<div class="lr i"><span>Otros Haberes</span><span>$${fmt(otros)}</span></div>`:''}
+    ${subHab===0?`<div class="lr i" style="color:var(--ink4)"><span>Sin haberes del mes ingresados</span><span>$0</span></div>`:''}
+    <div class="lr b"><span>SUBTOTAL HABERES MES</span><span><b>$${fmt(subHab)}</b></span></div>
+
+    <!-- III. DESCUENTOS -->
+    <div class="lst" style="margin-top:10px">③ DESCUENTOS PREVISIONALES (solo sobre haberes imponibles del mes: $${fmt(habImpon)})</div>
+    <div class="lr i"><span>AFP ${afpR}% sobre $${fmt(habImpon>P.TOPE_AFP_UF*P.UF?~~(P.TOPE_AFP_UF*P.UF):habImpon)}</span><span style="color:var(--red)">-$${fmt(dAFP_f)}</span></div>
+    <div class="lr i"><span>Salud ${saludR}% legal</span><span style="color:var(--red)">-$${fmt(dSal_f)}</span></div>
+    ${dIsa_f>0?`<div class="lr i"><span>Isapre adicional ${isapre} UF × $${fmt(P.UF)}</span><span style="color:var(--red)">-$${fmt(dIsa_f)}</span></div>`:''}
+    <div class="lr i"><span>Seguro Cesantía Trabajador ${cesR}%</span><span style="color:var(--red)">-$${fmt(dCes_f)}</span></div>
+    ${ant>0?`<div class="lr i"><span>Anticipos / Préstamos</span><span style="color:var(--red)">-$${fmt(ant)}</span></div>`:''}
+    <div class="lr b"><span>TOTAL DESCUENTOS</span><span style="color:var(--red)"><b>-$${fmt(totalDesc)}</b></span></div>
+
+    <!-- TOTALES FINALES -->
+    <div class="lr b" style="font-size:14px;margin-top:14px;padding:12px 0;border-top:2px solid var(--brd2)">
+      <span>TOTAL BRUTO FINIQUITO</span><span style="color:var(--blue)"><b>$${fmt(totalBruto)}</b></span>
+    </div>
+    <div class="lr b" style="font-size:16px;background:var(--red-lt);border:1.5px solid #fca5a5;border-radius:8px;padding:14px;margin-top:4px">
+      <span style="color:var(--red)">💵 TOTAL LÍQUIDO A PAGAR</span>
+      <span style="color:var(--red);font-size:22px"><b>$${fmt(totalNeto)}</b></span>
+    </div>
+    <div style="margin-top:10px;font-size:9px;color:var(--ink4);padding:8px 12px;background:var(--surf2);border-radius:6px">
+      ⚠️ Las indemnizaciones por años de servicio, aviso previo y feriado proporcional no están afectas a cotizaciones previsionales (Art.163 CT). Los descuentos aplican solo sobre las remuneraciones del mes en curso.
+    </div>
   </div>`;return FR;
 }
 
@@ -1749,156 +1947,146 @@ function genFinDoc(){
   const fO=new Date(r.fec),mES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const fechaLeg=`${emp?.ciu||'Santiago'}, ${fO.getDate()} de ${mES[fO.getMonth()]} de ${fO.getFullYear()}`;
   $i('fDoc').innerHTML=`
-<div id="printFinDiv" style="background:#fff;color:#1a1d2e;padding:36px 40px;font-family:'Segoe UI',system-ui,sans-serif;font-size:11px;line-height:1.7;max-width:780px;margin:0 auto;border:1px solid #e2e5f0;border-radius:10px">
+<div id="printFinDiv" style="background:#fff;color:#1a1d2e;padding:36px 40px;font-family:'Segoe UI',system-ui,sans-serif;font-size:11px;line-height:1.75;max-width:800px;margin:0 auto;border:1px solid #e2e5f0;border-radius:10px">
 
   <!-- MEMBRETE -->
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:20px;border-bottom:3px solid #dc2626;margin-bottom:22px">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:18px;border-bottom:3px solid #dc2626;margin-bottom:20px">
     <div>
-      <div style="font-size:19px;font-weight:800;color:#1a1d2e;letter-spacing:-.5px">${emp?.nombre||'EMPRESA'}</div>
+      <div style="font-size:20px;font-weight:800;color:#1a1d2e;letter-spacing:-.5px">${emp?.nombre||'EMPRESA'}</div>
       <div style="font-size:10px;color:#6b7280;margin-top:3px">RUT ${emp?.rut} &nbsp;·&nbsp; ${emp?.giro}</div>
-      <div style="font-size:10px;color:#6b7280">${emp?.dir}, ${emp?.ciu||'Santiago'}</div>
+      <div style="font-size:10px;color:#6b7280">${emp?.dir}, ${emp?.ciu||'Santiago'} &nbsp;·&nbsp; ${emp?.tel||''} &nbsp;·&nbsp; ${emp?.email||''}</div>
     </div>
     <div style="text-align:right">
-      <div style="background:#dc2626;color:#fff;font-size:14px;font-weight:800;padding:8px 18px;border-radius:7px;letter-spacing:.5px">FINIQUITO DE TRABAJO</div>
-      <div style="font-size:9px;font-weight:600;color:#6b7280;margin-top:5px">Art. 177 del Código del Trabajo</div>
-      <div style="font-size:10px;color:#374151;margin-top:3px">${fechaLeg}</div>
+      <div style="background:#dc2626;color:#fff;font-size:13px;font-weight:800;padding:8px 18px;border-radius:7px;letter-spacing:.5px">FINIQUITO DE TRABAJO</div>
+      <div style="font-size:9px;font-weight:600;color:#6b7280;margin-top:5px">Art. 177 Código del Trabajo — DFL-1</div>
+      <div style="font-size:10px;color:#374151;margin-top:3px;font-weight:600">${fechaLeg}</div>
     </div>
   </div>
 
-  <!-- INTRO -->
-  <p style="margin-bottom:14px;color:#374151;line-height:1.8">En <strong>${fechaLeg}</strong>, comparecen ante el Ministro de Fe que suscribe el presente instrumento:</p>
+  <!-- INTRODUCCIÓN LEGAL -->
+  <p style="margin-bottom:14px;color:#374151;line-height:1.85;text-align:justify">En <strong>${fechaLeg}</strong>, comparecen ante el Ministro de Fe que suscribe el presente instrumento y acuerdan celebrar el siguiente Finiquito de Contrato de Trabajo, en conformidad a lo dispuesto en los artículos 159, 160, 161 y 177 del Código del Trabajo:</p>
 
   <!-- PARTES -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
     <div style="border:1.5px solid #fca5a5;border-left:4px solid #dc2626;border-radius:8px;padding:13px 16px;background:#fff8f8">
-      <div style="font-size:9px;font-weight:800;color:#dc2626;text-transform:uppercase;letter-spacing:.9px;margin-bottom:7px">&#9632; Empleador</div>
-      <div style="font-weight:700;font-size:12px;color:#1a1d2e;margin-bottom:4px">${emp?.nombre}</div>
-      <div style="color:#4b5563">RUT: <strong>${emp?.rut}</strong></div>
-      <div style="color:#4b5563">Giro: ${emp?.giro}</div>
-      <div style="color:#4b5563">Rep. Legal: <strong>${emp?.rep}</strong></div>
-      <div style="color:#4b5563">Domicilio: ${emp?.dir}, ${emp?.ciu||'Santiago'}</div>
+      <div style="font-size:9px;font-weight:800;color:#dc2626;text-transform:uppercase;letter-spacing:.9px;margin-bottom:8px">&#9632; Empleador</div>
+      <div style="font-weight:700;font-size:12px;color:#1a1d2e;margin-bottom:5px">${emp?.nombre}</div>
+      <div style="color:#374151;line-height:1.8">RUT: <strong>${emp?.rut}</strong><br>Giro: ${emp?.giro}<br>Rep. Legal: <strong>${emp?.rep}</strong> (RUT ${emp?.repRut||'—'})<br>Domicilio: ${emp?.dir}, ${emp?.ciu||'Santiago'}<br>Mutual: ${emp?.mut||'—'}</div>
     </div>
     <div style="border:1.5px solid #bfdbfe;border-left:4px solid #1d4ed8;border-radius:8px;padding:13px 16px;background:#f8faff">
-      <div style="font-size:9px;font-weight:800;color:#1d4ed8;text-transform:uppercase;letter-spacing:.9px;margin-bottom:7px">&#9632; Trabajador/a</div>
-      <div style="font-weight:700;font-size:12px;color:#1a1d2e;margin-bottom:4px">${r.t.nom} ${r.t.a1} ${r.t.a2||''}</div>
-      <div style="color:#4b5563">RUT: <strong>${r.t.rut}</strong></div>
-      <div style="color:#4b5563">Cargo: ${r.t.cargo}</div>
-      <div style="color:#4b5563">Domicilio: ${r.t.dir||'—'}</div>
-      <div style="color:#4b5563">Nacionalidad: ${r.t.nac||'Chilena'}</div>
+      <div style="font-size:9px;font-weight:800;color:#1d4ed8;text-transform:uppercase;letter-spacing:.9px;margin-bottom:8px">&#9632; Trabajador/a</div>
+      <div style="font-weight:700;font-size:12px;color:#1a1d2e;margin-bottom:5px">${r.t.nom} ${r.t.a1} ${r.t.a2||''}</div>
+      <div style="color:#374151;line-height:1.8">RUT: <strong>${r.t.rut}</strong><br>Cargo: ${r.t.cargo}<br>Domicilio: ${r.t.dir||'—'}<br>Nacionalidad: ${r.t.nac||'Chilena'}<br>AFP: ${r.t.afp} &nbsp;·&nbsp; Salud: ${r.t.isa}</div>
     </div>
   </div>
 
   <!-- ANTECEDENTES LABORALES -->
-  <div style="margin-bottom:18px">
-    <div style="font-size:9px;font-weight:800;color:#374151;text-transform:uppercase;letter-spacing:.8px;margin-bottom:9px">Antecedentes de la Relación Laboral</div>
-    <table style="width:100%;border-collapse:collapse;font-size:11px">
-      <tr>
-        <td style="padding:7px 12px;background:#f8faff;border:1px solid #e2e5f0;font-weight:600;color:#374151;width:22%">Fecha de Ingreso</td>
-        <td style="padding:7px 12px;border:1px solid #e2e5f0;width:28%">${fd(r.t.ing)}</td>
-        <td style="padding:7px 12px;background:#f8faff;border:1px solid #e2e5f0;font-weight:600;color:#374151;width:22%">Fecha de Término</td>
-        <td style="padding:7px 12px;border:1px solid #e2e5f0;font-weight:700;color:#dc2626">${fd(r.fec)}</td>
-      </tr>
-      <tr>
-        <td style="padding:7px 12px;background:#f8faff;border:1px solid #e2e5f0;font-weight:600;color:#374151">Cargo</td>
-        <td style="padding:7px 12px;border:1px solid #e2e5f0">${r.t.cargo}</td>
-        <td style="padding:7px 12px;background:#f8faff;border:1px solid #e2e5f0;font-weight:600;color:#374151">Tipo Contrato</td>
-        <td style="padding:7px 12px;border:1px solid #e2e5f0">${r.tCont}</td>
-      </tr>
-      <tr>
-        <td style="padding:7px 12px;background:#f8faff;border:1px solid #e2e5f0;font-weight:600;color:#374151">AFP / Salud</td>
-        <td style="padding:7px 12px;border:1px solid #e2e5f0">${r.t.afp} / ${r.t.isa}</td>
-        <td style="padding:7px 12px;background:#f8faff;border:1px solid #e2e5f0;font-weight:600;color:#374151">Jornada</td>
-        <td style="padding:7px 12px;border:1px solid #e2e5f0">${r.t.jorn} hrs/semana</td>
-      </tr>
-      <tr style="background:#1e293b">
-        <td style="padding:9px 12px;color:#fff;font-weight:700;border:1px solid #374151" colspan="2">AÑOS DE SERVICIO</td>
-        <td style="padding:9px 12px;border:1px solid #374151;font-weight:800;font-size:13px;color:#1a1d2e;background:#dbeafe" colspan="2">${r.A.a} año(s), ${r.A.m} mes(es), ${r.A.d} día(s) &nbsp;<span style="font-size:9px;color:#6b7280;font-weight:400">(${r.A.dec.toFixed(4)} años exactos)</span></td>
-      </tr>
-      <tr style="background:#1e293b">
-        <td style="padding:9px 12px;color:#fff;font-weight:700;border:1px solid #374151" colspan="2">CAUSAL DE TÉRMINO</td>
-        <td style="padding:9px 12px;border:1px solid #374151;font-weight:600;color:#1a1d2e;background:#fff" colspan="2">${causNom(r.caus)}</td>
-      </tr>
-    </table>
+  <div style="margin-bottom:18px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
+    <div style="background:#f1f5f9;padding:8px 14px;font-size:9px;font-weight:800;color:#374151;text-transform:uppercase;letter-spacing:.8px">Antecedentes de la Relación Laboral</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;font-size:10.5px">
+      <div style="padding:10px 14px;border-right:1px solid #e5e7eb"><div style="color:#6b7280;font-size:9px;margin-bottom:3px">Fecha Ingreso</div><div style="font-weight:700">${fd(r.t.ing)}</div></div>
+      <div style="padding:10px 14px;border-right:1px solid #e5e7eb"><div style="color:#6b7280;font-size:9px;margin-bottom:3px">Fecha Término</div><div style="font-weight:700">${fd(r.fec)}</div></div>
+      <div style="padding:10px 14px"><div style="color:#6b7280;font-size:9px;margin-bottom:3px">Años de Servicio</div><div style="font-weight:700;color:#1d4ed8">${r.A.a} año(s), ${r.A.m} mes(es), ${r.A.d} día(s)</div></div>
+      <div style="padding:10px 14px;border-top:1px solid #e5e7eb;border-right:1px solid #e5e7eb"><div style="color:#6b7280;font-size:9px;margin-bottom:3px">Tipo de Contrato</div><div style="font-weight:700">${r.tCont==='indefinido'?'Indefinido':r.tCont==='plazo_fijo'?'Plazo Fijo':'Por Obra o Faena'}</div></div>
+      <div style="padding:10px 14px;border-top:1px solid #e5e7eb;border-right:1px solid #e5e7eb"><div style="color:#6b7280;font-size:9px;margin-bottom:3px">Sueldo Base</div><div style="font-weight:700">$${fmt(r.t.suel)}</div></div>
+      <div style="padding:10px 14px;border-top:1px solid #e5e7eb"><div style="color:#6b7280;font-size:9px;margin-bottom:3px">Promedio Remun. (3 meses)</div><div style="font-weight:700">$${fmt(~~r.prom)}</div></div>
+    </div>
+    <div style="padding:10px 14px;border-top:1px solid #e5e7eb;font-size:10.5px">
+      <div style="color:#6b7280;font-size:9px;margin-bottom:3px">Causal de Término</div>
+      <div style="font-weight:700;color:#dc2626">${causNom(r.caus)}</div>
+    </div>
   </div>
 
-  <!-- LIQUIDACIÓN FINAL -->
+  <!-- TABLA DE MONTOS -->
   <div style="margin-bottom:18px">
-    <div style="font-size:9px;font-weight:800;color:#374151;text-transform:uppercase;letter-spacing:.8px;margin-bottom:9px">Liquidación Final — Desglose Detallado</div>
-    <table style="width:100%;border-collapse:collapse;font-size:11px">
+    <div style="font-size:9px;font-weight:800;color:#374151;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Liquidación de Haberes e Indemnizaciones</div>
+    <table style="width:100%;border-collapse:collapse;font-size:10.5px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
       <thead>
-        <tr style="background:#1e293b">
-          <th style="padding:8px 12px;color:#fff;text-align:left;font-size:9px;letter-spacing:.6px;text-transform:uppercase;border:1px solid #374151">Concepto</th>
-          <th style="padding:8px 12px;color:#9ca3af;text-align:center;font-size:9px;letter-spacing:.6px;text-transform:uppercase;border:1px solid #374151">Base de Cálculo</th>
-          <th style="padding:8px 12px;color:#fff;text-align:right;font-size:9px;letter-spacing:.6px;text-transform:uppercase;border:1px solid #374151">Monto ($)</th>
+        <tr style="background:#f1f5f9">
+          <th style="padding:9px 12px;text-align:left;font-size:9px;font-weight:800;color:#374151;text-transform:uppercase;letter-spacing:.6px;border-bottom:1.5px solid #e5e7eb">Concepto</th>
+          <th style="padding:9px 12px;text-align:center;font-size:9px;font-weight:800;color:#374151;text-transform:uppercase;letter-spacing:.6px;border-bottom:1.5px solid #e5e7eb">Base / Fórmula</th>
+          <th style="padding:9px 12px;text-align:right;font-size:9px;font-weight:800;color:#374151;text-transform:uppercase;letter-spacing:.6px;border-bottom:1.5px solid #e5e7eb">Monto</th>
         </tr>
       </thead>
       <tbody>
-        ${r.conIndem?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px;color:#374151">Indemnización por Años de Servicio (Art.163 CT)</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">$${fmt(~~r.promBase)} × ${r.aTop.toFixed(3)} meses (tope 11 años, max 90 UF/mes)</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#1d4ed8">$${fmt(r.indem)}</td></tr>`:'<tr><td style="padding:8px 12px;color:#9ca3af;font-style:italic">Indemnización por Años de Servicio</td><td style="padding:8px 12px;text-align:center;color:#9ca3af;font-size:10px">No aplica a esta causal</td><td style="padding:8px 12px;text-align:right;font-family:monospace;color:#9ca3af">—</td></tr>'}
-        ${r.avisoP>0?`<tr style="background:#fafbff;border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px;color:#374151">Indemnización Sustitutiva Aviso Previo (Art.161 CT)</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">1 mes de remuneración promedio</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#1d4ed8">$${fmt(r.avisoP)}</td></tr>`:''}
-        ${r.ferP>0?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px;color:#374151">Feriado Proporcional (Art.73 CT)</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">${r.vacD} días hábiles × ($${fmt(~~r.prom)}/30) × 1.2</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#1d4ed8">$${fmt(r.ferP)}</td></tr>`:''}
-        ${r.sP>0?`<tr style="background:#fafbff;border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px;color:#374151">Remuneración Proporcional mes en curso</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">Días trabajados / días del mes</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#059669">$${fmt(r.sP)}</td></tr>`:''}
-        ${r.gP>0?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px;color:#374151">Gratificación Proporcional mes en curso</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">Proporcional al período</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#059669">$${fmt(r.gP)}</td></tr>`:''}
-        ${r.otros>0?`<tr style="background:#fafbff;border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px;color:#374151">Otros Haberes y Beneficios Pendientes</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">—</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#059669">$${fmt(r.otros)}</td></tr>`:''}
-        <tr style="border-bottom:1px solid #f1f5f9;background:#fff1f2">
-          <td style="padding:8px 12px;color:#374151">AFP ${r.afpR}% sobre remuneración proporcional</td>
-          <td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">Solo sobre sueldo del período</td>
-          <td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#dc2626">-$${fmt(r.dAFP_f)}</td>
+        <!-- INDEMNIZACIONES -->
+        <tr><td colspan="3" style="padding:6px 12px;background:#fef2f2;font-size:9px;font-weight:800;color:#dc2626;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid #fee2e2">I. Indemnizaciones Legales</td></tr>
+        ${r.indem>0?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px">Indemnización por Años de Servicio (Art.163 CT)</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">${r.aTop.toFixed(4)} años × $${fmt(~~r.promBase)} (tope 90 UF)</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#1d4ed8">$${fmt(r.indem)}</td></tr>`:`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px;color:#9ca3af" colspan="2">Indemnización por Años de Servicio — No corresponde por causal</td><td style="padding:8px 12px;text-align:right;color:#9ca3af">$0</td></tr>`}
+        ${r.avisoP>0?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px">Indemnización Sustitutiva Aviso Previo (Art.161 CT)</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">1 mes de remuneración promedio</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#1d4ed8">$${fmt(r.avisoP)}</td></tr>`:''}
+        ${r.ferP>0?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px">Feriado Proporcional (Art.73 CT)</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">${r.vacD} días × ($${fmt(~~r.promBase)}/30) × 1.2</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#1d4ed8">$${fmt(r.ferP)}</td></tr>`:''}
+
+        <!-- HABERES DEL MES -->
+        ${r.subHab>0?`<tr><td colspan="3" style="padding:6px 12px;background:#f0fdf4;font-size:9px;font-weight:800;color:#059669;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid #bbf7d0;border-top:1px solid #e5e7eb">II. Haberes Pendientes del Mes</td></tr>`:''}
+        ${r.sP>0?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px">Remuneración Proporcional mes en curso</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">${r.diasTrab} días × $${fmt(r.t.suel)}/30</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#059669">$${fmt(r.sP)}</td></tr>`:''}
+        ${r.gP>0?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px">Gratificación Proporcional</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">Proporcional al período</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#059669">$${fmt(r.gP)}</td></tr>`:''}
+        ${r.bono>0?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px">Bonos / Comisiones pendientes</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">—</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#059669">$${fmt(r.bono)}</td></tr>`:''}
+        ${r.hext>0?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px">Horas Extras pendientes</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">—</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#059669">$${fmt(r.hext)}</td></tr>`:''}
+        ${r.col>0?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px">Asig. Colación (No Imponible)</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">—</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#059669">$${fmt(r.col)}</td></tr>`:''}
+        ${r.mov>0?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px">Asig. Movilización (No Imponible)</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">—</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#059669">$${fmt(r.mov)}</td></tr>`:''}
+        ${r.otros>0?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px">Otros Haberes pendientes</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">—</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#059669">$${fmt(r.otros)}</td></tr>`:''}
+
+        <!-- DESCUENTOS -->
+        <tr><td colspan="3" style="padding:6px 12px;background:#fff1f2;font-size:9px;font-weight:800;color:#dc2626;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid #fee2e2;border-top:1px solid #e5e7eb">III. Descuentos Previsionales (sobre haberes imponibles del mes: $${fmt(r.habImpon)})</td></tr>
+        <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px">Cotización AFP ${r.afpR}%</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">Solo período trabajado</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#dc2626">-$${fmt(r.dAFP_f)}</td></tr>
+        <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px">Cotización Salud ${r.saludR}%</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">Solo período trabajado</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#dc2626">-$${fmt(r.dSal_f)}</td></tr>
+        ${r.dIsa_f>0?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px">Isapre adicional ${r.isapre} UF</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">—</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#dc2626">-$${fmt(r.dIsa_f)}</td></tr>`:''}
+        <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px">Seguro Cesantía ${r.cesR}%</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">Solo período trabajado</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#dc2626">-$${fmt(r.dCes_f)}</td></tr>
+        ${r.ant>0?`<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 12px">Anticipos / Préstamos</td><td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">—</td><td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#dc2626">-$${fmt(r.ant)}</td></tr>`:''}
+
+        <!-- TOTALES -->
+        <tr style="border-top:2px solid #1e293b;background:#f8faff">
+          <td style="padding:10px 12px;font-weight:800;font-size:12px" colspan="2">TOTAL BRUTO FINIQUITO</td>
+          <td style="padding:10px 12px;text-align:right;font-family:monospace;font-weight:800;font-size:13px;color:#1d4ed8">$${fmt(r.totalBruto)}</td>
         </tr>
-        <tr style="background:#fff1f2">
-          <td style="padding:8px 12px;color:#374151">Salud ${P.SALUD}% sobre remuneración proporcional</td>
-          <td style="padding:8px 12px;text-align:center;color:#6b7280;font-size:10px">Solo sobre sueldo del período</td>
-          <td style="padding:8px 12px;text-align:right;font-family:monospace;font-weight:700;color:#dc2626">-$${fmt(r.dSal_f)}</td>
-        </tr>
-        <tr style="border-top:2px solid #1e293b">
-          <td style="padding:10px 12px;font-weight:800;font-size:12px;background:#f8faff;color:#1a1d2e">TOTAL BRUTO</td>
-          <td style="padding:10px 12px;background:#f8faff"></td>
-          <td style="padding:10px 12px;text-align:right;font-family:monospace;font-weight:800;font-size:13px;color:#1d4ed8;background:#f8faff">$${fmt(r.totalBruto)}</td>
+        <tr style="background:#f8faff">
+          <td style="padding:6px 12px;color:#6b7280;font-size:10px" colspan="2">Menos: Total Descuentos Previsionales</td>
+          <td style="padding:6px 12px;text-align:right;font-family:monospace;color:#dc2626;font-weight:700">-$${fmt(r.totalDesc)}</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <!-- TOTAL NETO -->
+  <!-- TOTAL LÍQUIDO -->
   <div style="display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#dc2626,#b91c1c);border-radius:10px;padding:18px 26px;margin-bottom:22px">
     <div>
-      <div style="color:rgba(255,255,255,.75);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Total Líquido a Pagar — Finiquito</div>
-      <div style="color:rgba(255,255,255,.6);font-size:9px;margin-top:2px">Bruto $${fmt(r.totalBruto)} &nbsp;·&nbsp; Descuentos -$${fmt(r.totalDesc)} &nbsp;·&nbsp; ${causNom(r.caus)}</div>
+      <div style="color:rgba(255,255,255,.8);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Total Líquido a Pagar — Finiquito</div>
+      <div style="color:rgba(255,255,255,.65);font-size:9px;margin-top:3px">Bruto $${fmt(r.totalBruto)} &nbsp;·&nbsp; Descuentos -$${fmt(r.totalDesc)} &nbsp;·&nbsp; ${causNom(r.caus).split('—')[0].trim()}</div>
     </div>
-    <div style="color:#fff;font-size:30px;font-weight:800;font-family:monospace;letter-spacing:-1.5px">$${fmt(r.totalNeto)}</div>
+    <div style="color:#fff;font-size:32px;font-weight:800;font-family:monospace;letter-spacing:-1.5px">$${fmt(r.totalNeto)}</div>
   </div>
 
   <!-- DECLARACIÓN LEGAL -->
-  <div style="background:#fafbff;border:1.5px solid #dbeafe;border-radius:8px;padding:14px 18px;margin-bottom:22px;font-size:10.5px;color:#374151;line-height:1.9">
-    <p>Las partes declaran que con el pago de las sumas indicadas, quedan recíprocamente saldadas y liquidadas todas las obligaciones emanadas del contrato de trabajo que los ligó, sin que existan diferencias, reclamos ni demandas pendientes entre ellas, de ninguna naturaleza.</p>
-    <p style="margin-top:8px">El trabajador/a declara que ha recibido a su entera satisfacción todas las sumas y beneficios que le corresponden según la ley y el contrato de trabajo, otorgando al empleador el más amplio y completo finiquito, con plena eficacia legal.</p>
+  <div style="background:#fafbff;border:1.5px solid #dbeafe;border-radius:8px;padding:14px 18px;margin-bottom:22px;font-size:10.5px;color:#374151;line-height:1.9;text-align:justify">
+    <p>Las partes declaran que con el pago de las sumas indicadas precedentemente, quedan recíprocamente saldadas y liquidadas todas las obligaciones emanadas del contrato de trabajo que los ligó, sin que existan diferencias, reclamos ni demandas pendientes entre ellas, de ninguna naturaleza, sea por concepto de remuneraciones, horas extraordinarias, gratificaciones, feriados, asignaciones, indemnizaciones u otros beneficios de cualquier índole.</p>
+    <p style="margin-top:8px">El/La Trabajador/a declara haber recibido a su entera satisfacción todas las sumas y beneficios que le corresponden conforme a la ley y al contrato de trabajo suscrito, otorgando al Empleador el más amplio y completo finiquito, con plena eficacia liberatoria, en los términos del artículo 177 del Código del Trabajo.</p>
   </div>
 
-  <!-- FIRMAS 3 COLUMNAS -->
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px;margin-top:40px">
+  <!-- FIRMAS -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px;margin-top:44px">
     <div style="text-align:center">
-      <div style="height:48px;border-bottom:1.5px solid #374151;margin-bottom:8px"></div>
-      <div style="font-weight:700;color:#1a1d2e;font-size:11px">${r.t.nom} ${r.t.a1}</div>
+      <div style="height:52px;border-bottom:1.5px solid #374151;margin-bottom:8px"></div>
+      <div style="font-weight:700;color:#1a1d2e;font-size:11px">${r.t.nom} ${r.t.a1} ${r.t.a2||''}</div>
       <div style="color:#6b7280;font-size:10px">RUT: ${r.t.rut}</div>
-      <div style="color:#9ca3af;font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-top:3px">El Trabajador</div>
+      <div style="color:#9ca3af;font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-top:3px">El/La Trabajador/a</div>
     </div>
     <div style="text-align:center">
-      <div style="height:48px;border-bottom:1.5px solid #374151;margin-bottom:8px"></div>
+      <div style="height:52px;border-bottom:1.5px solid #374151;margin-bottom:8px"></div>
       <div style="font-weight:700;color:#1a1d2e;font-size:11px">${emp?.rep||'Representante Legal'}</div>
       <div style="color:#6b7280;font-size:10px">RUT: ${emp?.repRut||'—'}</div>
       <div style="color:#9ca3af;font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-top:3px">Por el Empleador</div>
     </div>
     <div style="text-align:center">
-      <div style="height:48px;border-bottom:1.5px solid #374151;margin-bottom:8px"></div>
+      <div style="height:52px;border-bottom:1.5px solid #374151;margin-bottom:8px"></div>
       <div style="font-weight:700;color:#1a1d2e;font-size:11px">Ministro de Fe</div>
-      <div style="color:#6b7280;font-size:10px">Timbre y Firma</div>
+      <div style="color:#6b7280;font-size:10px">Nombre y Timbre</div>
       <div style="color:#9ca3af;font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-top:3px">Art. 177 C. del Trabajo</div>
     </div>
   </div>
 
   <!-- FOOTER -->
-  <div style="border-top:1px solid #e5e7eb;margin-top:22px;padding-top:10px;display:flex;justify-content:space-between;align-items:center">
-    <div style="font-size:8.5px;color:#9ca3af">SistemRem Chile 2026 &nbsp;·&nbsp; Art. 177 Código del Trabajo</div>
-    <div style="font-size:8.5px;color:#9ca3af">IMF $${fmt(P.IMF)} &nbsp;·&nbsp; UF $${fmt(P.UF)} &nbsp;·&nbsp; ${fechaLeg}</div>
+  <div style="border-top:1px solid #e5e7eb;margin-top:24px;padding-top:10px;display:flex;justify-content:space-between;align-items:center">
+    <div style="font-size:8.5px;color:#9ca3af">SistemRem Chile 2026 &nbsp;·&nbsp; Art. 177 Código del Trabajo &nbsp;·&nbsp; DFL-1</div>
+    <div style="font-size:8.5px;color:#9ca3af">IMF $${fmt(P.IMF)} &nbsp;·&nbsp; UF $${fmt(P.UF)} &nbsp;·&nbsp; UTM $${fmt(P.UTM)}</div>
   </div>
 
 </div>`;
