@@ -739,6 +739,8 @@ tbody tr:hover td{background:#f7f9ff}
           <button class="btn sm sec" onclick="expLibroXLS()">&#x1F4C5; Excel</button>
           <button class="btn sm sec" onclick="expLibroPDF()">&#x1F5A8;&#xFE0F; PDF</button>
           <button class="btn sm sec" onclick="expLibroRTF()">&#x1F4C4; Word</button>
+          <button class="btn sm sec" onclick="impResumenMes()">&#x1F4CB; Resumen + PREVIRED</button>
+          <button class="btn sm sec" onclick="wResumenMes()">&#x1F4C4; Resumen Word</button>
           <button class="btn sm" onclick="abrirLiq()">+ Nueva Liquidaci&#243;n</button>
         </div>
       </div>
@@ -997,7 +999,7 @@ tbody tr:hover td{background:#f7f9ff}
      <div class="rem-card"><div class="rem-card-lbl">Asig. Colaci&#243;n <small>(No Imponible)</small></div><div class="rem-inp"><span class="rem-inp-sym">$</span><input type="number" id="cCol" value="0" min="0"></div></div>
      <div class="rem-card"><div class="rem-card-lbl">Asig. Movilizaci&#243;n <small>(No Imponible)</small></div><div class="rem-inp"><span class="rem-inp-sym">$</span><input type="number" id="cMov" value="0" min="0"></div></div>
     </div>
-    <div class="fg"><label>Tipo de Gratificaci&#243;n</label><select id="cGrat"><option value="legal">Legal 25% — tope 4.75 IMF anual (Art. 50 CT)</option><option value="garantizada">Garantizada 1/12 mensual del 25% de 4.75 IMF</option></select></div>
+    <div class="fg"><label>Tipo de Gratificaci&#243;n</label><select id="cGrat"><option value="tope">Legal tope 4.75 IMM ÷ 12 (Art. 50 CT)</option><option value="legal">Legal 25% con tope 4.75 IMM</option><option value="garantizada">Garantizada 1/12 mensual del 25% de 4.75 IMF</option></select></div>
    </div>
    <div class="fsec">
     <div class="fsec-title"><span class="fsec-num">04</span>Funciones y Cl&#225;usulas Legales</div>
@@ -1391,7 +1393,7 @@ function guardarClave(){
 
 
 // PARÁMETROS
-let P={IMF:504000,UF:38500,UTM:68306,GRATIF_TOPE:4.75,TOPE_AFP_UF:81.6,SALUD:7.0,SIS:1.49,MUTUAL:0.95,CES_T:0.6,CES_E_IND:2.4,CES_E_PF:3.0,AFP:{Habitat:11.44,Modelo:10.58,Planvital:11.44,ProVida:11.44,Capital:11.44,Cuprum:11.44,Uno:10.65},IUT:[{d:0,h:13.5,t:0,r:0},{d:13.5,h:30,t:.04,r:.54},{d:30,h:50,t:.08,r:1.74},{d:50,h:70,t:.135,r:4.49},{d:70,h:90,t:.23,r:11.14},{d:90,h:120,t:.304,r:17.8},{d:120,h:310,t:.355,r:23.9},{d:310,h:9999,t:.4,r:39.45}]};
+let P={IMF:553553,UF:41057.2,UTM:71721,GRATIF_TOPE:4.75,TOPE_AFP_UF:90,TOPE_CES_UF:135.2,SALUD:7.0,SIS:1.94,MUTUAL:0.93,CES_T:0.6,CES_E_IND:2.4,CES_E_PF:3.0,AFP:{Habitat:11.27,Modelo:10.58,Planvital:11.16,ProVida:11.45,Capital:11.44,Cuprum:11.44,Uno:10.46},IUT:[{d:0,h:13.5,t:0,r:0},{d:13.5,h:30,t:.04,r:.54},{d:30,h:50,t:.08,r:1.74},{d:50,h:70,t:.135,r:4.49},{d:70,h:90,t:.23,r:11.14},{d:90,h:120,t:.304,r:17.8},{d:120,h:310,t:.35,r:23.32},{d:310,h:9999,t:.4,r:38.82}]};
 
 // PERÍODO
 let PER=new Date();PER.setDate(1);
@@ -1490,7 +1492,7 @@ function guardarEmp(){const o={rut:gv('eRut'),nombre:gv('eNom'),giro:gv('eGiro')
 // TRABAJADORES
 let tF='',tE='';
 function renderTrabajadores(f,e){if(f!==undefined)tF=f;if(e!==undefined)tE=e;let ts=DB.trabajadores.filter(t=>t.empId===CE);if(tF)ts=ts.filter(t=>`${t.nom} ${t.a1} ${t.rut}`.toLowerCase().includes(tF.toLowerCase()));if(tE==='1')ts=ts.filter(t=>t.activo);if(tE==='0')ts=ts.filter(t=>!t.activo);
-  $i('tbTrab').innerHTML=ts.map(t=>{const a=calcAnios(t.ing,new Date().toISOString().slice(0,10));return`<tr><td><code style="color:var(--ac2);font-size:10px">${t.rut}</code></td><td><b>${t.nom} ${t.a1} ${t.a2}</b></td><td>${t.cargo}</td><td>${fd(t.ing)}</td><td><span class="badge bc">${a.a}a ${a.m}m</span></td><td><span style="font-family:var(--mn)">$${fmt(t.suel)}</span></td><td>${t.afp}</td><td>${t.isa}${t.sUF>0?` <span class="badge by">+${t.sUF}UF</span>`:''}</td><td><span class="badge ${t.activo?'bg':'br'}">${t.activo?'Activo':'Inactivo'}</span></td><td style="display:flex;gap:3px"><button class="btn sm sec" onclick="editTrab(${t.id})">Editar</button><button class="btn sm sec" onclick="impFichaTrabId(${t.id})">PDF</button></td></tr>`;}).join('')||nd(10);}
+  $i('tbTrab').innerHTML=ts.map(t=>{const a=calcAnios(t.ing,new Date().toISOString().slice(0,10));return`<tr><td><code style="color:var(--ac2);font-size:10px">${t.rut}</code></td><td><b>${t.nom} ${t.a1} ${t.a2}</b></td><td>${t.cargo}</td><td>${fd(t.ing)}</td><td><span class="badge bc">${a.a}a ${a.m}m</span></td><td><span style="font-family:var(--mn)">$${fmt(t.suel)}</span></td><td>${t.afp}</td><td>${t.isa}${t.sUF>0?` <span class="badge by">+${t.sUF}UF</span>`:''}</td><td><span class="badge ${t.activo?'bg':'br'}">${t.activo?'Activo':'Inactivo'}</span></td><td style="display:flex;gap:3px"><button class="btn sm sec" onclick="editTrab(${t.id})">Editar</button><button class="btn sm sec" onclick="impFichaTrabId(${t.id})">PDF</button><button class="btn sm sec" onclick="wFichaId(${t.id})">Word</button></td></tr>`;}).join('')||nd(10);}
 function filtT(v){renderTrabajadores(v);}
 function filtTE(v){renderTrabajadores(undefined,v);}
 function abrirTrab(){eTrabId=null;$i('moTrabT').textContent='Nuevo Trabajador';$i('btnDT').style.display='none';['tRut','tNom','tA1','tA2','tEmail','tTel','tDir','tCta'].forEach(id=>$i(id).value='');$i('tSuel').value='';$i('tSUF').value='0';abrir('moTrab');}
@@ -1499,7 +1501,7 @@ function elimTrab(){if(!eTrabId)return;if(!confirm('¿Eliminar trabajador y todo
 function guardarTrab(){const o={empId:CE,rut:gv('tRut'),nom:gv('tNom'),a1:gv('tA1'),a2:gv('tA2'),cargo:gv('tCargo'),ing:gv('tIng'),suel:pf('tSuel')||P.IMF,afp:gv('tAFP'),isa:gv('tIsa'),sUF:pf('tSUF'),jorn:gv('tJorn'),bco:gv('tBco'),tipoCta:gv('tTipoCta'),cta:gv('tCta'),email:gv('tEmail'),tel:gv('tTel'),dir:gv('tDir'),sexo:gv('tSex'),fnac:gv('tFNac'),nac:gv('tNac'),activo:true};if(!o.rut||!o.nom){toast('RUT y Nombres requeridos','rd');return;}if(eTrabId)Object.assign(DB.trabajadores.find(x=>x.id===eTrabId),o);else DB.trabajadores.push({id:Date.now(),...o});cerrar('moTrab');renderAll();fbGuardar();toast('Trabajador guardado');}
 
 // CONTRATOS
-function renderContratos(){const tipos={indefinido:'Indefinido',plazo_fijo:'Plazo Fijo',obra_faena:'Obra/Faena',reemplazo:'Reemplazo'};const cs=DB.contratos.filter(c=>{const t=DB.trabajadores.find(x=>x.id===c.trabId);return t&&t.empId===CE;});const hoy=new Date();$i('tbCont').innerHTML=cs.map(c=>{const t=DB.trabajadores.find(x=>x.id===c.trabId);const dr=c.term?~~((new Date(c.term)-hoy)/864e5):null;const eb=c.estado==='vigente'?'bg':c.estado==='vencido'?'br':'by';return`<tr><td><code style="font-size:10px;color:var(--ac2)">${c.num}</code></td><td><b>${t?t.nom+' '+t.a1:'-'}</b></td><td><span class="badge bb">${tipos[c.tipo]||c.tipo}</span></td><td>${fd(c.ini)}</td><td>${c.term?fd(c.term)+' '+(dr!==null&&dr<0?'<span class="badge br">VENCIÓ</span>':dr<30?`<span class="badge by">⚠️${dr}d</span>`:''):'<span style="color:var(--tx3)">Indefinido</span>'}</td><td>${c.jorn}h</td><td><span style="font-family:var(--mn)">$${fmt(c.suel)}</span></td><td><span class="badge ${eb}">${c.estado}</span></td><td style="display:flex;gap:3px"><button class="btn sm sec" onclick="editCont(${c.id})">Editar</button><button class="btn sm sec" onclick="impContratoId(${c.id})">PDF</button><button class="btn sm sec" onclick="expContXLSId(${c.id})">Excel</button></td></tr>`;}).join('')||nd(9);}
+function renderContratos(){const tipos={indefinido:'Indefinido',plazo_fijo:'Plazo Fijo',obra_faena:'Obra/Faena',reemplazo:'Reemplazo'};const cs=DB.contratos.filter(c=>{const t=DB.trabajadores.find(x=>x.id===c.trabId);return t&&t.empId===CE;});const hoy=new Date();$i('tbCont').innerHTML=cs.map(c=>{const t=DB.trabajadores.find(x=>x.id===c.trabId);const dr=c.term?~~((new Date(c.term)-hoy)/864e5):null;const eb=c.estado==='vigente'?'bg':c.estado==='vencido'?'br':'by';return`<tr><td><code style="font-size:10px;color:var(--ac2)">${c.num}</code></td><td><b>${t?t.nom+' '+t.a1:'-'}</b></td><td><span class="badge bb">${tipos[c.tipo]||c.tipo}</span></td><td>${fd(c.ini)}</td><td>${c.term?fd(c.term)+' '+(dr!==null&&dr<0?'<span class="badge br">VENCIÓ</span>':dr<30?`<span class="badge by">⚠️${dr}d</span>`:''):'<span style="color:var(--tx3)">Indefinido</span>'}</td><td>${c.jorn}h</td><td><span style="font-family:var(--mn)">$${fmt(c.suel)}</span></td><td><span class="badge ${eb}">${c.estado}</span></td><td style="display:flex;gap:3px"><button class="btn sm sec" onclick="editCont(${c.id})">Editar</button><button class="btn sm sec" onclick="impContratoId(${c.id})">PDF</button><button class="btn sm sec" onclick="wContId(${c.id})">Word</button><button class="btn sm sec" onclick="expContXLSId(${c.id})">Excel</button></td></tr>`;}).join('')||nd(9);}
 function pobTrabSel(sid){const ts=DB.trabajadores.filter(t=>t.empId===CE&&t.activo);$i(sid).innerHTML=ts.map(t=>`<option value="${t.id}">${t.nom} ${t.a1} — ${t.rut}</option>`).join('');}
 function abrirCont(){eContId=null;$i('moContT').textContent='Nuevo Contrato';$i('btnDC').style.display='none';pobTrabSel('cTrab');['cLug','cCiu','cFunc','cClaus'].forEach(id=>$i(id).value='');$i('cSuel').value='';$i('cCol').value='0';$i('cMov').value='0';$i('cTipo').value='indefinido';chTerm();abrir('moCont');}
 function editCont(id){const c=DB.contratos.find(x=>x.id===id);if(!c)return;eContId=id;pobTrabSel('cTrab');$i('moContT').textContent='Editar Contrato';$i('btnDC').style.display='inline-flex';$i('cTrab').value=c.trabId;$i('cTipo').value=c.tipo;$i('cIni').value=c.ini;$i('cTerm').value=c.term||'';$i('cJorn').value=c.jorn;$i('cDist').value=c.dist||'Lunes a Viernes';$i('cLug').value=c.lug;$i('cCiu').value=c.ciu||'';$i('cSuel').value=c.suel;$i('cGrat').value=c.grat;$i('cCol').value=c.col||0;$i('cMov').value=c.mov||0;$i('cFunc').value=c.func;$i('cClaus').value=c.claus;chTerm();abrir('moCont');}
@@ -1508,8 +1510,9 @@ function chTerm(){$i('cTermG').style.display=gv('cTipo')==='indefinido'?'none':'
 function guardarCont(){const o={trabId:parseInt(gv('cTrab')),tipo:gv('cTipo'),ini:gv('cIni'),term:gv('cTerm')||null,jorn:gv('cJorn'),dist:gv('cDist'),lug:gv('cLug'),ciu:gv('cCiu'),suel:pf('cSuel')||P.IMF,grat:gv('cGrat'),col:pf('cCol'),mov:pf('cMov'),func:gv('cFunc'),claus:gv('cClaus'),estado:'vigente'};if(eContId)Object.assign(DB.contratos.find(x=>x.id===eContId),o);else{o.id=Date.now();o.num=`CTR-${new Date().getFullYear()}-${String(DB.contratos.length+1).padStart(3,'0')}`;DB.contratos.push(o);}cerrar('moCont');renderContratos();fbGuardar();toast('Contrato guardado');}
 
 // CÁLCULO LIQUIDACIÓN
-function calcGrat(s){return Math.min(s*.25,P.IMF*P.GRATIF_TOPE)/12;}
-function calcIUT(base){const uf=base/P.UF;for(const tr of P.IUT)if(uf>=tr.d&&uf<tr.h)return Math.max(0,(uf*tr.t-tr.r)*P.UF);return 0;}
+function calcGrat(s,m){const tope=P.IMF*P.GRATIF_TOPE/12;return m==='legal'?Math.min(s*.25,tope):tope;}
+function contVig(tid){return DB.contratos.filter(c=>c.trabId===tid&&c.estado==='vigente').sort((a,b)=>(b.ini||'').localeCompare(a.ini||''))[0];}
+function calcIUT(base){const u=base/P.UTM;for(const tr of P.IUT)if(u>=tr.d&&u<tr.h)return Math.max(0,Math.round((base*tr.t)-tr.r*P.UTM));return 0;}
 function calcAnios(ing,term){
   const i=new Date(ing),f=new Date(term),ms=f-i,dec=ms/(365.25*864e5);
   let a=f.getFullYear()-i.getFullYear(),m=f.getMonth()-i.getMonth(),d=f.getDate()-i.getDate();
@@ -1527,24 +1530,25 @@ function cargarTrab(){
   $i('lSuel').value=t.suel;
   $i('lSUF').value=t.sUF||0;
   $i('lIsa').value=t.isa;
+  {const p=gv('lPer')||perStr(PER);let d=30;if(t.ing&&t.ing.slice(0,7)===p)d=Math.max(1,Math.min(30,30-(parseInt(t.ing.slice(8,10))-1)));$i('lDias').value=d;}
   calcLiq();
 }
 function calcLiq(){
   const suel=pf('lSuel'),dias=pf('lDias'),hE=pf('lHE'),hET=pf('lHET');
   const bon=pf('lBon'),oH=pf('lOH'),col=pf('lCol'),mov=pf('lMov');
   const afpR=pf('lAFP'),sUF=pf('lSUF'),ant=pf('lAnt'),prest=pf('lPrest'),oD=pf('lOD');
-  const g=calcGrat(suel),suP=suel*(dias/30),vH=(suel/30/8)*hET,totHE=hE*vH;
+  const _t=DB.trabajadores.find(x=>x.id===parseInt(gv('lTrab'))),_c=_t&&contVig(_t.id),indef=!_c||_c.tipo==='indefinido';const g=calcGrat(suel,_c&&_c.grat==='legal'?'legal':'tope')*(dias/30),suP=suel*(dias/30),vH=(suel/30/8)*hET,totHE=hE*vH;
   let totH=0; const totI=suP+totHE+g+bon+oH,noI=col+mov; totH=totI+noI;
   const topI=Math.min(totI,P.TOPE_AFP_UF*P.UF);
   const dAFP=topI*(afpR/100),dS7=topI*(P.SALUD/100),dSUF=sUF*P.UF,dSal=dS7+dSUF;
-  const dCes=topI*(P.CES_T/100),bIUT=Math.max(0,totI-dAFP-dS7),dIUT=calcIUT(bIUT);
+  const topC=Math.min(totI,P.TOPE_CES_UF*P.UF),dCes=indef?topC*(P.CES_T/100):0,bIUT=Math.max(0,totI-dAFP-dCes-Math.min(dSal,P.SALUD/100*P.TOPE_AFP_UF*P.UF)),dIUT=calcIUT(bIUT);
   let totD=dAFP+dSal+dCes+dIUT+ant+prest+oD,liq=~~(totH-totD);
-  const cSIS=topI*(P.SIS/100),cMut=topI*(P.MUTUAL/100),cCesE=topI*(P.CES_E_PF/100);
+  const cSIS=topI*(P.SIS/100),cMut=topI*(P.MUTUAL/100),cCesE=topC*((indef?P.CES_E_IND:P.CES_E_PF)/100);
   const conceptosExtra=getConceptosExtra();
   const extraHab=conceptosExtra.filter(c=>c.tipo==='haber').reduce((s,c)=>s+c.monto,0);
   const extraDesc=conceptosExtra.filter(c=>c.tipo==='descuento').reduce((s,c)=>s+c.monto,0);
   totH=~~totH+extraHab; totD=~~totD+extraDesc; liq=totH-~~totD;
-  LR={suel,dias,suP,hE,hET,totHE,g,bon,oH,col,mov,totI,noI,totH,topI,afpR,sUF,dAFP,dS7,dSUF,dSal,dCes,bIUT,dIUT,ant,prest,oD,totD,liq,cSIS,cMut,cCesE,conceptosExtra};
+  LR={indef,suel,dias,suP,hE,hET,totHE,g,bon,oH,col,mov,totI,noI,totH,topI,afpR,sUF,dAFP,dS7,dSUF,dSal,dCes,bIUT,dIUT,ant,prest,oD,totD,liq,cSIS,cMut,cCesE,conceptosExtra};
   const u=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   u('ls-imp','$'+fmt(~~totI)); u('ls-afp','-$'+fmt(~~dAFP));
   u('ls-sal','-$'+fmt(~~dS7)); u('ls-isa',sUF>0?'-$'+fmt(~~dSUF):'—');
@@ -1558,7 +1562,7 @@ function calcLiq(){
     <div style="text-align:center;font-weight:700;color:var(--ac2);margin-bottom:11px">HOJA DE CÁLCULO — LIQUIDACIÓN DE SUELDO</div>
     <div class="lst">① HABERES IMPONIBLES</div>
     <div class="lr i"><span>Sueldo Base × (${dias}/30 días)</span><span>$${fmt(~~suP)}</span></div>
-    <div class="lr i"><span>Gratificación legal (25% cap. ${P.GRATIF_TOPE}×IMF÷12)</span><span>$${fmt(~~g)}</span></div>
+    <div class="lr i"><span>Gratificación legal (tope ${P.GRATIF_TOPE} IMM ÷ 12, Art. 50 CT)</span><span>$${fmt(~~g)}</span></div>
     ${hE>0?`<div class="lr i"><span>Horas extras: ${hE} × $${fmt(~~vH)} (recargo ${hET==2?'100':'50'}%)</span><span>$${fmt(~~totHE)}</span></div>`:''}
     ${bon>0?`<div class="lr i"><span>Bonos / Comisiones</span><span>$${fmt(bon)}</span></div>`:''}
     ${oH>0?`<div class="lr i"><span>Otros haberes imponibles</span><span>$${fmt(oH)}</span></div>`:''}
@@ -1570,7 +1574,7 @@ function calcLiq(){
     <div class="lr i"><span>AFP ${afpR}%</span><span style="color:var(--rd)">-$${fmt(~~dAFP)}</span></div>
     <div class="lr i"><span>Salud ${P.SALUD}% legal</span><span style="color:var(--rd)">-$${fmt(~~dS7)}</span></div>
     ${sUF>0?`<div class="lr i"><span>Salud adicional Isapre: ${sUF} UF × $${fmt(P.UF)}</span><span style="color:var(--rd)">-$${fmt(~~dSUF)}</span></div>`:''}
-    <div class="lr i"><span>Seg. Cesantía trabajador ${P.CES_T}%</span><span style="color:var(--rd)">-$${fmt(~~dCes)}</span></div>
+    <div class="lr i"><span>Seg. Cesantía trabajador ${indef?P.CES_T:0}%</span><span style="color:var(--rd)">-$${fmt(~~dCes)}</span></div>
     ${dIUT>0?`<div class="lr i"><span>Impuesto Único (base: $${fmt(~~bIUT)})</span><span style="color:var(--rd)">-$${fmt(~~dIUT)}</span></div>`:`<div class="lr i"><span>Impuesto Único — Exento (base &lt; tramo)</span><span style="color:var(--tx3)">$0</span></div>`}
     ${ant>0?`<div class="lr i"><span>Anticipos</span><span style="color:var(--rd)">-$${fmt(ant)}</span></div>`:''}
     ${prest>0?`<div class="lr i"><span>Cuota préstamo</span><span style="color:var(--rd)">-$${fmt(prest)}</span></div>`:''}
@@ -1580,7 +1584,7 @@ function calcLiq(){
     <div class="lst" style="margin-top:12px">④ COSTOS ADICIONALES EMPLEADOR (solo referencial)</div>
     <div class="lr i"><span>SIS ${P.SIS}%</span><span>$${fmt(~~cSIS)}</span></div>
     <div class="lr i"><span>Mutual ${P.MUTUAL}%</span><span>$${fmt(~~cMut)}</span></div>
-    <div class="lr i"><span>Cesantía empleador ${P.CES_E_PF}%</span><span>$${fmt(~~cCesE)}</span></div>
+    <div class="lr i"><span>Cesantía empleador ${indef?P.CES_E_IND:P.CES_E_PF}%</span><span>$${fmt(~~cCesE)}</span></div>
     <div class="lr b"><span>COSTO TOTAL EMPRESA</span><span>$${fmt(~~(totH+cSIS+cMut+cCesE))}</span></div>
   </div>`;return LR;
 }
@@ -1740,7 +1744,7 @@ function renderLiqs(){
   const per=perStr(PER);$i('liqPerBadge').textContent=perNom(per);
   const liqs=DB.liquidaciones.filter(l=>l.empId===CE&&l.per===per);
   $i('tbLiq').innerHTML=liqs.map(l=>{const t=DB.trabajadores.find(x=>x.id===l.trabId),d=l.d||{};
-    return`<tr><td><span class="badge bb">${perNom(l.per)}</span></td><td><b>${t?t.nom+' '+t.a1:'-'}</b></td><td>${d.dias||30}</td><td><span style="font-family:var(--mn)">$${fmt(d.suel||0)}</span></td><td><span style="font-family:var(--mn)">$${fmt(l.hab)}</span></td><td><span style="font-family:var(--mn);color:var(--rd)">$${fmt(~~(d.dAFP||0))}</span></td><td><span style="font-family:var(--mn);color:var(--rd)">$${fmt(~~(d.dSal||d.dS7||0))}</span></td><td><span style="font-family:var(--mn);color:var(--rd)">$${fmt(~~(d.dIUT||0))}</span></td><td><span style="font-family:var(--mn);color:var(--rd)">$${fmt(~~((d.ant||0)+(d.prest||0)+(d.oD||0)))}</span></td><td><strong style="font-family:var(--mn);color:var(--gn);font-size:13px">$${fmt(l.liq)}</strong></td><td><span class="badge bg">${l.estado}</span></td><td style="display:flex;gap:3px"><button class="btn sm sec" onclick="impLiqId(${l.id})">PDF</button><button class="btn sm sec" onclick="expLiqXLSId(${l.id})">Excel</button></td></tr>`;
+    return`<tr><td><span class="badge bb">${perNom(l.per)}</span></td><td><b>${t?t.nom+' '+t.a1:'-'}</b></td><td>${d.dias||30}</td><td><span style="font-family:var(--mn)">$${fmt(d.suel||0)}</span></td><td><span style="font-family:var(--mn)">$${fmt(l.hab)}</span></td><td><span style="font-family:var(--mn);color:var(--rd)">$${fmt(~~(d.dAFP||0))}</span></td><td><span style="font-family:var(--mn);color:var(--rd)">$${fmt(~~(d.dSal||d.dS7||0))}</span></td><td><span style="font-family:var(--mn);color:var(--rd)">$${fmt(~~(d.dIUT||0))}</span></td><td><span style="font-family:var(--mn);color:var(--rd)">$${fmt(~~((d.ant||0)+(d.prest||0)+(d.oD||0)))}</span></td><td><strong style="font-family:var(--mn);color:var(--gn);font-size:13px">$${fmt(l.liq)}</strong></td><td><span class="badge bg">${l.estado}</span></td><td style="display:flex;gap:3px"><button class="btn sm sec" onclick="impLiqId(${l.id})">PDF</button><button class="btn sm sec" onclick="wLiqId(${l.id})">Word</button><button class="btn sm sec" onclick="expLiqXLSId(${l.id})">Excel</button></td></tr>`;
   }).join('')||nd(12);
   if(liqs.length){const tH=liqs.reduce((s,l)=>s+l.hab,0),tD=liqs.reduce((s,l)=>s+l.desc,0),tL=liqs.reduce((s,l)=>s+l.liq,0);
     $i('liqRes').innerHTML=`<div class="sum-grid"><div class="sum-card"><div class="s-lbl">Total Haberes</div><div class="s-val" style="color:var(--amb)">$${fmt(tH)}</div></div><div class="sum-card"><div class="s-lbl">Total Descuentos</div><div class="s-val" style="color:var(--red)">$${fmt(tD)}</div></div><div class="sum-card"><div class="s-lbl">Líquido a Pagar</div><div class="s-val" style="color:var(--grn)">$${fmt(tL)}</div></div></div>`;
@@ -2102,13 +2106,13 @@ function guardarFin(){
 function renderFins(){
   const fins=DB.finiquitos.filter(f=>f.empId===CE);
   $i('tbFin').innerHTML=fins.map(f=>{const t=DB.trabajadores.find(x=>x.id===f.trabId);const cS=causNom(f.caus).split('—')[1]?.trim().substring(0,28)||causNom(f.caus).substring(0,28);
-    return`<tr><td>${fd(f.fec)}</td><td><b>${t?t.nom+' '+t.a1:'-'}</b></td><td><code style="font-size:10px">${t?.rut||'-'}</code></td><td style="font-size:10px">${cS}...</td><td><span class="badge bc">${f.anA}a ${f.anM}m ${f.anD}d</span></td><td><span style="font-family:var(--mn)">$${fmt(f.indem)}</span></td><td><span style="font-family:var(--mn)">$${fmt(f.avisoP)}</span></td><td><span style="font-family:var(--mn)">$${fmt(f.ferP)}</span></td><td><b style="font-family:var(--mn)">$${fmt(f.totalBruto)}</b></td><td><b style="font-family:var(--mn);color:var(--gn)">$${fmt(f.totalNeto)}</b></td><td><span class="badge bg">${f.estado}</span></td><td style="display:flex;gap:3px"><button class="btn sm sec" onclick="impFinId(${f.id})">PDF</button><button class="btn sm sec" onclick="expFinXLSId(${f.id})">Excel</button></td></tr>`;
+    return`<tr><td>${fd(f.fec)}</td><td><b>${t?t.nom+' '+t.a1:'-'}</b></td><td><code style="font-size:10px">${t?.rut||'-'}</code></td><td style="font-size:10px">${cS}...</td><td><span class="badge bc">${f.anA}a ${f.anM}m ${f.anD}d</span></td><td><span style="font-family:var(--mn)">$${fmt(f.indem)}</span></td><td><span style="font-family:var(--mn)">$${fmt(f.avisoP)}</span></td><td><span style="font-family:var(--mn)">$${fmt(f.ferP)}</span></td><td><b style="font-family:var(--mn)">$${fmt(f.totalBruto)}</b></td><td><b style="font-family:var(--mn);color:var(--gn)">$${fmt(f.totalNeto)}</b></td><td><span class="badge bg">${f.estado}</span></td><td style="display:flex;gap:3px"><button class="btn sm sec" onclick="impFinId(${f.id})">PDF</button><button class="btn sm sec" onclick="wFinId(${f.id})">Word</button><button class="btn sm sec" onclick="expFinXLSId(${f.id})">Excel</button></td></tr>`;
   }).join('')||nd(12);
 }
 
 // PARÁMETROS
 function renderParams(){
-  $i('pRem').innerHTML=[['IMF ($)','IMF'],['Valor UF ($)','UF'],['UTM ($)','UTM'],['Tope Gratif. (×IMF)','GRATIF_TOPE'],['Tope AFP/Salud (UF)','TOPE_AFP_UF']].map(([l,k])=>`<div class="pm"><span style="color:var(--tx2);font-size:11px">${l}</span><input class="einp" type="number" step="any" value="${P[k]}" id="pk_${k}" onchange="P['${k}']=parseFloat(this.value)||P['${k}']"></div>`).join('');
+  $i('pRem').innerHTML=[['IMF ($)','IMF'],['Valor UF ($)','UF'],['UTM ($)','UTM'],['Tope Gratif. (×IMF)','GRATIF_TOPE'],['Tope AFP/Salud (UF)','TOPE_AFP_UF'],['Tope Cesantía (UF)','TOPE_CES_UF']].map(([l,k])=>`<div class="pm"><span style="color:var(--tx2);font-size:11px">${l}</span><input class="einp" type="number" step="any" value="${P[k]}" id="pk_${k}" onchange="P['${k}']=parseFloat(this.value)||P['${k}']"></div>`).join('');
   $i('pPrev').innerHTML=[['Salud trab. (%)','SALUD'],['SIS empl. (%)','SIS'],['Mutual (%)','MUTUAL'],['Cesantía trab. (%)','CES_T'],['Ces. empl. indef. (%)','CES_E_IND'],['Ces. empl. p.fijo (%)','CES_E_PF']].map(([l,k])=>`<div class="pm"><span style="color:var(--tx2);font-size:11px">${l}</span><input class="einp" type="number" step="0.01" value="${P[k]}" id="pk_${k}" onchange="P['${k}']=parseFloat(this.value)||P['${k}']"></div>`).join('');
   $i('pAFP').innerHTML=Object.entries(P.AFP).map(([a,r])=>`<div class="pm"><span style="color:var(--tx2);font-size:11px">${a}</span><input class="einp" type="number" step="0.01" value="${r}" id="pk_AFP_${a}" onchange="P.AFP['${a}']=parseFloat(this.value)||${r}"></div>`).join('');
   $i('pIUT').innerHTML='<div style="margin-bottom:8px;font-size:10px;color:var(--ink3)">Tramos vigentes — edita tasas y rebajas según resolución SII</div>'
@@ -2139,7 +2143,7 @@ function renderParams(){
     +'Actualiza tasas y rebajas según Circular SII vigente. Los cambios aplican inmediatamente al calcular liquidaciones.'
     +'</div>';
 }
-function guardarP(){['IMF','UF','UTM','GRATIF_TOPE','TOPE_AFP_UF','SALUD','SIS','MUTUAL','CES_T','CES_E_IND','CES_E_PF'].forEach(k=>{const e=$i('pk_'+k);if(e)P[k]=parseFloat(e.value)||P[k];});Object.keys(P.AFP).forEach(a=>{const e=$i('pk_AFP_'+a);if(e)P.AFP[a]=parseFloat(e.value)||P.AFP[a];});renderAll();fbGuardar();toast('Parámetros guardados');}
+function guardarP(){['IMF','UF','UTM','GRATIF_TOPE','TOPE_AFP_UF','TOPE_CES_UF','SALUD','SIS','MUTUAL','CES_T','CES_E_IND','CES_E_PF'].forEach(k=>{const e=$i('pk_'+k);if(e)P[k]=parseFloat(e.value)||P[k];});Object.keys(P.AFP).forEach(a=>{const e=$i('pk_AFP_'+a);if(e)P.AFP[a]=parseFloat(e.value)||P.AFP[a];});renderAll();fbGuardar();toast('Parámetros guardados');}
 function renderPrev(){if(!$i('tbAFP'))return;$i('tbAFP').innerHTML=Object.entries(P.AFP).map(([a,r])=>`<tr><td><b>${a}</b></td><td>${r}%</td><td>${P.SIS}%</td><td><b>${(r+P.SIS).toFixed(2)}%</b></td></tr>`).join('');const iss=[['FONASA','7.0%','—','Pública'],['Banmédica','7.0%','~1.50 UF','Isapre'],['Colmena','7.0%','~1.80 UF','Isapre'],['Cruz Blanca','7.0%','~1.60 UF','Isapre'],['Consalud','7.0%','~2.00 UF','Isapre'],['Vida Tres','7.0%','~2.20 UF','Isapre'],['Nueva Masvida','7.0%','~1.40 UF','Isapre']];$i('tbIsa').innerHTML=iss.map(([n,c,u,t])=>`<tr><td><b>${n}</b></td><td>${c}</td><td>${u}</td><td><span class="badge ${t==='Pública'?'bb':'bg'}">${t}</span></td></tr>`).join('');}
 
 // DEMO DATA
@@ -2163,7 +2167,22 @@ function generarDemo(){
 function mkXLS(rows,cols,nombre){const wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet(rows);if(cols)ws['!cols']=cols.map(w=>({wch:w}));XLSX.utils.book_append_sheet(wb,ws,'Datos');XLSX.writeFile(wb,nombre+'.xlsx');toast('Excel descargado: '+nombre+'.xlsx');}
 function cabXLS(e){return[[e?.nombre||'EMPRESA'],[`RUT: ${e?.rut} | ${e?.giro} | ${e?.dir}, ${e?.ciu}`],[]];}
 function expLibroXLS(){expLibroXLSMes();}
-function expLibroXLSMes(){const per=$i('rMes').value||perStr(PER),emp=DB.empresas.find(e=>e.id===CE),liqs=DB.liquidaciones.filter(l=>l.empId===CE&&l.per===per);const rows=[...cabXLS(emp),[`LIBRO DE REMUNERACIONES — ${perNom(per)}`],[],['RUT','Nombre','Cargo','AFP','Salud','Días','Sueldo','Gratif.','H.Extra','Bonos','T.Impon.','No Imp.','T.Hab.','AFP $','Sal 7%','Sal+UF','Ces.','IUT','Otros','T.Desc.','LÍQUIDO']];liqs.forEach(l=>{const t=DB.trabajadores.find(x=>x.id===l.trabId),d=l.d||{};rows.push([t?.rut,t?`${t.a1} ${t.nom}`:'-',t?.cargo,t?.afp,t?.isa,d.dias||30,d.suel||0,~~(d.g||0),~~(d.totHE||0),d.bon||0,~~(d.totI||0),~~(d.noI||0),l.hab,~~(d.dAFP||0),~~(d.dS7||0),~~(d.dSUF||0),~~(d.dCes||0),~~(d.dIUT||0),~~((d.ant||0)+(d.prest||0)+(d.oD||0)),l.desc,l.liq]);});rows.push([],[,'','','','','','','','','','','','','','','','','','','Total:',liqs.reduce((s,l)=>s+l.liq,0)]);mkXLS(rows,[12,22,16,10,12,5,12,10,7,10,12,11,12,10,9,9,9,8,8,11,12],`LibroRem_${per}`);}
+function libroData(per){const emp=DB.empresas.find(e=>e.id===CE),liqs=DB.liquidaciones.filter(l=>l.empId===CE&&l.per===per);
+const H=['RUT','Nombre','Cargo','AFP','Salud','Días','Sueldo Base','Gratificación','H. Extra','Bonos','Otros Imp.','TOTAL IMPONIBLE','Colación','Movilización','Otros Haberes','TOTAL HABERES','AFP','Salud 7%','Adic. Salud','Seg. Cesantía','Imp. Único','Anticipos','Préstamos','Otros Desc.','TOTAL DESCUENTOS','LÍQUIDO A PAGAR','SIS Emp.','Cesantía Emp.','Mutual','COSTO EMPRESA'];
+const rows=liqs.map(l=>{const t=DB.trabajadores.find(x=>x.id===l.trabId),d=l.d||{},ex=d.conceptosExtra||[],eH=ex.filter(c=>c.tipo==='haber').reduce((a,c)=>a+c.monto,0),eD=ex.filter(c=>c.tipo==='descuento').reduce((a,c)=>a+c.monto,0);
+return[t?.rut||'',t?`${t.a1||''} ${t.a2||''} ${t.nom}`.replace(/\s+/g,' ').trim():'-',t?.cargo||'',t?.afp||'',t?.isa||'',d.dias||30,~~(d.suP||d.suel||0),~~(d.g||0),~~(d.totHE||0),~~(d.bon||0),~~(d.oH||0),~~(d.totI||0),~~(d.col||0),~~(d.mov||0),~~eH,l.hab,~~(d.dAFP||0),~~(d.dS7||0),~~(d.dSUF||0),~~(d.dCes||0),~~(d.dIUT||0),~~(d.ant||0),~~(d.prest||0),~~((d.oD||0)+eD),l.desc,l.liq,~~(d.cSIS||0),~~(d.cCesE||0),~~(d.cMut||0),~~(l.hab+(d.cSIS||0)+(d.cCesE||0)+(d.cMut||0))];});
+const tot=H.map((_,i)=>i<6?'':rows.reduce((a,r)=>a+(r[i]||0),0));tot[1]='TOTALES';
+return{emp,H,rows,tot,n:liqs.length};}
+function expLibroXLSMes(){const per=$i('rMes').value||perStr(PER),D=libroData(per);if(!D.n){toast('Sin liquidaciones en el período','rd');return;}
+mkXLS([...cabXLS(D.emp),[`LIBRO DE REMUNERACIONES — ${perNom(per)}`],[],D.H,...D.rows,[],D.tot],[12,28,16,10,12,5,...Array(24).fill(13)],`LibroRem_${per}`);}
+function expLibroPDFMes(){const per=$i('rMes').value||perStr(PER),D=libroData(per);if(!D.n){toast('Sin liquidaciones en el período','rd');return;}
+const f=v=>typeof v==='number'?fmt(v):v,th=D.H.map(h=>`<th style="background:#1e293b;color:#fff;padding:4px 3px;font-size:7px;border:1px solid #475569">${h}</th>`).join('');
+const tr=D.rows.map((r,i)=>`<tr style="background:${i%2?'#f8faff':'#fff'}">${r.map((v,k)=>`<td style="padding:3px;border:1px solid #d1d5db;font-size:7.5px;${typeof v==='number'?'text-align:right;font-family:monospace;':''}${[11,15,24,25,29].includes(k)?'font-weight:bold;background:#eff4ff;':''}">${f(v)}</td>`).join('')}</tr>`).join('');
+const tt=`<tr>${D.tot.map(v=>`<td style="padding:3px;border:1px solid #1e293b;font-size:7.5px;font-weight:bold;background:#e2e8f0;${typeof v==='number'?'text-align:right;font-family:monospace;':''}">${f(v)}</td>`).join('')}</tr>`;
+pw(`<style>@page{size:A3 landscape;margin:8mm}</style><div style="font-family:Arial,sans-serif;color:#000"><h2 style="margin:0">${D.emp?.nombre} — LIBRO DE REMUNERACIONES ${perNom(per).toUpperCase()}</h2><div style="font-size:10px;margin-bottom:8px">RUT ${D.emp?.rut} · ${D.emp?.dir||''}</div><table style="border-collapse:collapse;width:100%"><thead><tr>${th}</tr></thead><tbody>${tr}${tt}</tbody></table></div>`,'Libro_'+per);}
+function expLibroRTFMes(){const per=$i('rMes').value||perStr(PER),D=libroData(per);if(!D.n){toast('Sin liquidaciones en el período','rd');return;}
+const ix=[1,11,15,16,17,18,19,20,24,25,29];let b=rtfB(D.emp?.nombre||'')+' \\\\\\\\line RUT: '+(D.emp?.rut||'')+' \\\\\\\\line\\\\\\\\line '+rtfBU('LIBRO DE REMUNERACIONES - '+perNom(per).toUpperCase())+' \\\\\\\\line\\\\\\\\line ';
+D.rows.concat([D.tot]).forEach(r=>{b+=ix.map(k=>D.H[k]+': '+(typeof r[k]==='number'?'$'+fmt(r[k]):r[k])).join(' | ')+' \\\\\\\\line\\\\\\\\line ';});rtf(b,'LibroRem_'+per);}
 function expNominaXLS(){const emp=DB.empresas.find(e=>e.id===CE),ts=DB.trabajadores.filter(t=>t.empId===CE);const rows=[...cabXLS(emp),['NÓMINA DE PERSONAL'],[],['RUT','Apellidos','Nombres','Cargo','Ingreso','Antigüedad','Sueldo','AFP','Isapre','UF Sal.','Banco','Tipo Cta','N°Cta','Email','Tel','Estado']];ts.forEach(t=>{const a=calcAnios(t.ing,new Date().toISOString().slice(0,10));rows.push([t.rut,`${t.a1} ${t.a2}`,t.nom,t.cargo,t.ing,`${a.a}a ${a.m}m`,t.suel,t.afp,t.isa,t.sUF||0,t.bco,t.tipoCta||'',t.cta,t.email||'',t.tel||'',t.activo?'Activo':'Inactivo']);});mkXLS(rows,[12,20,14,18,11,9,12,10,13,7,15,14,12,22,13,9],'NominaPersonal');}
 function expPrevXLS(){const per=$i('rPrev').value||perStr(PER),emp=DB.empresas.find(e=>e.id===CE),liqs=DB.liquidaciones.filter(l=>l.empId===CE&&l.per===per);const rows=[...cabXLS(emp),[`PREVIRED — ${perNom(per)}`],[],['RUT','Ap.Paterno','Ap.Materno','Nombres','AFP','Cotiz.AFP','Salud 7%','Sal.Isap.','Ces.Trab.','SIS Emp.','Ces.Emp.','Total']];liqs.forEach(l=>{const t=DB.trabajadores.find(x=>x.id===l.trabId),d=l.d||{};rows.push([t?.rut,t?.a1,t?.a2,t?.nom,t?.afp,~~(d.dAFP||0),~~(d.dS7||0),~~(d.dSUF||0),~~(d.dCes||0),~~(d.cSIS||0),~~(d.cCesE||0),~~((d.dAFP||0)+(d.dSal||0)+(d.dCes||0)+(d.cSIS||0)+(d.cCesE||0))]);});mkXLS(rows,[13,15,13,13,10,12,10,10,10,10,10,13],`Previred_${per}`);}
 function expContsXLS(){const hoy=new Date(),emp=DB.empresas.find(e=>e.id===CE),cs=DB.contratos.filter(c=>{const t=DB.trabajadores.find(x=>x.id===c.trabId);return t&&t.empId===CE;});const rows=[...cabXLS(emp),['CONTRATOS'],[],['N° Contrato','Trabajador','RUT','Tipo','Inicio','Término','Jornada','Sueldo','Estado','Días Rest.','Alerta']];cs.forEach(c=>{const t=DB.trabajadores.find(x=>x.id===c.trabId),dr=c.term?~~((new Date(c.term)-hoy)/864e5):null;rows.push([c.num,t?`${t.nom} ${t.a1}`:'-',t?.rut,c.tipo,c.ini,c.term||'Indefinido',c.jorn+'h',c.suel,c.estado,dr!==null?dr:'-',dr===null?'OK':dr<0?'VENCIDO':dr<30?'POR VENCER':'OK']);});mkXLS(rows,[14,20,12,13,11,11,7,12,10,10,12],'Contratos');}
@@ -2176,7 +2195,14 @@ function expFinXLSId(id){const f=DB.finiquitos.find(x=>x.id===id);if(!f)return;c
 function expContXLSId(id){const c=id&&DB.contratos.find(x=>x.id===id);if(!c)return;const t=DB.trabajadores.find(x=>x.id===c.trabId),emp=DB.empresas.find(e=>e.id===CE);const rows=[...cabXLS(emp),['CONTRATO — '+c.num],[],['Empresa:',emp?.nombre],['Trabajador:',t?`${t.nom} ${t.a1}`:'-'],['RUT:',t?.rut],['Tipo:',c.tipo],['Inicio:',c.ini],['Término:',c.term||'Indefinido'],['Sueldo:',c.suel],['Jornada:',c.jorn+'h'],['Distribución:',c.dist],['Funciones:',c.func]];mkXLS(rows,[25,36],`Contrato_${c.num}`);}
 
 // PDF / PRINT
+let WORDMODE=false;
+function wordDl(html,titulo){const land=/A3 landscape/.test(html),pg=land?'size:1190.55pt 841.9pt;mso-page-orientation:landscape;margin:20pt':'size:595.3pt 841.9pt;margin:50pt 45pt';
+const doc=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${titulo}</title><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]--><style>@page Section1{${pg}}div.Section1{page:Section1}body{font-family:Arial,sans-serif}</style></head><body><div class="Section1">${html.replace(/<style>@page\{[^}]*\}<\/style>/,'')}</div></body></html>`;
+const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff',doc],{type:'application/msword'}));a.download=String(titulo).replace(/[^\w\-]+/g,'_')+'.doc';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);toast('Word descargado');}
+function enWord(fn,...a){WORDMODE=true;try{fn(...a);}finally{WORDMODE=false;}}
+function wLiqId(id){enWord(impLiqId,id);}function wContId(id){enWord(impContratoId,id);}function wFinId(id){enWord(impFinId,id);}function wFichaId(id){enWord(impFichaTrabId,id);}function wResumenMes(){enWord(impResumenMes);}
 function pw(html,titulo){
+  if(WORDMODE){wordDl(html,titulo);return;}
   const w=window.open('','_blank','width=900,height=850');
   if(!w){toast('Permita ventanas emergentes en el navegador','rd');return;}
   w.document.write(`<!DOCTYPE html>
@@ -2265,125 +2291,6 @@ function cabPDF(emp,titulo,subtit){
 }
 
 function expLibroPDF(){expLibroPDFMes();}
-function expLibroPDFMes(){
-  const per=$i('rMes').value||perStr(PER);
-  const emp=DB.empresas.find(e=>e.id===CE);
-  const liqs=DB.liquidaciones.filter(l=>l.empId===CE&&l.per===per);
-  const tH=liqs.reduce((s,l)=>s+l.hab,0);
-  const tD=liqs.reduce((s,l)=>s+l.desc,0);
-  const tL=liqs.reduce((s,l)=>s+l.liq,0);
-  const tAfp=liqs.reduce((s,l)=>s+~~(l.d?.dAFP||0),0);
-  const tSal=liqs.reduce((s,l)=>s+~~((l.d?.dS7||0)+(l.d?.dSUF||0)),0);
-  const tCes=liqs.reduce((s,l)=>s+~~(l.d?.dCes||0),0);
-  const tIut=liqs.reduce((s,l)=>s+~~(l.d?.dIUT||0),0);
-
-  const rows=liqs.map((l,i)=>{
-    const t=DB.trabajadores.find(x=>x.id===l.trabId),d=l.d||{};
-    const bg=i%2===0?'#fff':'#f8faff';
-    const extras=(d.conceptosExtra||[]);
-    const eH=extras.filter(c=>c.tipo==='haber').reduce((s,c)=>s+c.monto,0);
-    const eD=extras.filter(c=>c.tipo==='descuento').reduce((s,c)=>s+c.monto,0);
-    return `<tr style="background:${bg};border-bottom:1px solid #eef0f6">
-      <td style="padding:8px 10px;font-family:monospace;font-size:10px;color:#6b7280;white-space:nowrap">${t?.rut||'—'}</td>
-      <td style="padding:8px 10px;font-weight:600;color:#1a1d2e;white-space:nowrap">${t?t.nom+' '+t.a1:'-'}</td>
-      <td style="padding:8px 10px;color:#4b5563;font-size:10px">${t?.cargo||'—'}</td>
-      <td style="padding:8px 10px;text-align:center;color:#4b5563">${d.dias||30}</td>
-      <td style="padding:8px 10px;text-align:right;font-family:monospace">$${fmt(~~(d.suP||0))}</td>
-      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#374151">$${fmt(~~(d.g||0))}</td>
-      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#374151">${(d.totHE||0)>0?'$'+fmt(~~d.totHE):'—'}</td>
-      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#374151">${(d.bon||0)>0?'$'+fmt(~~d.bon):'—'}</td>
-      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#374151">${((d.col||0)+(d.mov||0))>0?'$'+fmt((d.col||0)+(d.mov||0)):'—'}</td>
-      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#0891b2">${eH>0?'$'+fmt(eH):'—'}</td>
-      <td style="padding:8px 10px;text-align:right;font-family:monospace;font-weight:700;color:#1d4ed8">$${fmt(l.hab)}</td>
-      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#dc2626">-$${fmt(~~(d.dAFP||0))}</td>
-      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#dc2626">-$${fmt(~~((d.dS7||0)+(d.dSUF||0)))}</td>
-      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#dc2626">-$${fmt(~~(d.dCes||0))}</td>
-      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#dc2626">${(d.dIUT||0)>0?'-$'+fmt(~~d.dIUT):'Exento'}</td>
-      <td style="padding:8px 10px;text-align:right;font-family:monospace;color:#dc2626">${((d.ant||0)+(d.prest||0)+(d.oD||0)+eD)>0?'-$'+fmt((d.ant||0)+(d.prest||0)+(d.oD||0)+eD):'—'}</td>
-      <td style="padding:8px 10px;text-align:right;font-family:monospace;font-weight:800;color:#059669;font-size:12px">$${fmt(l.liq)}</td>
-    </tr>`;
-  }).join('');
-
-  pw(`<div style="font-family:'Segoe UI',system-ui,sans-serif;padding:28px 32px;color:#1a1d2e;font-size:11px;background:#fff">
-    ${cabPDF(emp,'LIBRO DE REMUNERACIONES',perNom(per).toUpperCase())}
-
-    ${liqs.length===0
-      ?`<div style="padding:40px;text-align:center;color:#9ca3af;border:1.5px dashed #e5e7eb;border-radius:10px;font-size:13px">No hay liquidaciones registradas para este período</div>`
-      :`<div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse;min-width:1100px">
-          <thead>
-            <tr style="background:#1e293b">
-              <th colspan="11" style="padding:7px 10px;color:#93c5fd;text-align:left;font-size:9px;letter-spacing:.8px;text-transform:uppercase;border-right:2px solid #374151">▲ HABERES</th>
-              <th colspan="6" style="padding:7px 10px;color:#fca5a5;text-align:left;font-size:9px;letter-spacing:.8px;text-transform:uppercase">▼ DESCUENTOS</th>
-            </tr>
-            <tr style="background:#334155">
-              <th style="padding:7px 10px;color:#94a3b8;text-align:left;font-size:9px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">RUT</th>
-              <th style="padding:7px 10px;color:#e2e8f0;text-align:left;font-size:9px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">Nombre</th>
-              <th style="padding:7px 10px;color:#94a3b8;text-align:left;font-size:9px;letter-spacing:.5px;text-transform:uppercase">Cargo</th>
-              <th style="padding:7px 10px;color:#94a3b8;text-align:center;font-size:9px;letter-spacing:.5px;text-transform:uppercase">Días</th>
-              <th style="padding:7px 10px;color:#94a3b8;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">S. Base</th>
-              <th style="padding:7px 10px;color:#94a3b8;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase">Gratif.</th>
-              <th style="padding:7px 10px;color:#94a3b8;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase">H. Extra</th>
-              <th style="padding:7px 10px;color:#94a3b8;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase">Bonos</th>
-              <th style="padding:7px 10px;color:#94a3b8;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">Col+Mov</th>
-              <th style="padding:7px 10px;color:#67e8f9;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">Extras</th>
-              <th style="padding:7px 10px;color:#7dd3fc;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;border-right:2px solid #374151">TOT. HAB.</th>
-              <th style="padding:7px 10px;color:#fca5a5;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase">AFP</th>
-              <th style="padding:7px 10px;color:#fca5a5;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase">Salud</th>
-              <th style="padding:7px 10px;color:#fca5a5;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase">Ces.</th>
-              <th style="padding:7px 10px;color:#fca5a5;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase">IUT</th>
-              <th style="padding:7px 10px;color:#fca5a5;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase">Otros</th>
-              <th style="padding:7px 10px;color:#6ee7b7;text-align:right;font-size:9px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">LÍQUIDO</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-          <tfoot>
-            <tr style="background:#1e293b;border-top:2px solid #475569">
-              <td colspan="3" style="padding:10px 10px;color:#fff;font-weight:700;font-size:11px">TOTALES — ${liqs.length} trabajador(es)</td>
-              <td style="padding:10px;color:#94a3b8;text-align:center;font-size:10px">—</td>
-              <td colspan="6" style="padding:10px;color:#94a3b8;text-align:right;font-size:10px">Total haberes:</td>
-              <td style="padding:10px 10px;text-align:right;font-family:monospace;font-weight:800;color:#7dd3fc;border-right:2px solid #374151">$${fmt(tH)}</td>
-              <td style="padding:10px 10px;text-align:right;font-family:monospace;font-weight:700;color:#fca5a5">-$${fmt(tAfp)}</td>
-              <td style="padding:10px 10px;text-align:right;font-family:monospace;font-weight:700;color:#fca5a5">-$${fmt(tSal)}</td>
-              <td style="padding:10px 10px;text-align:right;font-family:monospace;font-weight:700;color:#fca5a5">-$${fmt(tCes)}</td>
-              <td style="padding:10px 10px;text-align:right;font-family:monospace;font-weight:700;color:#fca5a5">-$${fmt(tIut)}</td>
-              <td style="padding:10px 10px;text-align:right;font-family:monospace;font-weight:700;color:#fca5a5">-$${fmt(tD-tAfp-tSal-tCes-tIut)}</td>
-              <td style="padding:10px 10px;text-align:right;font-family:monospace;font-weight:800;font-size:14px;color:#6ee7b7">$${fmt(tL)}</td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-top:16px">
-        <div style="background:#eff4ff;border:1.5px solid #bfdbfe;border-radius:8px;padding:12px 16px">
-          <div style="font-size:9px;font-weight:800;color:#1d4ed8;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px">Total Haberes</div>
-          <div style="font-size:20px;font-weight:800;font-family:monospace;color:#1d4ed8">$${fmt(tH)}</div>
-          <div style="font-size:9px;color:#6b7280;margin-top:2px">${liqs.length} trabajador(es)</div>
-        </div>
-        <div style="background:#f5f3ff;border:1.5px solid #ddd6fe;border-radius:8px;padding:12px 16px">
-          <div style="font-size:9px;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px">Total AFP</div>
-          <div style="font-size:20px;font-weight:800;font-family:monospace;color:#7c3aed">$${fmt(tAfp)}</div>
-          <div style="font-size:9px;color:#6b7280;margin-top:2px">Cotización previsional</div>
-        </div>
-        <div style="background:#fff1f2;border:1.5px solid #fca5a5;border-radius:8px;padding:12px 16px">
-          <div style="font-size:9px;font-weight:800;color:#dc2626;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px">Total Descuentos</div>
-          <div style="font-size:20px;font-weight:800;font-family:monospace;color:#dc2626">$${fmt(tD)}</div>
-          <div style="font-size:9px;color:#6b7280;margin-top:2px">AFP+Salud+Ces+IUT+Otros</div>
-        </div>
-        <div style="background:#f0fdf4;border:1.5px solid #6ee7b7;border-radius:8px;padding:12px 16px">
-          <div style="font-size:9px;font-weight:800;color:#059669;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px">Total Líquido</div>
-          <div style="font-size:20px;font-weight:800;font-family:monospace;color:#059669">$${fmt(tL)}</div>
-          <div style="font-size:9px;color:#6b7280;margin-top:2px">A transferir</div>
-        </div>
-      </div>`}
-
-    <div style="border-top:1px solid #e5e7eb;margin-top:16px;padding-top:10px;display:flex;justify-content:space-between;font-size:8.5px;color:#9ca3af">
-      <span>SistemRem Chile 2026 · Código del Trabajo DFL-1</span>
-      <span>IMF $${fmt(P.IMF)} · UF $${fmt(P.UF)} · UTM $${fmt(P.UTM)}</span>
-    </div>
-  </div>`,`Libro_${perNom(per)}`);
-}
-
 function expNominaPDF(){const emp=DB.empresas.find(e=>e.id===CE),ts=DB.trabajadores.filter(t=>t.empId===CE);const rows=ts.map(t=>{const a=calcAnios(t.ing,new Date().toISOString().slice(0,10));return`<tr><td>${t.rut}</td><td><b>${t.nom} ${t.a1} ${t.a2}</b></td><td>${t.cargo}</td><td>${t.ing}</td><td>${a.a}a ${a.m}m</td><td align="right">$${fmt(t.suel)}</td><td>${t.afp}</td><td>${t.isa}${t.sUF>0?` +${t.sUF}UF`:''}</td><td>${t.activo?'Activo':'Inactivo'}</td></tr>`;}).join('');pw(`${cabPDF(emp,'NÓMINA DE PERSONAL')}<table border="1" cellpadding="5" cellspacing="0" style="font-size:9px"><thead><tr style="background:#333;color:white"><th>RUT</th><th>Nombre</th><th>Cargo</th><th>Ingreso</th><th>Antigüed.</th><th>Sueldo</th><th>AFP</th><th>Salud</th><th>Estado</th></tr></thead><tbody>${rows}</tbody></table>`,'Nómina');}
 function expPrevPDF(){const per=$i('rPrev').value||perStr(PER),emp=DB.empresas.find(e=>e.id===CE),liqs=DB.liquidaciones.filter(l=>l.empId===CE&&l.per===per);const rows=liqs.map(l=>{const t=DB.trabajadores.find(x=>x.id===l.trabId),d=l.d||{};return`<tr><td>${t?.rut}</td><td>${t?`${t.a1} ${t.nom}`:'-'}</td><td>${t?.afp}</td><td align="right">$${fmt(~~(d.dAFP||0))}</td><td align="right">$${fmt(~~(d.dS7||0))}</td><td align="right">$${fmt(~~(d.dCes||0))}</td><td align="right">$${fmt(~~((d.dAFP||0)+(d.dSal||0)+(d.dCes||0)+(d.cSIS||0)+(d.cCesE||0)))}</td></tr>`;}).join('');pw(`${cabPDF(emp,'PREVIRED — '+perNom(per).toUpperCase())}<table border="1" cellpadding="5" cellspacing="0" style="font-size:9px"><thead><tr style="background:#333;color:white"><th>RUT</th><th>Nombre</th><th>AFP</th><th>Cotiz.AFP</th><th>Salud 7%</th><th>Cesantía</th><th>Total Cotiz.</th></tr></thead><tbody>${rows}</tbody></table>`,`Previred ${perNom(per)}`);}
 function expContsPDF(){const hoy=new Date(),emp=DB.empresas.find(e=>e.id===CE),cs=DB.contratos.filter(c=>{const t=DB.trabajadores.find(x=>x.id===c.trabId);return t&&t.empId===CE;});const rows=cs.map(c=>{const t=DB.trabajadores.find(x=>x.id===c.trabId),dr=c.term?~~((new Date(c.term)-hoy)/864e5):null;const al=dr===null?'OK':dr<0?'<span style="color:red">VENCIDO</span>':dr<30?`<span style="color:orange">⚠️ ${dr}d</span>`:'OK';return`<tr><td>${c.num}</td><td>${t?`${t.nom} ${t.a1}`:'-'}</td><td>${c.tipo}</td><td>${c.ini}</td><td>${c.term||'Indefinido'}</td><td align="right">$${fmt(c.suel)}</td><td>${c.estado}</td><td>${al}</td></tr>`;}).join('');pw(`${cabPDF(emp,'INFORME DE CONTRATOS')}<table border="1" cellpadding="5" cellspacing="0" style="font-size:9px"><thead><tr style="background:#333;color:white"><th>N°</th><th>Trabajador</th><th>Tipo</th><th>Inicio</th><th>Término</th><th>Sueldo</th><th>Estado</th><th>Alerta</th></tr></thead><tbody>${rows}</tbody></table>`,'Contratos');}
@@ -2393,6 +2300,19 @@ function expAnualPDF(){const anio=parseInt($i('rAnio').value)||new Date().getFul
 // PDF individuales
 function expLiqPDF(){if(!LR)return;genLiqPrev();const div=$i('printLiqDiv');if(div)pw(div.innerHTML,'Liquidación');}
 function expFinPDF(){if(!FR)return;genFinDoc();const div=$i('printFinDiv');if(div)pw(div.innerHTML,'Finiquito');}
+function impResumenMes(){const per=perStr(PER),emp=DB.empresas.find(e=>e.id===CE),ls=DB.liquidaciones.filter(l=>l.empId===CE&&l.per===per);if(!ls.length){toast('Sin liquidaciones en el período','rd');return;}
+const f=n=>fmt(~~n),T={};const add=(k,v)=>T[k]=(T[k]||0)+v;
+const rows=ls.map(l=>{const t=DB.trabajadores.find(x=>x.id===l.trabId),d=l.d||{};['suP','g','totH','dAFP','dS7','dSUF','dCes','dIUT','cSIS','cMut','cCesE','liq'].forEach(k=>add(k,d[k]||(k==='liq'?l.liq:0)));add('otros',(d.ant||0)+(d.prest||0)+(d.oD||0));
+return`<tr><td>${d.dias||30}</td><td>${t?t.nom+' '+t.a1:'-'}</td><td>${t?.rut||''}</td><td align="right">${f(d.suel||0)}</td><td align="right">${f(d.g||0)}</td><td align="right">${f(l.hab)}</td><td align="right">${f(d.dAFP||0)}</td><td align="right">${f((d.dSal||d.dS7||0))}</td><td align="right">${f(d.dCes||0)}</td><td align="right">${f(d.dIUT||0)}</td><td align="right">${f(l.desc)}</td><td align="right"><b>${f(l.liq)}</b></td></tr>`;}).join('');
+const sal=T.dS7+T.dSUF,prev=T.dAFP+sal+T.dCes+T.cSIS+T.cMut+T.cCesE,remPP=T.liq;
+const as=[['Remuneraciones',T.totH,0],['SIS',T.cSIS,0],['Seguro Cesantía empleador',T.cCesE,0],['Mutual (ISL/ACHS)',T.cMut,0],['Leyes sociales AFP por pagar',0,T.dAFP],['Leyes sociales Isapre/Fonasa por pagar',0,sal],['Aportes y leyes sociales por pagar',0,T.dCes+T.cSIS+T.cMut+T.cCesE],['Impuesto único por pagar',0,T.dIUT],['Remuneraciones por pagar',0,remPP]];
+const dh=as.reduce((a,x)=>a+x[1],0),hh=as.reduce((a,x)=>a+x[2],0);
+pw(`<div style="font-family:Arial,sans-serif;font-size:10px;color:#000"><h2 style="margin:0">${emp?.nombre} — Resumen de Remuneraciones ${perNom(per)}</h2><div style="margin-bottom:10px">RUT ${emp?.rut}</div>
+<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:9px"><tr style="background:#1e293b;color:#fff"><th>Días</th><th>Nombre</th><th>RUT</th><th>Sueldo Base</th><th>Gratif.</th><th>Total Haberes</th><th>AFP</th><th>Salud</th><th>AFC</th><th>Imp. Único</th><th>Total Desc.</th><th>Líquido</th></tr>${rows}
+<tr style="font-weight:bold;background:#eff4ff"><td colspan="3">TOTALES</td><td align="right">${f(T.suP)}</td><td align="right">${f(T.g)}</td><td align="right">${f(T.totH)}</td><td align="right">${f(T.dAFP)}</td><td align="right">${f(sal)}</td><td align="right">${f(T.dCes)}</td><td align="right">${f(T.dIUT)}</td><td align="right">${f(T.totH-T.liq)}</td><td align="right">${f(T.liq)}</td></tr></table>
+<h3>Pago PREVIRED</h3><table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:10px"><tr><td>Aportes trabajador (AFP + Salud + AFC)</td><td align="right">${f(T.dAFP+sal+T.dCes)}</td></tr><tr><td>Aportes empleador (SIS + Cesantía + Mutual)</td><td align="right">${f(T.cSIS+T.cMut+T.cCesE)}</td></tr><tr style="font-weight:bold"><td>Total a pagar</td><td align="right">${f(prev)}</td></tr></table>
+<h3>Asiento contable</h3><table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-size:10px;width:60%"><tr style="background:#eee"><th>Cuenta</th><th>Debe</th><th>Haber</th></tr>${as.map(x=>`<tr><td>${x[0]}</td><td align="right">${x[1]?f(x[1]):''}</td><td align="right">${x[2]?f(x[2]):''}</td></tr>`).join('')}<tr style="font-weight:bold"><td>Totales</td><td align="right">${f(dh)}</td><td align="right">${f(hh)}</td></tr></table>
+<div style="margin-top:8px">Costo empresa: $${f(T.totH+T.cSIS+T.cMut+T.cCesE)}</div></div>`,'Resumen '+perNom(per));}
 function impLiqId(id){
   const l=DB.liquidaciones.find(x=>x.id===id);if(!l)return;
   const t=DB.trabajadores.find(x=>x.id===l.trabId),emp=DB.empresas.find(e=>e.id===CE),d=l.d||{};
@@ -2467,9 +2387,12 @@ function impLiqId(id){
     <div style="color:#fff;font-size:30px;font-weight:800;font-family:monospace;letter-spacing:-1.5px">$${fmt(l.liq)}</div>
   </div>
 
+  ${(d.conceptosExtra||[]).length?`<table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:14px">${d.conceptosExtra.map(c=>`<tr><td style="padding:4px 12px;color:#374151">${c.nombre||c.nom||'Otro'} (${c.tipo})</td><td style="padding:4px 12px;text-align:right;font-family:monospace">${c.tipo==='descuento'?'-':''}$${fmt(c.monto)}</td></tr>`).join('')}</table>`:''}
+  <div style="font-size:10px;color:#4b5563;margin-bottom:6px">Total Imponible: $${fmt(~~(d.totI||0))} &nbsp;·&nbsp; No Imponible: $${fmt(~~(d.noI||0))}</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:40px">
     <div style="text-align:center">
       <div style="height:52px;border-bottom:1.5px solid #374151;margin-bottom:9px"></div>
+      <div style="font-size:9px;text-transform:uppercase;color:#6b7280">Recibí conforme</div>
       <div style="font-weight:700">${t?t.nom+' '+t.a1:''}</div>
       <div style="color:#6b7280;font-size:10px">RUT: ${t?.rut||''}</div>
       <div style="color:#9ca3af;font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-top:3px">El Trabajador</div>
@@ -2503,32 +2426,43 @@ function impFinId(id){
   if(div)pw(div.innerHTML,'Finiquito_'+fd(f.fec));
 }
 
-function impContratoId(id){const c=id&&DB.contratos.find(x=>x.id===id);if(!c)return;const t=DB.trabajadores.find(x=>x.id===c.trabId),emp=DB.empresas.find(e=>e.id===CE),hoy=new Date();const fecLeg=`Santiago, ${hoy.getDate()} de ${['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'][hoy.getMonth()]} de ${hoy.getFullYear()}`;pw(`<div style="font-family:Arial,sans-serif;font-size:10px;line-height:1.8;color:#000">
-<div style="text-align:center;margin-bottom:18px"><div style="font-size:15px;font-weight:bold;text-decoration:underline">CONTRATO INDIVIDUAL DE TRABAJO</div><div style="font-size:11px;margin-top:4px">N° ${c.num} — En conformidad al artículo 10 del Código del Trabajo</div></div>
-<p style="margin-bottom:8px">En <b>${fecLeg}</b>, entre:</p>
-<p style="margin-bottom:8px;padding:7px 10px;background:#f5f5f5;border-left:3px solid #333"><b>EMPLEADOR:</b> ${emp?.nombre}, RUT ${emp?.rut}, representada por ${emp?.rep}, RUT ${emp?.repRut||'—'}, domicilio: ${emp?.dir}, ${emp?.ciu}.</p>
-<p style="margin-bottom:10px;padding:7px 10px;background:#f5f5f5;border-left:3px solid #333"><b>TRABAJADOR/A:</b> ${t?t.nom+' '+t.a1+' '+t.a2:'—'}, RUT ${t?.rut||'—'}, domicilio: ${t?.dir||'—'}.</p>
-<p><b>PRIMERO — FUNCIONES:</b> El/La Trabajador/a se desempeñará como <b>${t?.cargo}</b>. ${c.func}</p>
-<p><b>SEGUNDO — LUGAR:</b> Las funciones se desempeñarán en ${c.lug}, ${c.ciu}.</p>
-<p><b>TERCERO — JORNADA:</b> La jornada ordinaria será de <b>${c.jorn} horas semanales</b>, distribuidas de ${c.dist}.</p>
-<p><b>CUARTO — REMUNERACIÓN:</b></p>
-<table border="1" cellpadding="5" cellspacing="0" style="font-size:10px;margin:8px 0;width:60%">
-<tr><td><b>Sueldo Base:</b></td><td align="right"><b>$${fmt(c.suel)}</b>/mes</td></tr>
-${c.col>0?`<tr><td>Asignación Colación (NI):</td><td align="right">$${fmt(c.col)}/mes</td></tr>`:''}
-${c.mov>0?`<tr><td>Asignación Movilización (NI):</td><td align="right">$${fmt(c.mov)}/mes</td></tr>`:''}
-<tr><td>Gratificación:</td><td>${c.grat==='legal'?'Legal 25% (tope 4.75 IMF anual)':'Garantizada mensual 1/12'}</td></tr>
-</table>
-<p><b>QUINTO — DURACIÓN:</b> El presente contrato es de tipo <b>${c.tipo}</b>${c.tipo==='plazo_fijo'?`, con fecha de término el <b>${fd(c.term)}</b>`:''}.</p>
-${c.claus?`<p><b>SEXTO — CLÁUSULAS ESPECIALES:</b> ${c.claus}</p>`:''}
-<table style="width:100%;margin-top:50px;font-size:9px">
-<tr>
-<td style="width:45%;text-align:center;border-top:1px solid #000;padding-top:6px">${t?t.nom+' '+t.a1+' '+t.a2:''}<br>RUT: ${t?.rut||''}<br><i>EL TRABAJADOR</i></td>
-<td style="width:10%"></td>
-<td style="width:45%;text-align:center;border-top:1px solid #000;padding-top:6px">${emp?.rep||''}<br>RUT: ${emp?.repRut||''}<br><i>POR EL EMPLEADOR</i></td>
-</tr>
-</table>
-<div style="text-align:center;font-size:8px;color:#999;margin-top:12px">Art. 10 Código del Trabajo · DFL-1 · SistemRem Chile 2026</div>
-</div>`,`Contrato ${c.num}`);}
+function numLetras(n){n=Math.floor(n);if(n===0)return'cero';const U=['','uno','dos','tres','cuatro','cinco','seis','siete','ocho','nueve','diez','once','doce','trece','catorce','quince','dieciséis','diecisiete','dieciocho','diecinueve','veinte','veintiuno','veintidós','veintitrés','veinticuatro','veinticinco','veintiséis','veintisiete','veintiocho','veintinueve'],D=['','','','treinta','cuarenta','cincuenta','sesenta','setenta','ochenta','noventa'],C=['','ciento','doscientos','trescientos','cuatrocientos','quinientos','seiscientos','setecientos','ochocientos','novecientos'];
+const b=x=>{if(x===100)return'cien';let r='';if(x>=100){r=C[~~(x/100)]+' ';x%=100;}if(x<30)r+=U[x];else{r+=D[~~(x/10)];if(x%10)r+=' y '+U[x%10];}return r.trim();};
+const m=x=>{if(x===0)return'';if(x<1000)return b(x);const k=~~(x/1000),r=x%1000;return(k===1?'mil':b(k).replace(/veintiuno$/,'veintiún').replace(/uno$/,'un')+' mil')+(r?' '+b(r):'');};
+if(n<1e6)return m(n);const mi=~~(n/1e6),r=n%1e6;return(mi===1?'un millón':m(mi).replace(/uno$/,'un')+' millones')+(r?' '+m(r):'');}
+const ORD=['PRIMERO','SEGUNDO','TERCERO','CUARTO','QUINTO','SEXTO','SÉPTIMO','OCTAVO','NOVENO','DÉCIMO','UNDÉCIMO','DUODÉCIMO','DÉCIMO TERCERO','DÉCIMO CUARTO'];
+function fLarga(d){const M=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];if(!d)return'—';const[y,m,dd]=d.split('-');return`${parseInt(dd)} de ${M[parseInt(m)-1]} del año ${y}`;}
+function impContratoId(id){const c=id&&DB.contratos.find(x=>x.id===id);if(!c)return;const t=DB.trabajadores.find(x=>x.id===c.trabId),emp=DB.empresas.find(e=>e.id===CE);
+const nT=t?[t.nom,t.a1,t.a2].filter(Boolean).join(' '):'—',nac=t?.nac?`, de nacionalidad ${t.nac}`:'',fn=t?.fnac?`, nacido el ${fLarga(t.fnac)}`:'';
+const nTrab=DB.trabajadores.filter(x=>x.empId===CE&&x.activo).length,imm=P.IMF;
+const plazo=c.tipo==='indefinido'?'de plazo indefinido':c.tipo==='plazo_fijo'?`a plazo fijo, con fecha de término el ${fLarga(c.term)}`:c.tipo==='obra_faena'?'por obra o faena determinada'+(c.term?`, con término estimado el ${fLarga(c.term)}`:''):'de reemplazo'+(c.term?`, con término el ${fLarga(c.term)}`:'');
+const sw=`$ ${fmt(c.suel)}.- (${numLetras(c.suel)} pesos)`;
+const gr=c.grat==='legal'?'Gratificación legal del 25% de lo devengado, con tope de 4,75 ingresos mínimos mensuales (Art. 50 Código del Trabajo)':'Gratificación legal de 4,75 ingresos mínimos mensuales (Art. 50 Código del Trabajo), pagada en 12 cuotas mensuales';
+const col=c.col>0?`asignación de colación por la suma de $ ${fmt(c.col)}.-`:'',mov=c.mov>0?`asignación de movilización por la suma de $ ${fmt(c.mov)}.-`:'';
+const otras=[mov,col].filter(Boolean).join(' y ');
+const cl=[];
+cl.push(['De la naturaleza de los servicios',`El trabajador se obliga a desempeñar las funciones de <b>${t?.cargo||'—'}</b>, debiendo realizar en general todas las funciones derivadas de la naturaleza de dicho cargo. ${c.func||''}`]);
+cl.push(['Del lugar o ciudad en que han de prestarse los servicios',`Los servicios serán prestados en ${c.lug||emp?.dir}, ${c.ciu||emp?.ciu}. Sin perjuicio de lo anterior el empleador podrá, en uso de sus atribuciones legales, disponer el traslado a otras dependencias ubicadas en la misma ciudad, de acuerdo al artículo 12 del Código del Trabajo.`]);
+cl.push(['Del monto, forma y periodo de pago de las remuneraciones',`El trabajador tendrá derecho a percibir las siguientes prestaciones a título de remuneración: a) Sueldo base ascendente a ${sw}; b) ${gr}. De las sumas anteriores se deducirán los impuestos que las graven, las cotizaciones de seguridad social y otras, en conformidad a lo establecido en el artículo 58 del Código del Trabajo.`]);
+cl.push(['De otras prestaciones',`${otras?`El empleador se compromete a entregar al trabajador las siguientes prestaciones no constitutivas de remuneración: ${otras} `:'No se pactan prestaciones no constitutivas de remuneración. '}Cualquier otra prestación o beneficio que no sea dispuesto por la ley ni señalado en este contrato se entenderá conferido a título de mera liberalidad, por lo que en ningún caso constituirá un derecho para el trabajador.`]);
+cl.push(['De la duración y distribución de la jornada de trabajo',`Las partes dejan constancia que la jornada ordinaria de trabajo será de <b>${c.jorn} horas semanales</b>, distribuidas de ${c.dist||'lunes a viernes'}, con un descanso de 30 minutos para colación.`]);
+cl.push(['Del plazo del contrato',`Las partes acuerdan que el presente contrato es ${plazo}.`]);
+cl.push(['De la terminación del contrato',`Este contrato terminará en los casos señalados en los artículos 159, 160 y 161 del Código del Trabajo.<br>Para los efectos del N°1 del artículo 160, constituyen falta de probidad los siguientes hechos: a) destinar para uso personal o autorizar el uso por parte de terceros de bienes de la empresa sin autorización del empleador; b) adquirir bienes a terceros relacionados (parientes, socios), infringiendo las reglas establecidas por la empresa para estos efectos; c) aceptar comisiones, prebendas u obsequios de terceros que se relacionen comercialmente con la empresa, tales como acreedores o proveedores.<br>Para los efectos del N°7 del mismo artículo 160, constituyen incumplimiento grave de las obligaciones que impone el contrato: a) negligencia grave en el desempeño de sus tareas; b) contravención de lo establecido en la cláusula Quinta y Octava de este contrato.`]);
+cl.push(['Prohibiciones esenciales del contrato de trabajo',`a) Ejercer cualquier otra actividad permanente o transitoria, remunerada o no, en el horario de trabajo establecido, sin autorización escrita del empleador; queda expresamente prohibido ejecutar negociaciones en el mismo giro del negocio con terceras personas, pudiendo terminar el contrato en los términos del artículo 160 N°2 del Código del Trabajo.<br>b) Incumplir las obligaciones señaladas en la cláusula primera.<br>c) No cumplir de manera reiterada el horario establecido en la cláusula quinta.<br>d) Demorar excesivamente una tarea o no realizar alguna labor encomendada sin justificación que lo amerite.<br>e) Incumplir el deber de reserva, revelando por cualquier vía antecedentes de un trabajador en particular o de procedimientos internos de la empresa.<br>f) Desconocer el deber de confidencialidad: el trabajador se obliga a guardar total reserva, dentro y fuera de la empresa, de todos los hechos, antecedentes e informaciones de que tome conocimiento en el ejercicio de sus funciones o derivados de las actividades y negocios del empleador y sus sociedades relacionadas, aun después de terminado el contrato.<br>g) No respetar el deber de reserva: está prohibida la divulgación, transferencia a cualquier título, comunicación, alteración, modificación o copia de dichos antecedentes, así como su utilización indebida; el trabajador se obliga además a adoptar las medidas de seguridad apropiadas para su protección.`]);
+cl.push(['De la capacitación del trabajador','En el evento que el empleador ofreciere realizar cursos de capacitación ocupacional, el trabajador tendrá la obligación de participar activamente en estos, sea que se realicen durante o con posterioridad a la jornada de trabajo.']);
+cl.push(['Del Reglamento de Orden, Higiene y Seguridad',nTrab<10?'El trabajador está en conocimiento de que la empresa, al contar con menos de 10 trabajadores, no se encuentra obligada a contar con Reglamento Interno de Orden, Higiene y Seguridad.':'El trabajador declara haber recibido un ejemplar del Reglamento Interno de Orden, Higiene y Seguridad de la empresa, obligándose a cumplirlo.']);
+cl.push(['Del feriado legal','El trabajador hará uso del feriado anual que le corresponda en conformidad a la ley, en la época que señale el empleador, preferentemente en época estival de acuerdo con las necesidades de la empresa, pudiendo el empleador fraccionarlo.']);
+cl.push(['De la fecha de ingreso del trabajador',`El trabajador ingresa al servicio con fecha ${fLarga(c.ini)}.`]);
+cl.push(['De la suscripción del contrato','El presente contrato se firma en dos ejemplares, quedando uno en poder del trabajador y otro en poder del empleador.']);
+if(c.claus)cl.push(['Cláusulas especiales',c.claus]);
+pw(`<div style="font-family:'Times New Roman',serif;font-size:11px;line-height:1.55;color:#000;text-align:justify">
+<div style="text-align:center;font-size:15px;font-weight:bold;margin-bottom:14px">CONTRATO DE TRABAJO</div>
+<p>En ${emp?.ciu||'Santiago'}, a ${fLarga(c.ini)}, entre <b>${emp?.nombre}</b>, R.U.T. N° <b>${emp?.rut}</b>${emp?.giro?`, ${emp.giro}`:''}, con domicilio en ${emp?.dir}, ${emp?.ciu||''}, representada por don(ña) <b>${emp?.rep||'—'}</b>${emp?.repRut?`, R.U.T. N° <b>${emp.repRut}</b>`:''}, en adelante “El Empleador”, por una parte, y <b>${nT}</b>, R.U.T. N° <b>${t?.rut||'—'}</b>, con domicilio en ${t?.dir||'—'}${nac}${fn}, en adelante “El Trabajador”, por otra parte, se conviene un contrato de trabajo cuyas cláusulas son las siguientes:</p>
+${cl.map((x,k)=>`<p><b>${ORD[k]}.- ${x[0]}.</b> ${x[1]}</p>`).join('')}
+<table style="width:100%;margin-top:60px;font-size:10px"><tr>
+<td style="width:45%;text-align:center;border-top:1px solid #000;padding-top:6px"><b>EMPLEADOR</b><br>${emp?.rep||''}<br>Representante Legal<br>${emp?.nombre}<br>R.U.T.: ${emp?.rut}</td><td style="width:10%"></td>
+<td style="width:45%;text-align:center;border-top:1px solid #000;padding-top:6px"><b>TRABAJADOR</b><br>${nT}<br>R.U.T.: ${t?.rut||''}</td></tr></table>
+<div style="text-align:center;font-size:8px;color:#666;margin-top:22px">${emp?.nombre} – ${emp?.dir}, ${emp?.ciu||''} · Contrato ${c.num}</div></div>`,`Contrato ${c.num}`);}
 function impFichaTrabId(id){const t=id&&DB.trabajadores.find(x=>x.id===id);if(!t)return;const emp=DB.empresas.find(e=>e.id===CE),a=calcAnios(t.ing,new Date().toISOString().slice(0,10));const ls=DB.liquidaciones.filter(l=>l.trabId===t.id&&l.empId===CE).slice(-6);pw(`${cabPDF(emp,'FICHA DEL TRABAJADOR')}<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:10px;margin-bottom:12px"><div><b>Nombre:</b> ${t.nom} ${t.a1} ${t.a2}<br><b>RUT:</b> ${t.rut}<br><b>Cargo:</b> ${t.cargo}<br><b>Ingreso:</b> ${fd(t.ing)}<br><b>Antigüedad:</b> ${a.a}a ${a.m}m ${a.d}d<br><b>Estado:</b> ${t.activo?'Activo':'Inactivo'}</div><div><b>AFP:</b> ${t.afp}<br><b>Salud:</b> ${t.isa}${t.sUF>0?` +${t.sUF}UF`:''}<br><b>Banco:</b> ${t.bco}<br><b>Tipo Cta:</b> ${t.tipoCta||'-'}<br><b>N° Cuenta:</b> ${t.cta}<br><b>Sueldo Base:</b> $${fmt(t.suel)}</div></div>${ls.length?`<div style="font-size:10px;font-weight:bold;margin-bottom:5px">Últimas liquidaciones:</div><table border="1" cellpadding="4" cellspacing="0" style="font-size:9px"><thead><tr style="background:#333;color:white"><th>Período</th><th>Total Haberes</th><th>Total Desc.</th><th>Líquido</th></tr></thead><tbody>${ls.map(l=>`<tr><td>${perNom(l.per)}</td><td align="right">$${fmt(l.hab)}</td><td align="right">$${fmt(l.desc)}</td><td align="right"><b>$${fmt(l.liq)}</b></td></tr>`).join('')}</tbody></table>`:''}`,'Ficha '+t.nom);}
 function impEmpresaId(id){const e=id&&DB.empresas.find(x=>x.id===id);if(!e)return;const ts=DB.trabajadores.filter(t=>t.empId===e.id);pw(`${cabPDF(e,'FICHA DE EMPRESA')}<table border="0" cellpadding="4" style="font-size:10px;margin-bottom:12px"><tr><td><b>Giro:</b> ${e.giro}</td><td><b>Código SII:</b> ${e.sii||'—'}</td></tr><tr><td><b>Rep. Legal:</b> ${e.rep}</td><td><b>RUT Rep.:</b> ${e.repRut||'—'}</td></tr><tr><td><b>Dirección:</b> ${e.dir}</td><td><b>Ciudad:</b> ${e.ciu}</td></tr><tr><td><b>Tel:</b> ${e.tel}</td><td><b>Email:</b> ${e.email}</td></tr><tr><td><b>Mutual:</b> ${e.mut}</td></tr></table><div style="font-size:10px;font-weight:bold;margin-bottom:5px">Trabajadores (${ts.length}):</div><table border="1" cellpadding="4" cellspacing="0" style="font-size:9px"><thead><tr style="background:#333;color:white"><th>RUT</th><th>Nombre</th><th>Cargo</th><th>Ingreso</th><th>Sueldo</th><th>AFP</th><th>Estado</th></tr></thead><tbody>${ts.map(t=>`<tr><td>${t.rut}</td><td>${t.nom} ${t.a1}</td><td>${t.cargo}</td><td>${fd(t.ing)}</td><td align="right">$${fmt(t.suel)}</td><td>${t.afp}</td><td>${t.activo?'Activo':'Inactivo'}</td></tr>`).join('')}</tbody></table>`,'Ficha Empresa '+e.nombre);}
 
@@ -2543,15 +2477,7 @@ function rtfB(t){return '{\\\\b '+t+'}';}
 function rtfBU(t){return '{\\\\b\\\\ul '+t+'}';}
 function rtfLine(t){return (t||'')+' \\\\line ';}
 
-function expLibroRTFMes(){
-  const per=$i('rMes').value||perStr(PER),emp=DB.empresas.find(e=>e.id===CE);
-  const liqs=DB.liquidaciones.filter(l=>l.empId===CE&&l.per===per);
-  let b=rtfB(emp?.nombre||'')+' \\\\line RUT: '+(emp?.rut||'')+' \\\\line\\\\line '+rtfBU('LIBRO DE REMUNERACIONES - '+perNom(per).toUpperCase())+' \\\\line\\\\line ';
-  liqs.forEach(l=>{const t=DB.trabajadores.find(x=>x.id===l.trabId);b+=rtfB(t?t.nom+' '+t.a1:'-')+' ('+t?.rut+') - Liquido: $'+fmt(l.liq)+' \\\\line ';});
-  b+=' \\\\line Total liquido: $'+fmt(liqs.reduce((s,l)=>s+l.liq,0));
-  rtf(b,'LibroRem_'+per);
-}
-function expLibroRTF(){expLibroRTFMes();}
+function expLibroRTF(){enWord(expLibroPDFMes);}
 function expNominaRTF(){
   const emp=DB.empresas.find(e=>e.id===CE),ts=DB.trabajadores.filter(t=>t.empId===CE);
   let b=rtfB(emp?.nombre||'')+' \\\\line\\\\line '+rtfBU('NOMINA DE PERSONAL')+' \\\\line\\\\line ';
@@ -2587,7 +2513,8 @@ function expFinRTF(){
   b+='Ministro de Fe: _________________________';
   rtf(b,'Finiquito_'+r.t.a1);
 }
-function expLiqRTF(){
+function expLiqRTF(){if(LR){genLiqPrev();const d=$i('printLiqDiv');if(d){enWord(pw,d.innerHTML,'Liquidacion');return;}}
+
   if(!LR)return;
   const trabId=parseInt(gv('lTrab')),t=DB.trabajadores.find(x=>x.id===trabId);
   const emp=DB.empresas.find(e=>e.id===CE),per=gv('lPer');
